@@ -32,21 +32,33 @@ PATTERNS = {
     ("no_response", 3): (0, 0, 0, 0),
 }
 
+# (model, [(case, column), ...]); shared and opposite use the outer columns, as in the original Fig. 3
 _ROWS = [
-    ("stress_ready", [1, 2, 3, 4]),
-    ("shared", [1, 2]),
-    ("unique", [1, 2, 3, 4]),
-    ("opposite", [1, 2]),
-    ("no_response", [1, 2, 3]),
+    ("stress_ready", [(1, 0), (2, 1), (3, 2), (4, 3)]),
+    ("shared", [(1, 0), (2, 3)]),
+    ("unique", [(1, 0), (2, 1), (3, 2), (4, 3)]),
+    ("opposite", [(1, 0), (2, 3)]),
+    ("no_response", [(1, 0), (2, 1), (3, 2)]),
 ]
 
-_TITLES = {
+DEFAULT_MODEL_LABELS = {
     "stress_ready": "Stress-ready",
     "shared": "Shared response",
     "unique": "Unique response",
     "opposite": "Opposite response",
     "no_response": "No response",
 }
+
+
+def _model_labels(model_labels):
+    labels = dict(DEFAULT_MODEL_LABELS)
+    if model_labels:
+        unknown = set(model_labels) - set(labels)
+        if unknown:
+            raise ValueError(f"Unknown model(s) in model_labels: {sorted(unknown)}; "
+                             f"valid keys are {list(DEFAULT_MODEL_LABELS)}")
+        labels.update({k: str(v) for k, v in model_labels.items()})
+    return labels
 
 
 DEFAULT_CONDITION_LABELS = ("C", "S")
@@ -80,6 +92,7 @@ def plot_model_patterns(
     classification: Optional[pd.DataFrame] = None,
     group_names: Optional[Sequence[str]] = None,
     condition_labels: Sequence[str] = DEFAULT_CONDITION_LABELS,
+    model_labels: Optional[dict] = None,
     title: Optional[str] = None,
     figsize=(11, 10),
 ):
@@ -99,10 +112,15 @@ def plot_model_patterns(
         Two tick labels, ``(control, stress)``, shown above every panel.
         Default ``("C", "S")``; e.g. ``("C", "D")`` for drought as in the
         original publication, or ``("Ctrl", "NaCl")``.
+    model_labels:
+        Row labels, as a dict keyed by model: ``"stress_ready"``, ``"shared"``,
+        ``"unique"``, ``"opposite"``, ``"no_response"``. Only the keys you give
+        are changed, e.g. ``{"stress_ready": "Primed", "no_response": "Unchanged"}``.
     title:
         Figure title. By default it explains the condition labels.
     """
     condition_labels = _check_labels(condition_labels)
+    row_labels = _model_labels(model_labels)
     import matplotlib.pyplot as plt
     from matplotlib.lines import Line2D
 
@@ -111,13 +129,14 @@ def plot_model_patterns(
     summ = summarize_classification(classification).set_index(["model", "case"]) if classification is not None else None
 
     fig, axes = plt.subplots(len(_ROWS), 4, figsize=figsize)
-    for r, (model, cases) in enumerate(_ROWS):
+    for r, (model, layout) in enumerate(_ROWS):
+        by_col = {col: case for case, col in layout}
         for c in range(4):
             ax = axes[r, c]
-            if c >= len(cases):
+            if c not in by_col:
                 ax.axis("off")
                 continue
-            case = cases[c]
+            case = by_col[c]
             _mini(ax, PATTERNS[(model, case)], condition_labels)
             label = f"Case {case}"
             if summ is not None:
@@ -125,7 +144,7 @@ def plot_model_patterns(
                 pct = summ["pct_of_responsive"].get((model, case), float("nan"))
                 label += f": {n}" + (f" ({pct:.1f}%)" if pd.notna(pct) else "")
             ax.set_xlabel(label, fontsize=8)
-        axes[r, 0].set_ylabel(_TITLES[model], fontsize=9)
+        axes[r, 0].set_ylabel(row_labels[model], fontsize=9)
     handles = [Line2D([0], [0], color=COLOR_A, lw=3), Line2D([0], [0], color=COLOR_B, lw=3)]
     fig.legend(handles, list(group_names), loc="lower right", bbox_to_anchor=(0.97, 0.08), frameon=False)
     if title is None:

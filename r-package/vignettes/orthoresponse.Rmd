@@ -77,12 +77,13 @@ head(res$classification[, c("label", "primed_group", "description", "flags")], 3
 plot_model_patterns(res$classification)
 ```
 
-The condition tick labels ("C" and "S" by default) and the title can be set by
-hand, control first and stress second:
+The condition tick labels ("C" and "S" by default), the row labels and the
+title can be set by hand (condition labels: control first, stress second):
 
 ```{r patterns-labels}
 plot_model_patterns(res$classification, condition_labels = c("Ctrl", "Salt"),
-                    group_names = c("sensitive", "tolerant"), title = "Simulated salt stress")
+                    group_names = c("sensitive", "tolerant"), title = "Simulated salt stress",
+                    model_labels = c(stress_ready = "Primed", no_response = "Unchanged"))
 ```
 
 ## From existing contrast tables

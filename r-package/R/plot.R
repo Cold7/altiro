@@ -5,8 +5,10 @@
   opposite = list(c(0, 1, 0, -1), c(0, -1, 0, 1)),
   no_response = list(c(0, 0, 1, 1), c(0, 0, -1, -1), c(0, 0, 0, 0))
 )
-.titles <- c(stress_ready = "Stress-ready", shared = "Shared response", unique = "Unique response",
-             opposite = "Opposite response", no_response = "No response")
+# panel column (1-4) of each case; shared and opposite use the outer columns, as in the original Fig. 3
+.columns <- list(stress_ready = 1:4, shared = c(1, 4), unique = 1:4, opposite = c(1, 4), no_response = 1:3)
+.default_model_labels <- c(stress_ready = "Stress-ready", shared = "Shared response", unique = "Unique response",
+                           opposite = "Opposite response", no_response = "No response")
 .col_a <- "#1f77b4"
 .col_b <- "#ff7f0e"
 
@@ -24,14 +26,28 @@
 #'   used as tick labels above every panel. Default `c("C", "S")`; e.g.
 #'   `c("C", "D")` for drought as in the original publication, or
 #'   `c("Ctrl", "NaCl")`.
+#' @param model_labels Row labels: a named character vector (or list) with
+#'   any of the names `stress_ready`, `shared`, `unique`, `opposite`,
+#'   `no_response`. Only the names you give are changed, e.g.
+#'   `c(stress_ready = "Primed", no_response = "Unchanged")`.
 #' @param title Figure title. By default it explains the condition labels.
 #' @return Invisibly, `NULL`.
 #' @examples
 #' plot_model_patterns()
-#' plot_model_patterns(condition_labels = c("Ctrl", "Drought"), group_names = c("Sly", "Spenn"))
+#' plot_model_patterns(condition_labels = c("Ctrl", "Drought"), group_names = c("Sly", "Spenn"),
+#'                     model_labels = c(stress_ready = "Primed", no_response = "Unchanged"))
 #' @export
 plot_model_patterns <- function(classification = NULL, group_names = NULL, condition_labels = c("C", "S"),
-                                title = NULL) {
+                                model_labels = NULL, title = NULL) {
+  row_labels <- .default_model_labels
+  if (!is.null(model_labels)) {
+    model_labels <- unlist(model_labels)
+    bad <- setdiff(names(model_labels), names(row_labels))
+    if (is.null(names(model_labels)) || any(names(model_labels) == "") || length(bad)) {
+      stop("model_labels must be named with any of: ", paste(names(row_labels), collapse = ", "))
+    }
+    row_labels[names(model_labels)] <- as.character(model_labels)
+  }
   condition_labels <- as.character(condition_labels)
   if (length(condition_labels) != 2) stop("condition_labels must have exactly two elements: c(control, stress)")
   if (is.null(title)) {
@@ -49,8 +65,10 @@ plot_model_patterns <- function(classification = NULL, group_names = NULL, condi
   on.exit(graphics::par(op))
   for (model in names(.patterns)) {
     pats <- .patterns[[model]]
-    for (j in 1:4) {
-      if (j > length(pats)) {
+    cols <- .columns[[model]]
+    for (col in 1:4) {
+      j <- match(col, cols)
+      if (is.na(j)) {
         graphics::plot.new()
         next
       }
@@ -72,7 +90,7 @@ plot_model_patterns <- function(classification = NULL, group_names = NULL, condi
         lab <- paste0(lab, ": ", n, if (!is.na(pct)) sprintf(" (%.1f%%)", pct) else "")
       }
       graphics::mtext(lab, side = 1, line = 0.6, cex = 0.6)
-      if (j == 1) graphics::mtext(.titles[[model]], side = 2, line = 0.8, cex = 0.65)
+      if (col == 1) graphics::mtext(row_labels[[model]], side = 2, line = 0.8, cex = 0.65)
     }
   }
   graphics::mtext(title, outer = TRUE, side = 3, cex = 0.8)

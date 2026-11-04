@@ -31,3 +31,20 @@ def test_custom_condition_labels_and_title(contrasts):
 def test_condition_labels_validation():
     with pytest.raises(ValueError):
         plot_model_patterns(condition_labels=("Control",))
+
+
+def test_shared_and_opposite_use_outer_columns():
+    fig = plot_model_patterns()
+    grid = [fig.axes[i:i + 4] for i in range(0, 20, 4)]
+    on = [[ax.axison for ax in row] for row in grid]
+    assert on[1] == [True, False, False, True]   # shared
+    assert on[3] == [True, False, False, True]   # opposite
+    assert on[4] == [True, True, True, False]    # no response
+
+
+def test_custom_model_labels():
+    fig = plot_model_patterns(model_labels={"stress_ready": "Primed", "no_response": "Unchanged"})
+    rows = [fig.axes[i].get_ylabel() for i in range(0, 20, 4)]
+    assert rows == ["Primed", "Shared response", "Unique response", "Opposite response", "Unchanged"]
+    with pytest.raises(ValueError):
+        plot_model_patterns(model_labels={"stressready": "x"})
