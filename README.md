@@ -26,8 +26,6 @@ function names; both give identical classifications for identical inputs.
 
 ## Installation
 
-Replace `Cold7` with the account hosting this repository.
-
 **Python** (>= 3.9)
 
 ```bash
