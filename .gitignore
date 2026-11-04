@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.venv/
+venv/
+
+# R
+.Rproj.user/
+.Rhistory
+.RData
+*.Rcheck/
+orthoresponse_*.tar.gz
+r-package/inst/doc/
+r-package/doc/
+r-package/Meta/
+
+# Example data and results (downloaded / generated)
+examples/*/data/
+examples/*/results_python/
+examples/*/results_r/
+
+# OS
+.DS_Store
+Thumbs.db

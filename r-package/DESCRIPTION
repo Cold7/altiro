@@ -1,0 +1,37 @@
+Package: orthoresponse
+Type: Package
+Title: Expression Response Models of Orthologs in Two-by-Two Designs
+Version: 0.1.0
+Authors@R:
+    person(given = "J. Sebastián", family = "Contreras-Riquelme",
+           email = "contrerasriquelme.sebastian@gmail.com", role = c("aut", "cre", "cph"))
+Description: Classifies orthologs (between species) or genes (within a species)
+    into stress-ready, shared, unique, opposite and no-response expression models
+    from five differential-expression contrasts between two groups (species,
+    genotypes or cell lines) measured under control and stress conditions. The
+    default rules reproduce the decision tree of Contreras-Riquelme et al. (2025)
+    <doi:10.1371/journal.pone.0324724>; optional rules treat missing statistics
+    explicitly, require a basal difference for stress-ready calls, or replace
+    "not significantly different" by a formal equivalence test. Includes helpers
+    for reciprocal best BLAST hits and ortholog-level count matrices.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Language: en-US
+Depends: R (>= 4.1)
+Imports:
+    DESeq2,
+    BiocGenerics,
+    graphics,
+    stats,
+    utils
+Suggests:
+    knitr,
+    rmarkdown,
+    testthat (>= 3.0.0)
+VignetteBuilder: knitr
+biocViews: RNASeq, DifferentialExpression, Transcriptomics, ComparativeGenomics
+URL: https://github.com/YOUR_GITHUB_USER/orthoresponse
+BugReports: https://github.com/YOUR_GITHUB_USER/orthoresponse/issues
+Roxygen: list(markdown = TRUE)
+Config/testthat/edition: 3
+Config/roxygen2/version: 8.1.1

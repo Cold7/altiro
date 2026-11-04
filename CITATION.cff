@@ -1,0 +1,39 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it and the original publication."
+title: "orthoresponse: expression response models of orthologs in two-by-two designs"
+version: 0.1.0
+date-released: 2026-11-04
+license: MIT
+repository-code: "https://github.com/YOUR_GITHUB_USER/orthoresponse"
+authors:
+  - family-names: "Contreras-Riquelme"
+    given-names: "J. Sebastián"
+    email: "contrerasriquelme.sebastian@gmail.com"
+keywords:
+  - RNA-seq
+  - orthologs
+  - stress-ready
+  - comparative transcriptomics
+  - differential expression
+preferred-citation:
+  type: article
+  title: "Desert-adapted tomato Solanum pennellii exhibit unique regulatory elements and stress-ready transcriptome patterns to drought"
+  authors:
+    - family-names: "Contreras-Riquelme"
+      given-names: "J. Sebastián"
+    - family-names: "Contreras"
+      given-names: "Miguel"
+    - family-names: "Moyano"
+      given-names: "Tomas C."
+    - family-names: "Sjoberg"
+      given-names: "Rachid"
+    - family-names: "Jimenez-Gomez"
+      given-names: "José"
+    - family-names: "Alvarez"
+      given-names: "José M."
+  journal: "PLoS One"
+  volume: 20
+  issue: 5
+  start: "e0324724"
+  year: 2025
+  doi: "10.1371/journal.pone.0324724"

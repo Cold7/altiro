@@ -1,0 +1,30 @@
+# Rice salt stress: salt-sensitive PL12 (group A) vs salt-tolerant Saltol introgression line IL22 (group B).
+# Data: GEO GSE167342 (leaves, control vs 24 h 80 mM NaCl, 3 replicates).
+# Requires: orthoresponse, readxl.  Run from this folder:  Rscript run_r.R
+
+library(orthoresponse)
+
+url <- "https://ftp.ncbi.nlm.nih.gov/geo/series/GSE167nnn/GSE167342/suppl/GSE167342_Raw_counts.xlsx"
+dir.create("data", showWarnings = FALSE)
+dest <- file.path("data", "GSE167342_Raw_counts.xlsx")
+if (!file.exists(dest)) download.file(url, dest, mode = "wb")
+
+raw <- as.data.frame(readxl::read_excel(dest))
+counts <- as.matrix(raw[, -1])
+rownames(counts) <- raw[[1]]
+samples <- read.delim("samples.tsv", row.names = 1)
+
+res <- orthoresponse(counts, samples,
+                     group_col = "line", condition_col = "treatment",
+                     group_a = "PL12", group_b = "IL22",   # A = sensitive, B = tolerant
+                     control = "Control", stress = "Salt")
+res
+save_orthoresponse(res, "results_r")
+
+strict <- classify_responses(res$contrasts, preset = "strict", group_names = c("PL12", "IL22"))
+cat("\nStress-ready genes, paper vs strict preset:",
+    sum(res$classification$model == "stress_ready"), "->", sum(strict$model == "stress_ready"), "\n")
+
+png(file.path("results_r", "model_patterns.png"), width = 1600, height = 1500, res = 170)
+plot_model_patterns(res$classification)
+dev.off()
