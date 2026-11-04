@@ -45,6 +45,10 @@ def test_pipeline_recovers_simulated_models(tmp_path):
     assert (lab.iloc[150:300] == "unique_1").mean() > 0.9
     assert (lab.iloc[300:450] == "shared_2").mean() > 0.9
     assert (lab.iloc[450:600] == "no_response_1").mean() > 0.9
+    text = str(res)
+    assert text.startswith("orthoresponse result: A = sens | B = tol")
+    assert "Stress-ready among single-group responders: sens-only" in text and "(Fisher p = " in text
+    assert repr(res) == text
     out = res.save(tmp_path / "res", condition_labels=("Ctrl", "Salt"))
     assert (out / "classification.tsv").exists() and (out / "contrasts" / "contrast_basal.tsv").exists()
     for f in ("model_patterns.png", "model_patterns.pdf", "model_summary.png", "model_summary.pdf"):

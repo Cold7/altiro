@@ -12,7 +12,7 @@ import pandas as pd
 from .classify import classify_responses, primed_asymmetry, summarize_classification
 from .contrasts import ContrastSet, run_contrasts, write_contrasts
 
-__all__ = ["OrthoResponseResult", "run_orthoresponse", "save_plots"]
+__all__ = ["OrthoResponseResult", "format_asymmetry", "run_orthoresponse", "save_plots"]
 
 
 @dataclass
@@ -23,6 +23,21 @@ class OrthoResponseResult:
     classification: pd.DataFrame
     summary: pd.DataFrame
     asymmetry: pd.DataFrame
+
+    def __str__(self) -> str:
+        """Same text as ``print(res)`` in the R package: summary table and asymmetry test."""
+        a, b = self.contrasts.group_names
+        summ = self.summary.copy()
+        for col in ("pct_of_responsive", "pct_of_all"):
+            summ[col] = summ[col].round(1)
+        lines = [f"orthoresponse result: A = {a} | B = {b}",
+                 f"{len(self.classification)} features classified", "",
+                 summ.to_string(index=False, na_rep="NA"), "",
+                 format_asymmetry(self.asymmetry)]
+        return "\n".join(lines)
+
+    def __repr__(self) -> str:
+        return self.__str__()
 
     def save(
         self,
@@ -57,6 +72,15 @@ class OrthoResponseResult:
             save_plots(self.classification, outdir, condition_labels=condition_labels, model_labels=model_labels,
                        group_names=group_names, title=title, formats=formats, dpi=dpi)
         return outdir
+
+
+def format_asymmetry(asymmetry: pd.DataFrame) -> str:
+    """One-line description of :func:`~orthoresponse.primed_asymmetry` (same wording as the R package)."""
+    a = asymmetry
+    return ("Stress-ready among single-group responders: "
+            f"{a['responding_group'].iloc[0]}-only {100 * a['fraction_stress_ready'].iloc[0]:.1f}%, "
+            f"{a['responding_group'].iloc[1]}-only {100 * a['fraction_stress_ready'].iloc[1]:.1f}% "
+            f"(Fisher p = {a['fisher_pvalue'].iloc[0]:.3g})")
 
 
 def save_plots(

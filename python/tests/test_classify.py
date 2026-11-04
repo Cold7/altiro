@@ -153,3 +153,11 @@ def test_shared_fixture_matches_expected():
         assert (got.loc[expected.index, "label"] == expected[preset]).all()
     got = classify_responses(tables, equivalence_margin=0.5)
     assert (got.loc[expected.index, "label"] == expected["paper_equivalence_0.5"]).all()
+
+
+def test_format_asymmetry_matches_r_wording():
+    from orthoresponse import format_asymmetry
+    t = pd.DataFrame({"responding_group": ["PL12", "IL22"], "fraction_stress_ready": [0.7396, 0.6712],
+                      "fisher_pvalue": [1.2241e-05, 1.2241e-05]})
+    assert format_asymmetry(t) == ("Stress-ready among single-group responders: PL12-only 74.0%, "
+                                   "IL22-only 67.1% (Fisher p = 1.22e-05)")

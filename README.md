@@ -83,7 +83,7 @@ S70     IL22  Salt       GSM5102560  Salt-IL22-1
 import orthoresponse as orr
 ex = orr.load_example("rice_salt")              # ex.counts, ex.samples, ex.params
 res = orr.run_orthoresponse(ex.counts, ex.samples, **ex.params)
-print(res.summary)
+print(res)                                      # summary + asymmetry test
 ```
 
 ```r
@@ -141,7 +141,7 @@ samples = pd.read_csv("samples.tsv", sep="\t", index_col=0)   # columns: line, t
 res = orr.run_orthoresponse(counts, samples, group_col="line", condition_col="treatment",
                             group_a="sensitive", group_b="tolerant",
                             control="control", stress="drought")
-res.summary          # number of genes per model and case
+print(res)           # summary table + asymmetry test (same output as R)
 res.save("results")  # tables + figures (model_patterns, model_summary; PNG and PDF)
 ```
 

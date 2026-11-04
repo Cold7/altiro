@@ -59,8 +59,11 @@ def _write_outputs(cls: pd.DataFrame, outdir: Path, a=None) -> None:
         from .pipeline import save_plots
 
         save_plots(cls, outdir, condition_labels=a.condition_labels, formats=a.plot_formats)
+    from .pipeline import format_asymmetry
+
     with pd.option_context("display.width", 120, "display.max_columns", 10):
-        print(summ.to_string(index=False, float_format=lambda x: f"{x:.1f}"))
+        print(summ.to_string(index=False, float_format=lambda x: f"{x:.1f}", na_rep="NA"))
+    print("\n" + format_asymmetry(primed_asymmetry(cls)))
     print(f"\nResults written to {outdir}/")
 
 

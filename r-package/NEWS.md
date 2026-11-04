@@ -1,3 +1,7 @@
+# orthoresponse 0.4.1
+
+* Python: `print(res)` shows the same summary as `print(res)` in R, including the stress-ready asymmetry line with its Fisher p-value; the command line prints it too. New `format_asymmetry()`.
+
 # orthoresponse 0.4.0
 
 * `save_orthoresponse()` (R) and `OrthoResponseResult.save()` (Python) also save the figures `model_patterns` and `model_summary` (PNG and PDF) by default; options `plots`, `condition_labels`, `model_labels`, `group_names`, `title`, `formats`.

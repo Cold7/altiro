@@ -1,6 +1,6 @@
 # orthoresponse user manual
 
-Version 0.4.0 · Python and R
+Version 0.4.1 · Python and R
 
 `orthoresponse` classifies genes (within one species) or ortholog pairs (between
 two species) into **expression response models** in a 2 x 2 design: two
@@ -158,8 +158,9 @@ res = orr.run_orthoresponse(
     group_a="PL12", group_b="IL22",          # A = sensitive, B = tolerant
     control="Control", stress="Salt",
 )
-print(res.summary)          # counts per model and case
-print(res.asymmetry)        # is one group more often primed?
+print(res)                  # summary table + asymmetry test (same output as R)
+res.summary                 # the table as a DataFrame
+res.asymmetry               # the asymmetry test as a DataFrame
 res.save("results")         # TSV files + contrast tables + normalized counts
 ```
 
