@@ -41,12 +41,24 @@ def _overrides(a) -> dict:
     }
 
 
-def _write_outputs(cls: pd.DataFrame, outdir: Path) -> None:
+def _add_plot_args(p: argparse.ArgumentParser) -> None:
+    g = p.add_argument_group("plots")
+    g.add_argument("--no-plots", action="store_true", help="do not save model_patterns / model_summary figures")
+    g.add_argument("--condition-labels", nargs=2, metavar=("CONTROL", "STRESS"), default=("C", "S"),
+                   help="tick labels for the two conditions in model_patterns (default: C S)")
+    g.add_argument("--plot-formats", nargs="+", default=["png", "pdf"], help="figure formats (default: png pdf)")
+
+
+def _write_outputs(cls: pd.DataFrame, outdir: Path, a=None) -> None:
     outdir.mkdir(parents=True, exist_ok=True)
     cls.to_csv(outdir / "classification.tsv", sep="\t")
     summ = summarize_classification(cls)
     summ.to_csv(outdir / "summary.tsv", sep="\t", index=False)
     primed_asymmetry(cls).to_csv(outdir / "primed_asymmetry.tsv", sep="\t", index=False)
+    if a is not None and not a.no_plots:
+        from .pipeline import save_plots
+
+        save_plots(cls, outdir, condition_labels=a.condition_labels, formats=a.plot_formats)
     with pd.option_context("display.width", 120, "display.max_columns", 10):
         print(summ.to_string(index=False, float_format=lambda x: f"{x:.1f}"))
     print(f"\nResults written to {outdir}/")
@@ -63,7 +75,7 @@ def cmd_run(a) -> None:
         min_total_count=a.min_total_count, filter_alpha=a.filter_alpha, round_counts=a.round_counts,
         **_overrides(a),
     )
-    res.save(a.out)
+    res.save(a.out, plots=not a.no_plots, condition_labels=a.condition_labels, formats=a.plot_formats)
     _write_outputs(res.classification, Path(a.out))
 
 
@@ -74,7 +86,7 @@ def cmd_classify(a) -> None:
     tables = read_contrasts(paths, id_col=a.id_col)
     names = tuple(a.group_names) if a.group_names else ("A", "B")
     cls = classify_responses(tables, preset=a.preset, group_names=names, **_overrides(a))
-    _write_outputs(cls, Path(a.out))
+    _write_outputs(cls, Path(a.out), a)
 
 
 def cmd_rbh(a) -> None:
@@ -136,6 +148,7 @@ def build_parser() -> argparse.ArgumentParser:
     r.add_argument("--round-counts", action="store_true")
     r.add_argument("--out", required=True, help="output directory")
     _add_classification_args(r)
+    _add_plot_args(r)
     r.set_defaults(func=cmd_run)
 
     c = sub.add_parser("classify", help="classify from five precomputed contrast tables")
@@ -144,6 +157,7 @@ def build_parser() -> argparse.ArgumentParser:
     c.add_argument("--id-col", default=None, help="feature id column (default: first column)")
     c.add_argument("--out", required=True)
     _add_classification_args(c)
+    _add_plot_args(c)
     c.set_defaults(func=cmd_classify)
 
     b = sub.add_parser("rbh", help="reciprocal best hits from two BLAST -outfmt 6 files")

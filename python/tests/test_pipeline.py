@@ -45,8 +45,12 @@ def test_pipeline_recovers_simulated_models(tmp_path):
     assert (lab.iloc[150:300] == "unique_1").mean() > 0.9
     assert (lab.iloc[300:450] == "shared_2").mean() > 0.9
     assert (lab.iloc[450:600] == "no_response_1").mean() > 0.9
-    out = res.save(tmp_path / "res")
+    out = res.save(tmp_path / "res", condition_labels=("Ctrl", "Salt"))
     assert (out / "classification.tsv").exists() and (out / "contrasts" / "contrast_basal.tsv").exists()
+    for f in ("model_patterns.png", "model_patterns.pdf", "model_summary.png", "model_summary.pdf"):
+        assert (out / f).stat().st_size > 1000, f
+    out2 = res.save(tmp_path / "res2", plots=False)
+    assert not (out2 / "model_patterns.png").exists()
 
 
 def test_cli_run(tmp_path):
@@ -59,3 +63,4 @@ def test_cli_run(tmp_path):
     assert rc == 0
     cls = pd.read_csv(tmp_path / "out" / "classification.tsv", sep="\t", index_col=0)
     assert "label" in cls.columns and len(cls) > 1000
+    assert (tmp_path / "out" / "model_patterns.png").exists() and (tmp_path / "out" / "model_summary.pdf").exists()

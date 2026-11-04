@@ -4,17 +4,29 @@
 \alias{save_orthoresponse}
 \title{Save an orthoresponse result to disk}
 \usage{
-save_orthoresponse(x, outdir)
+save_orthoresponse(x, outdir, plots = TRUE, ...)
 }
 \arguments{
 \item{x}{Output of \code{\link[=orthoresponse]{orthoresponse()}}.}
 
 \item{outdir}{Output directory.}
+
+\item{plots}{Save the figures (default \code{TRUE}).}
+
+\item{...}{Passed to \code{\link[=save_plots]{save_plots()}}: \code{condition_labels}, \code{model_labels},
+\code{group_names}, \code{title}, \code{formats}, \code{width}, \code{height}, \code{res}.}
 }
 \value{
 Invisibly, \code{outdir}.
 }
 \description{
 Writes \code{classification.tsv}, \code{summary.tsv}, \code{primed_asymmetry.tsv},
-\code{normalized_counts.tsv} and the five contrast tables.
+\code{normalized_counts.tsv}, the five contrast tables and, with \code{plots = TRUE}
+(default), the figures \verb{model_patterns.<fmt>} (the 15 patterns with counts)
+and \verb{model_summary.<fmt>} (bar chart).
+}
+\examples{
+\dontrun{
+save_orthoresponse(res, "results", condition_labels = c("Ctrl", "NaCl"))
+}
 }

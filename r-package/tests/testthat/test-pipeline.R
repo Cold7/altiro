@@ -35,7 +35,13 @@ test_that("the pipeline recovers simulated models", {
   expect_gt(mean(lab[301:450] == "shared_2"), 0.9)
   expect_gt(mean(lab[451:600] == "no_response_1"), 0.85)
   out <- tempfile()
-  save_orthoresponse(res, out)
+  save_orthoresponse(res, out, condition_labels = c("Ctrl", "Salt"))
   expect_true(file.exists(file.path(out, "classification.tsv")))
   expect_true(file.exists(file.path(out, "contrasts", "contrast_basal.tsv")))
+  for (f in c("model_patterns.png", "model_patterns.pdf", "model_summary.png", "model_summary.pdf")) {
+    expect_gt(file.size(file.path(out, f)), 1000)
+  }
+  out2 <- tempfile()
+  save_orthoresponse(res, out2, plots = FALSE)
+  expect_false(file.exists(file.path(out2, "model_patterns.png")))
 })

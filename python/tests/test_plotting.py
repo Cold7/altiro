@@ -48,3 +48,11 @@ def test_custom_model_labels():
     assert rows == ["Primed", "Shared response", "Unique response", "Opposite response", "Unchanged"]
     with pytest.raises(ValueError):
         plot_model_patterns(model_labels={"stressready": "x"})
+
+
+def test_save_plots(contrasts, tmp_path):
+    from orthoresponse import save_plots
+    cls = classify_responses(contrasts, group_names=("Sly", "Spenn"))
+    paths = save_plots(cls, tmp_path, condition_labels=("C", "D"), formats=("png",))
+    assert sorted(p.name for p in paths) == ["model_patterns.png", "model_summary.png"]
+    assert all(p.stat().st_size > 1000 for p in paths)

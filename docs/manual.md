@@ -1,6 +1,6 @@
 # orthoresponse user manual
 
-Version 0.3.0 · Python and R
+Version 0.4.0 · Python and R
 
 `orthoresponse` classifies genes (within one species) or ortholog pairs (between
 two species) into **expression response models** in a 2 x 2 design: two
@@ -434,7 +434,29 @@ results/
   primed_asymmetry.tsv
   normalized_counts.tsv
   contrasts/contrast_<key>.tsv     (full DESeq2 / PyDESeq2 tables)
+  model_patterns.png / .pdf        (the 15 patterns with counts and percentages)
+  model_summary.png / .pdf         (bar chart: features per model and case)
 ```
+
+Figures are saved by default. Pass the figure options to the save call, or turn
+them off:
+
+```python
+res.save("results", condition_labels=("Ctrl", "NaCl"),
+         model_labels={"stress_ready": "Primed"}, formats=("png",))
+res.save("results", plots=False)                     # tables only
+orr.save_plots(classification, "figures")            # figures for any classification
+```
+```r
+save_orthoresponse(res, "results", condition_labels = c("Ctrl", "NaCl"),
+                   model_labels = c(stress_ready = "Primed"), formats = "png")
+save_orthoresponse(res, "results", plots = FALSE)
+save_plots(classification, "figures")
+```
+
+Command line: figures are written by `orthoresponse run` and
+`orthoresponse classify`; use `--condition-labels Ctrl NaCl`,
+`--plot-formats png` or `--no-plots`.
 
 ---
 
@@ -705,7 +727,8 @@ To refit from counts with the published settings use
 | `plotting.plot_model_patterns()` | `plot_model_patterns()` | the 15 patterns with counts; custom `condition_labels`, `model_labels`, `group_names`, `title` |
 | `plotting.plot_summary()` | `plot_summary()` | bar chart of models |
 | `plotting.plot_feature()` | - | normalized counts of one feature |
-| `OrthoResponseResult.save()` | `save_orthoresponse()` | write all outputs |
+| `OrthoResponseResult.save()` | `save_orthoresponse()` | write all outputs, including figures |
+| `save_plots()` | `save_plots()` | write `model_patterns` and `model_summary` figures |
 | `load_example()`, `list_examples()` | same | bundled example data (`rice_salt`, `ovarian_brequinar`) |
 | `example_files()`, `export_example()` | same | paths / copies of the example files |
 | `CONTRAST_KEYS` | `contrast_keys()` | the five contrast names |

@@ -12,12 +12,9 @@ res <- orthoresponse(ex$counts, ex$samples,
                      group_a = "PL12", group_b = "IL22",   # A = sensitive, B = tolerant
                      control = "Control", stress = "Salt")
 res
-save_orthoresponse(res, "results_r")
+# tables + figures (model_patterns.png/pdf, model_summary.png/pdf)
+save_orthoresponse(res, "results_r", condition_labels = c("Ctrl", "NaCl"))
 
 strict <- classify_responses(res$contrasts, preset = "strict", group_names = c("PL12", "IL22"))
 cat("\nStress-ready genes, paper vs strict preset:",
     sum(res$classification$model == "stress_ready"), "->", sum(strict$model == "stress_ready"), "\n")
-
-png(file.path("results_r", "model_patterns.png"), width = 1600, height = 1500, res = 170)
-plot_model_patterns(res$classification, condition_labels = c("Ctrl", "NaCl"))
-dev.off()

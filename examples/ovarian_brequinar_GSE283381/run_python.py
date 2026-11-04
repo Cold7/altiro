@@ -9,7 +9,6 @@ Run from this folder:  python run_python.py
 from pathlib import Path
 
 import orthoresponse as orr
-from orthoresponse.plotting import plot_model_patterns
 
 HERE = Path(__file__).parent
 
@@ -21,7 +20,8 @@ def main():
     # ex.params = group_col="line", condition_col="treatment", group_a="CisS", group_b="CisR",
     #             control="Vehicle", stress="Brequinar"
     res = orr.run_orthoresponse(ex.counts, ex.samples, **ex.params)
-    out = res.save(HERE / "results_python")
+    # tables + figures (model_patterns.png/pdf, model_summary.png/pdf)
+    out = res.save(HERE / "results_python", condition_labels=("Veh", "BQ"))
 
     print(res.summary.to_string(index=False, float_format=lambda x: f"{x:.1f}"))
     print("\nStress-ready asymmetry among single-group responders:")
@@ -39,8 +39,6 @@ def main():
     print(top[["a_response_log2FoldChange", "basal_log2FoldChange"]].round(2).to_string())
     top.to_csv(out / "top_stress_ready_3_strict.tsv", sep="\t")
 
-    fig = plot_model_patterns(res.classification, condition_labels=("Veh", "BQ"))
-    fig.savefig(out / "model_patterns.png", dpi=150)
     print(f"\nResults in {out}/")
 
 

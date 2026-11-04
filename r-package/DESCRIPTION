@@ -1,7 +1,7 @@
 Package: orthoresponse
 Type: Package
 Title: Expression Response Models of Orthologs in Two-by-Two Designs
-Version: 0.3.0
+Version: 0.4.0
 Authors@R:
     person(given = "J. Sebastián", family = "Contreras-Riquelme",
            email = "contrerasriquelme.sebastian@gmail.com", role = c("aut", "cre", "cph"))
@@ -22,6 +22,7 @@ Imports:
     DESeq2,
     BiocGenerics,
     graphics,
+    grDevices,
     stats,
     utils
 Suggests:

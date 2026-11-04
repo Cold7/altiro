@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "orthoresponse"
-version = "0.3.0"
+version = "0.4.0"
 description = "Classify expression response models (stress-ready, shared, unique, opposite, no response) of orthologs or genes in 2 x 2 designs."
 readme = "README.md"
 license = { text = "MIT" }

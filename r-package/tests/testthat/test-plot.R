@@ -11,3 +11,13 @@ test_that("plot_model_patterns accepts custom condition labels and title", {
   expect_error(plot_model_patterns(model_labels = c(stressready = "x")), "model_labels")
   expect_error(plot_model_patterns(model_labels = "Primed"), "model_labels")
 })
+
+test_that("save_plots writes the figures", {
+  keys <- names(contrast_keys())
+  paths <- setNames(lapply(keys, function(k) system.file("extdata", paste0("contrast_", k, ".tsv"),
+                                                           package = "orthoresponse")), keys)
+  cls <- classify_responses(read_contrasts(paths))
+  out <- save_plots(cls, tempfile(), formats = "png", condition_labels = c("C", "D"))
+  expect_equal(basename(out), c("model_patterns.png", "model_summary.png"))
+  expect_true(all(file.size(out) > 1000))
+})

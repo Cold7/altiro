@@ -112,7 +112,7 @@ plot_summary <- function(classification, ...) {
   op <- graphics::par(mar = c(4, 9, 1, 2))
   on.exit(graphics::par(op))
   bp <- graphics::barplot(rev(s$n), names.arg = rev(s$label), horiz = TRUE, las = 1, col = "#4c72b0",
-                          xlab = "Features", cex.names = 0.75, ...)
+                          xlab = "Features", cex.names = 0.75, xlim = c(0, max(s$n) * 1.15), ...)
   graphics::text(rev(s$n), bp, labels = rev(s$n), pos = 4, cex = 0.7, xpd = TRUE)
   invisible(s)
 }

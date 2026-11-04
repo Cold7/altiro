@@ -1,3 +1,9 @@
+# orthoresponse 0.4.0
+
+* `save_orthoresponse()` (R) and `OrthoResponseResult.save()` (Python) also save the figures `model_patterns` and `model_summary` (PNG and PDF) by default; options `plots`, `condition_labels`, `model_labels`, `group_names`, `title`, `formats`.
+* New `save_plots()` in both languages; Python CLI options `--condition-labels`, `--plot-formats`, `--no-plots`.
+* `plot_summary()` (R) leaves room for the value labels.
+
 # orthoresponse 0.3.0
 
 * New bundled example `ovarian_brequinar` (GEO GSE283381): OVCAR5 cisplatin-sensitive vs -resistant cells, vehicle vs brequinar, raw HTSeq counts deposited by the authors. It replaces the GSE232890 example.

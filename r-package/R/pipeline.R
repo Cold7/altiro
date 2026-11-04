@@ -48,13 +48,22 @@ print.orthoresponse <- function(x, ...) {
 #' Save an orthoresponse result to disk
 #'
 #' Writes `classification.tsv`, `summary.tsv`, `primed_asymmetry.tsv`,
-#' `normalized_counts.tsv` and the five contrast tables.
+#' `normalized_counts.tsv`, the five contrast tables and, with `plots = TRUE`
+#' (default), the figures `model_patterns.<fmt>` (the 15 patterns with counts)
+#' and `model_summary.<fmt>` (bar chart).
 #'
 #' @param x Output of [orthoresponse()].
 #' @param outdir Output directory.
+#' @param plots Save the figures (default `TRUE`).
+#' @param ... Passed to [save_plots()]: `condition_labels`, `model_labels`,
+#'   `group_names`, `title`, `formats`, `width`, `height`, `res`.
 #' @return Invisibly, `outdir`.
+#' @examples
+#' \dontrun{
+#' save_orthoresponse(res, "results", condition_labels = c("Ctrl", "NaCl"))
+#' }
 #' @export
-save_orthoresponse <- function(x, outdir) {
+save_orthoresponse <- function(x, outdir, plots = TRUE, ...) {
   dir.create(outdir, showWarnings = FALSE, recursive = TRUE)
   w <- function(d, f) utils::write.table(d, file.path(outdir, f), sep = "\t", quote = FALSE, row.names = FALSE)
   w(x$classification, "classification.tsv")
@@ -63,5 +72,50 @@ save_orthoresponse <- function(x, outdir) {
   nc <- x$contrasts$normalized_counts
   w(data.frame(feature = rownames(nc), nc, check.names = FALSE), "normalized_counts.tsv")
   write_contrasts(x$contrasts, file.path(outdir, "contrasts"))
+  if (plots) save_plots(x$classification, outdir, ...)
   invisible(outdir)
+}
+
+#' Save the model figures of a classification
+#'
+#' Writes `model_patterns.<fmt>` ([plot_model_patterns()]) and
+#' `model_summary.<fmt>` ([plot_summary()]) for each format in `formats`.
+#'
+#' @param classification Output of [classify_responses()].
+#' @param outdir Output directory.
+#' @param condition_labels,model_labels,group_names,title Passed to
+#'   [plot_model_patterns()].
+#' @param formats Any of `"png"` and `"pdf"` (default both).
+#' @param width,height Size of `model_patterns` in inches.
+#' @param res Resolution (dpi) of the PNG files.
+#' @return Invisibly, the paths of the written files.
+#' @export
+save_plots <- function(classification, outdir, condition_labels = c("C", "S"), model_labels = NULL,
+                       group_names = NULL, title = NULL, formats = c("png", "pdf"),
+                       width = 10, height = 9.5, res = 150) {
+  formats <- match.arg(formats, c("png", "pdf"), several.ok = TRUE)
+  dir.create(outdir, showWarnings = FALSE, recursive = TRUE)
+  n_bars <- nrow(summarize_classification(classification))
+  figs <- list(
+    model_patterns = list(w = width, h = height, f = function() {
+      plot_model_patterns(classification, group_names = group_names, condition_labels = condition_labels,
+                          model_labels = model_labels, title = title)
+    }),
+    model_summary = list(w = 6, h = 0.3 * n_bars + 1.2, f = function() plot_summary(classification))
+  )
+  paths <- character()
+  for (name in names(figs)) {
+    fg <- figs[[name]]
+    for (fmt in formats) {
+      path <- file.path(outdir, paste0(name, ".", fmt))
+      if (fmt == "png") {
+        grDevices::png(path, width = fg$w, height = fg$h, units = "in", res = res)
+      } else {
+        grDevices::pdf(path, width = fg$w, height = fg$h)
+      }
+      tryCatch(fg$f(), finally = grDevices::dev.off())
+      paths <- c(paths, path)
+    }
+  }
+  invisible(paths)
 }

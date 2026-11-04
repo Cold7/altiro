@@ -13,7 +13,8 @@ res <- orthoresponse(ex$counts, ex$samples,
                      group_a = "CisS", group_b = "CisR",        # A = sensitive, B = resistant
                      control = "Vehicle", stress = "Brequinar")
 res
-save_orthoresponse(res, "results_r")
+# tables + figures (model_patterns.png/pdf, model_summary.png/pdf)
+save_orthoresponse(res, "results_r", condition_labels = c("Veh", "BQ"))
 
 strict <- classify_responses(res$contrasts, preset = "strict", group_names = c("CisS", "CisR"))
 cat("\nStress-ready genes, paper vs strict preset:",
@@ -24,7 +25,3 @@ print(primed_asymmetry(strict))
 sr3 <- subset(strict, label == "stress_ready_3")
 sr3 <- sr3[order(-sr3$a_response_log2FoldChange), c("a_response_log2FoldChange", "basal_log2FoldChange")]
 print(round(head(sr3, 20), 2))
-
-png(file.path("results_r", "model_patterns.png"), width = 1600, height = 1500, res = 170)
-plot_model_patterns(res$classification, condition_labels = c("Veh", "BQ"))
-dev.off()

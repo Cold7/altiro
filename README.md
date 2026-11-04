@@ -142,7 +142,7 @@ res = orr.run_orthoresponse(counts, samples, group_col="line", condition_col="tr
                             group_a="sensitive", group_b="tolerant",
                             control="control", stress="drought")
 res.summary          # number of genes per model and case
-res.save("results")
+res.save("results")  # tables + figures (model_patterns, model_summary; PNG and PDF)
 ```
 
 ```r
@@ -151,7 +151,7 @@ res <- orthoresponse(counts, samples, group_col = "line", condition_col = "treat
                      group_a = "sensitive", group_b = "tolerant",
                      control = "control", stress = "drought")
 res
-save_orthoresponse(res, "results")
+save_orthoresponse(res, "results")   # tables + figures
 ```
 
 ```bash
