@@ -26,12 +26,12 @@ function names; both give identical classifications for identical inputs.
 
 ## Installation
 
-Replace `YOUR_GITHUB_USER` with the account hosting this repository.
+Replace `Cold7` with the account hosting this repository.
 
 **Python** (>= 3.9)
 
 ```bash
-pip install "orthoresponse[all] @ git+https://github.com/YOUR_GITHUB_USER/orthoresponse.git#subdirectory=python"
+pip install "orthoresponse[all] @ git+https://github.com/Cold7/orthoresponse.git#subdirectory=python"
 ```
 
 **R** (>= 4.1)
@@ -39,7 +39,7 @@ pip install "orthoresponse[all] @ git+https://github.com/YOUR_GITHUB_USER/orthor
 ```r
 install.packages(c("BiocManager", "remotes"))
 BiocManager::install("DESeq2")
-remotes::install_github("YOUR_GITHUB_USER/orthoresponse", subdir = "r-package", build_vignettes = TRUE)
+remotes::install_github("Cold7/orthoresponse", subdir = "r-package", build_vignettes = TRUE)
 ```
 
 ## Quick start
@@ -99,12 +99,8 @@ tools/         maintenance scripts (shared test fixture)
 
 ## Citation
 
-Please cite the original publication and this software (`CITATION.cff`):
-
-> Contreras-Riquelme JS, Contreras M, Moyano TC, Sjoberg R, Jimenez-Gomez J,
-> Alvarez JM (2025). Desert-adapted tomato *Solanum pennellii* exhibit unique
-> regulatory elements and stress-ready transcriptome patterns to drought.
-> *PLoS One* 20(5): e0324724.
+If you use orthoresponse, please cite it using the metadata in
+[`CITATION.cff`](CITATION.cff) (GitHub's *Cite this repository* button).
 
 ## License
 

@@ -30,8 +30,8 @@ Suggests:
     testthat (>= 3.0.0)
 VignetteBuilder: knitr
 biocViews: RNASeq, DifferentialExpression, Transcriptomics, ComparativeGenomics
-URL: https://github.com/YOUR_GITHUB_USER/orthoresponse
-BugReports: https://github.com/YOUR_GITHUB_USER/orthoresponse/issues
+URL: https://github.com/Cold7/orthoresponse
+BugReports: https://github.com/Cold7/orthoresponse/issues
 Roxygen: list(markdown = TRUE)
 Config/testthat/edition: 3
 Config/roxygen2/version: 8.1.1

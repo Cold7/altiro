@@ -84,16 +84,16 @@ expression of the other group.
 
 ## 2. Installation
 
-Replace `YOUR_GITHUB_USER` with the GitHub account that hosts the repository.
+Replace `Cold7` with the GitHub account that hosts the repository.
 
 ### Python (>= 3.9)
 
 ```bash
 # everything: PyDESeq2, plotting and Excel support
-pip install "orthoresponse[all] @ git+https://github.com/YOUR_GITHUB_USER/orthoresponse.git#subdirectory=python"
+pip install "orthoresponse[all] @ git+https://github.com/Cold7/orthoresponse.git#subdirectory=python"
 
 # classifier only (numpy, pandas, scipy) - enough if you already have contrast tables
-pip install "git+https://github.com/YOUR_GITHUB_USER/orthoresponse.git#subdirectory=python"
+pip install "git+https://github.com/Cold7/orthoresponse.git#subdirectory=python"
 ```
 
 Optional extras: `deseq` (PyDESeq2), `plot` (matplotlib), `excel` (openpyxl),
@@ -102,7 +102,7 @@ Optional extras: `deseq` (PyDESeq2), `plot` (matplotlib), `excel` (openpyxl),
 From a local clone (development mode):
 
 ```bash
-git clone https://github.com/YOUR_GITHUB_USER/orthoresponse.git
+git clone https://github.com/Cold7/orthoresponse.git
 pip install -e "orthoresponse/python[all,test]"
 pytest orthoresponse/python/tests
 ```
@@ -112,7 +112,7 @@ pytest orthoresponse/python/tests
 ```r
 install.packages(c("BiocManager", "remotes"))
 BiocManager::install("DESeq2")
-remotes::install_github("YOUR_GITHUB_USER/orthoresponse", subdir = "r-package",
+remotes::install_github("Cold7/orthoresponse", subdir = "r-package",
                         build_vignettes = TRUE)
 library(orthoresponse)
 vignette("orthoresponse")
@@ -668,8 +668,8 @@ Python, `?classify_responses` in R.
 
 ## 16. Citation and license
 
-If you use this package, please cite the original publication (above) and the
-software (see `CITATION.cff`). DESeq2 / PyDESeq2 should be cited as well:
+If you use this package, please cite the software (see `CITATION.cff`).
+DESeq2 / PyDESeq2 should be cited as well:
 
 * Love MI, Huber W, Anders S (2014). Moderated estimation of fold change and
   dispersion for RNA-seq data with DESeq2. *Genome Biology* 15: 550.

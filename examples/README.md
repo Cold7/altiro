@@ -10,7 +10,7 @@ to `results_python/` or `results_r/`.
 | `human_osimertinib_GSE232890` | *Homo sapiens* | PC-9 empty vector (sensitive) vs PC-9 TP53 R248Q (resistant) | DMSO vs 24 h osimertinib | 2 | GEO GSE232890, NCBI-generated raw counts |
 
 ```bash
-pip install "orthoresponse[all] @ git+https://github.com/YOUR_GITHUB_USER/orthoresponse.git#subdirectory=python"
+pip install "orthoresponse[all] @ git+https://github.com/Cold7/orthoresponse.git#subdirectory=python"
 cd rice_salt_GSE167342 && python run_python.py
 ```
 

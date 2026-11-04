@@ -27,8 +27,8 @@ Main functions:
 \seealso{
 Useful links:
 \itemize{
-  \item \url{https://github.com/YOUR_GITHUB_USER/orthoresponse}
-  \item Report bugs at \url{https://github.com/YOUR_GITHUB_USER/orthoresponse/issues}
+  \item \url{https://github.com/Cold7/orthoresponse}
+  \item Report bugs at \url{https://github.com/Cold7/orthoresponse/issues}
 }
 
 }

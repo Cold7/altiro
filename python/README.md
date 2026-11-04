@@ -6,7 +6,7 @@ The default rules reproduce the decision tree of Contreras-Riquelme *et al.*
 (2025) *PLoS One* 20(5): e0324724.
 
 ```bash
-pip install "orthoresponse[all] @ git+https://github.com/YOUR_GITHUB_USER/orthoresponse.git#subdirectory=python"
+pip install "orthoresponse[all] @ git+https://github.com/Cold7/orthoresponse.git#subdirectory=python"
 ```
 
 ```python
@@ -22,6 +22,6 @@ res.save("results")
 Command line: `orthoresponse --help`.
 
 Full documentation: see `docs/manual.md` in the repository
-(https://github.com/YOUR_GITHUB_USER/orthoresponse/blob/main/docs/manual.md).
+(https://github.com/Cold7/orthoresponse/blob/main/docs/manual.md).
 
 Extras: `deseq` (PyDESeq2), `plot` (matplotlib), `excel` (openpyxl), `all`, `test`.

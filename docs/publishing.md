@@ -6,36 +6,16 @@ Notes for the maintainer.
 
 1. Create an **empty** repository named `orthoresponse` on GitHub (no README,
    no license, no .gitignore: they already exist here).
-2. Replace the placeholder with your account name everywhere:
+2. Commit and push:
 
    ```bash
-   # Linux
-   grep -rl YOUR_GITHUB_USER . --exclude-dir=.git | xargs sed -i 's/YOUR_GITHUB_USER/<your-user>/g'
-   # macOS
-   grep -rl YOUR_GITHUB_USER . --exclude-dir=.git | xargs sed -i '' 's/YOUR_GITHUB_USER/<your-user>/g'
-   ```
-
-   On Windows (PowerShell):
-
-   ```powershell
-   Get-ChildItem -Recurse -File | Where-Object { $_.FullName -notmatch '\\.git\\' } |
-     ForEach-Object { (Get-Content $_.FullName -Raw) -replace 'YOUR_GITHUB_USER','<your-user>' |
-       Set-Content $_.FullName -NoNewline }
-   ```
-
-3. Commit and push:
-
-   ```bash
-   git add -A
-   git commit -m "Set GitHub user"
-   git remote add origin https://github.com/<your-user>/orthoresponse.git
+   git remote add origin https://github.com/Cold7/orthoresponse.git
    git push -u origin main
    ```
 
-4. Tag the release so users can pin it:
+3. Push the release tag so users can pin it:
 
    ```bash
-   git tag -a v0.1.0 -m "orthoresponse 0.1.0"
    git push origin v0.1.0
    ```
 
@@ -47,11 +27,11 @@ on every push.
 ## 2. Installing a specific version
 
 ```bash
-pip install "orthoresponse[all] @ git+https://github.com/<your-user>/orthoresponse.git@v0.1.0#subdirectory=python"
+pip install "orthoresponse[all] @ git+https://github.com/Cold7/orthoresponse.git@v0.1.0#subdirectory=python"
 ```
 
 ```r
-remotes::install_github("<your-user>/orthoresponse@v0.1.0", subdir = "r-package")
+remotes::install_github("Cold7/orthoresponse@v0.1.0", subdir = "r-package")
 ```
 
 ## 3. Optional: PyPI
@@ -69,15 +49,15 @@ Test first on TestPyPI (`twine upload --repository testpypi dist/*`).
 ## 4. Optional: R-universe
 
 R-universe builds binary packages from GitHub. Create a repository
-`<your-user>.r-universe.dev` (named exactly `<your-user>.r-universe.dev` on
+`Cold7.r-universe.dev` (named exactly `Cold7.r-universe.dev` on
 GitHub) with a `packages.json`:
 
 ```json
-[{"package": "orthoresponse", "url": "https://github.com/<your-user>/orthoresponse", "subdir": "r-package"}]
+[{"package": "orthoresponse", "url": "https://github.com/Cold7/orthoresponse", "subdir": "r-package"}]
 ```
 
 and install the R-universe GitHub app. Users can then run
-`install.packages("orthoresponse", repos = c("https://<your-user>.r-universe.dev", "https://cloud.r-project.org", BiocManager::repositories()))`.
+`install.packages("orthoresponse", repos = c("https://Cold7.r-universe.dev", "https://cloud.r-project.org", BiocManager::repositories()))`.
 
 ## 5. Making a new version
 
