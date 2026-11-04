@@ -166,7 +166,10 @@ Already have differential-expression results? Pass the five contrasts to
 
 ## Documentation
 
-* **[User manual](docs/manual.md)**: concepts, input formats, decision tree,
+* **[User manual (PDF)](docs/orthoresponse_manual.pdf)**: illustrated manual with diagrams,
+  figures and worked examples (LaTeX source in `docs/latex/`, build with
+  `latexmk -xelatex orthoresponse_manual.tex`).
+* **[User manual (Markdown)](docs/manual.md)**: concepts, input formats, decision tree,
   options, outputs, cross-species workflow, worked examples, caveats.
 * R vignette: `vignette("orthoresponse")`.
 * Worked examples with public, already-counted data (no alignment needed):

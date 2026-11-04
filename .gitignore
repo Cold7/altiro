@@ -26,3 +26,15 @@ examples/*/results_r/
 # OS
 .DS_Store
 Thumbs.db
+
+# LaTeX build files
+docs/latex/*.aux
+docs/latex/*.log
+docs/latex/*.toc
+docs/latex/*.out
+docs/latex/*.fls
+docs/latex/*.fdb_latexmk
+docs/latex/*.xdv
+docs/latex/build.log
+docs/latex/orthoresponse_manual.pdf
+docs/latex/*.listing
