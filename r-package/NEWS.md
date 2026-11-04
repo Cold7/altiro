@@ -1,3 +1,8 @@
+# orthoresponse 0.3.0
+
+* New bundled example `ovarian_brequinar` (GEO GSE283381): OVCAR5 cisplatin-sensitive vs -resistant cells, vehicle vs brequinar, raw HTSeq counts deposited by the authors. It replaces the GSE232890 example.
+* README documents where the example files are and how to load them from the package or from file paths.
+
 # orthoresponse 0.2.0
 
 * Example data bundled with the package: rice salt stress, GEO GSE167342 (`load_example()`, `example_files()`, `export_example()`, `list_examples()`; Python CLI: `orthoresponse example`).

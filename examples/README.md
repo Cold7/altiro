@@ -1,14 +1,14 @@
 # Examples
 
-Each folder contains a sample sheet and one script per language, writing
-results to `results_python/` or `results_r/`. The rice data are bundled with
-the package; the human script downloads its count matrix on first run (into
-`data/`).
+Each folder contains a short README, the sample table and one script per
+language, writing results to `results_python/` or `results_r/`. The count
+matrices are bundled with the packages (see the main README, *Example data*),
+so nothing needs to be downloaded.
 
 | folder | organism | groups (A vs B) | conditions | replicates | source |
 |---|---|---|---|---|---|
-| `rice_salt_GSE167342` | *Oryza sativa* | PL12 (salt-sensitive) vs IL22 (*Saltol* introgression line, tolerant) | control vs 24 h 80 mM NaCl | 3 | GEO GSE167342, `GSE167342_Raw_counts.xlsx`; bundled with the package (`load_example("rice_salt")`) |
-| `human_osimertinib_GSE232890` | *Homo sapiens* | PC-9 empty vector (sensitive) vs PC-9 TP53 R248Q (resistant) | DMSO vs 24 h osimertinib | 2 | GEO GSE232890, NCBI-generated raw counts |
+| `rice_salt_GSE167342` | *Oryza sativa* | PL12 (salt-sensitive) vs IL22 (*Saltol* introgression line, tolerant) | control vs 24 h 80 mM NaCl | 3 | GEO GSE167342, `GSE167342_Raw_counts.xlsx`; `load_example("rice_salt")` |
+| `ovarian_brequinar_GSE283381` | *Homo sapiens* | OVCAR5 cisplatin-sensitive vs cisplatin-resistant | vehicle vs brequinar (DHODH inhibitor) | 3 | GEO GSE283381, `GSE283381_RAW.tar` (raw HTSeq counts); `load_example("ovarian_brequinar")` |
 
 ```bash
 pip install "orthoresponse[all] @ git+https://github.com/Cold7/orthoresponse.git#subdirectory=python"
@@ -18,16 +18,6 @@ cd rice_salt_GSE167342 && python run_python.py
 ```r
 setwd("rice_salt_GSE167342"); source("run_r.R")
 ```
-
-Download links used by the scripts:
-
-* https://ftp.ncbi.nlm.nih.gov/geo/series/GSE167nnn/GSE167342/suppl/GSE167342_Raw_counts.xlsx
-* https://www.ncbi.nlm.nih.gov/geo/download/?type=rnaseq_counts&acc=GSE232890&format=file&file=GSE232890_raw_counts_GRCh38.p13_NCBI.tsv.gz
-* https://ftp.ncbi.nlm.nih.gov/gene/DATA/GENE_INFO/Mammalia/Homo_sapiens.gene_info.gz
-
-If NCBI answers with a web page instead of the file (a browser check), open the
-link in a browser and save the file into the example's `data/` folder with the
-name shown in the error message.
 
 See section 10 of the [manual](../docs/manual.md) for the results and their
 interpretation.

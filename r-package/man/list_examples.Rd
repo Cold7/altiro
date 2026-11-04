@@ -42,6 +42,14 @@ derived from FL478 x PL12, carries the \emph{Saltol} QTL), control vs 24 h
 (\code{GSE167342_Raw_counts.xlsx}); columns S40-S72 are the authors' library
 names, described in the sample table.
 }
+\details{
+\code{ovarian_brequinar}: human ovarian cancer cells, GEO GSE283381. OVCAR5
+cisplatin-sensitive cells (CisS, group A) and their cisplatin-resistant
+derivative (CisR, group B), treated with vehicle or the DHODH inhibitor
+brequinar, 3 replicates per group. Raw HTSeq counts deposited by the
+authors (one file per sample in \code{GSE283381_RAW.tar}), merged into one
+matrix (59,453 genes x 12 samples); columns are the authors' library names.
+}
 \examples{
 list_examples()
 ex <- load_example("rice_salt")

@@ -6,7 +6,7 @@ opposite or no response -- with the decision tree of Contreras-Riquelme et al.
 (2025) PLoS One 20(5): e0324724.
 """
 
-__version__ = "0.2.0"
+__version__ = "0.3.0"
 
 from .classify import (  # noqa: E402
     CONTRAST_KEYS,

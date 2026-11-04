@@ -6,6 +6,14 @@ from FL478 x PL12, carries the *Saltol* QTL), control vs 24 h 80 mM NaCl,
 3 replicates per group. Raw gene-level counts (36,844 genes x 12 samples) as
 deposited by the authors in GEO (``GSE167342_Raw_counts.xlsx``); columns
 S40-S72 are the authors' library names (see the sample table).
+
+``ovarian_brequinar``: human ovarian cancer cells, GEO GSE283381. OVCAR5
+cisplatin-sensitive cells (CisS, group A) and their cisplatin-resistant
+derivative (CisR, group B), treated with vehicle or the DHODH inhibitor
+brequinar (de novo pyrimidine synthesis), 3 replicates per group. Raw HTSeq
+counts deposited by the authors (one file per sample in ``GSE283381_RAW.tar``),
+merged into one matrix (59,453 genes, Ensembl GRCh38 release 91 gene names x
+12 samples); columns are the authors' library names.
 """
 
 from __future__ import annotations
@@ -36,7 +44,23 @@ _EXAMPLES = {
             "Rice leaves (GEO GSE167342): salt-sensitive PL12 (A) vs salt-tolerant Saltol introgression "
             "line IL22 (B), control vs 24 h 80 mM NaCl, 3 replicates. Raw counts, 36,844 genes x 12 samples."
         ),
-    }
+    },
+    "ovarian_brequinar": {
+        "counts": "ovarian_GSE283381_counts.tsv.gz",
+        "samples": "ovarian_GSE283381_samples.tsv",
+        "params": {
+            "group_col": "line",
+            "condition_col": "treatment",
+            "group_a": "CisS",
+            "group_b": "CisR",
+            "control": "Vehicle",
+            "stress": "Brequinar",
+        },
+        "description": (
+            "Human ovarian cancer cells (GEO GSE283381): OVCAR5 cisplatin-sensitive (A) vs cisplatin-resistant "
+            "(B), vehicle vs the DHODH inhibitor brequinar, 3 replicates. Raw HTSeq counts, 59,453 genes x 12 samples."
+        ),
+    },
 }
 
 

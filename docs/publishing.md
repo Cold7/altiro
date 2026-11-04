@@ -16,10 +16,10 @@ Notes for the maintainer.
 3. Push the release tag so users can pin it:
 
    ```bash
-   git push origin v0.2.0
+   git push origin v0.3.0
    ```
 
-   Then on GitHub: *Releases -> Draft a new release -> choose v0.2.0*.
+   Then on GitHub: *Releases -> Draft a new release -> choose v0.3.0*.
 
 The workflows in `.github/workflows/` run the Python tests and `R CMD check`
 on every push.
@@ -27,11 +27,11 @@ on every push.
 ## 2. Installing a specific version
 
 ```bash
-pip install "orthoresponse[all] @ git+https://github.com/Cold7/orthoresponse.git@v0.2.0#subdirectory=python"
+pip install "orthoresponse[all] @ git+https://github.com/Cold7/orthoresponse.git@v0.3.0#subdirectory=python"
 ```
 
 ```r
-remotes::install_github("Cold7/orthoresponse@v0.2.0", subdir = "r-package")
+remotes::install_github("Cold7/orthoresponse@v0.3.0", subdir = "r-package")
 ```
 
 ## 3. Optional: PyPI

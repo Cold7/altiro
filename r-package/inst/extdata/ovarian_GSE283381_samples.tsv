@@ -1,0 +1,13 @@
+sample	line	treatment	geo_sample	title
+OV5WTC1	CisS	Vehicle	GSM8661174	OVCAR5 cisplatin sensitive cells, control, rep 1
+OV5WTC2	CisS	Vehicle	GSM8661175	OVCAR5 cisplatin sensitive cells, control, rep 2
+OV5WTC3	CisS	Vehicle	GSM8661176	OVCAR5 cisplatin sensitive cells, control, rep 3
+OV5WTBQ1	CisS	Brequinar	GSM8661177	OVCAR5 cisplatin sensitive cells, brequinar treatment, rep 1
+OV5WTBQ2	CisS	Brequinar	GSM8661178	OVCAR5 cisplatin sensitive cells, brequinar treatment, rep 2
+OV5WTBQ3	CisS	Brequinar	GSM8661179	OVCAR5 cisplatin sensitive cells, brequinar treatment, rep 3
+OV5CRC1	CisR	Vehicle	GSM8661180	OVCAR5 cisplatin resistant cells, control, rep 1
+OV5CRC2	CisR	Vehicle	GSM8661181	OVCAR5 cisplatin resistant cells, control, rep 2
+OV5CRC3	CisR	Vehicle	GSM8661182	OVCAR5 cisplatin resistant cells, control, rep 3
+OV5CRBQ1	CisR	Brequinar	GSM8661183	OVCAR5 cisplatin resistant cells, brequinar treatment, rep 1
+OV5CRBQ2	CisR	Brequinar	GSM8661184	OVCAR5 cisplatin resistant cells, brequinar treatment, rep 2
+OV5CRBQ3	CisR	Brequinar	GSM8661185	OVCAR5 cisplatin resistant cells, brequinar treatment, rep 3

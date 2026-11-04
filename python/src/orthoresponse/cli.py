@@ -166,7 +166,7 @@ def build_parser() -> argparse.ArgumentParser:
     m.set_defaults(func=cmd_merge)
 
     e = sub.add_parser("example", help="write the bundled example data (counts + samples) to a folder")
-    e.add_argument("--name", default="rice_salt", choices=["rice_salt"])
+    e.add_argument("--name", default="rice_salt", choices=["rice_salt", "ovarian_brequinar"])
     e.add_argument("--out", default="orthoresponse_example")
     e.set_defaults(func=cmd_example)
 
