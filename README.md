@@ -26,12 +26,12 @@ function names; both give identical classifications for identical inputs.
 
 ## Installation
 
-Replace `YOUR_GITHUB_USER` with the account hosting this repository.
+Replace `Cold7` with the account hosting this repository.
 
 **Python** (>= 3.9)
 
 ```bash
-pip install "orthoresponse[all] @ git+https://github.com/YOUR_GITHUB_USER/orthoresponse.git#subdirectory=python"
+pip install "orthoresponse[all] @ git+https://github.com/Cold7/orthoresponse.git#subdirectory=python"
 ```
 
 **R** (>= 4.1)
@@ -39,7 +39,7 @@ pip install "orthoresponse[all] @ git+https://github.com/YOUR_GITHUB_USER/orthor
 ```r
 install.packages(c("BiocManager", "remotes"))
 BiocManager::install("DESeq2")
-remotes::install_github("YOUR_GITHUB_USER/orthoresponse", subdir = "r-package", build_vignettes = TRUE)
+remotes::install_github("Cold7/orthoresponse", subdir = "r-package", build_vignettes = TRUE)
 ```
 
 ## Quick start
