@@ -1,12 +1,13 @@
 # Examples
 
-Each folder contains a sample sheet and one script per language. The scripts
-download the public count matrix on first run (into `data/`) and write results
-to `results_python/` or `results_r/`.
+Each folder contains a sample sheet and one script per language, writing
+results to `results_python/` or `results_r/`. The rice data are bundled with
+the package; the human script downloads its count matrix on first run (into
+`data/`).
 
 | folder | organism | groups (A vs B) | conditions | replicates | source |
 |---|---|---|---|---|---|
-| `rice_salt_GSE167342` | *Oryza sativa* | PL12 (salt-sensitive) vs IL22 (*Saltol* introgression line, tolerant) | control vs 24 h 80 mM NaCl | 3 | GEO GSE167342, `GSE167342_Raw_counts.xlsx` |
+| `rice_salt_GSE167342` | *Oryza sativa* | PL12 (salt-sensitive) vs IL22 (*Saltol* introgression line, tolerant) | control vs 24 h 80 mM NaCl | 3 | GEO GSE167342, `GSE167342_Raw_counts.xlsx`; bundled with the package (`load_example("rice_salt")`) |
 | `human_osimertinib_GSE232890` | *Homo sapiens* | PC-9 empty vector (sensitive) vs PC-9 TP53 R248Q (resistant) | DMSO vs 24 h osimertinib | 2 | GEO GSE232890, NCBI-generated raw counts |
 
 ```bash
@@ -15,7 +16,6 @@ cd rice_salt_GSE167342 && python run_python.py
 ```
 
 ```r
-# install.packages("readxl")   # needed by the rice example
 setwd("rice_salt_GSE167342"); source("run_r.R")
 ```
 

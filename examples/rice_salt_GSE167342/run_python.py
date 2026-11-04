@@ -1,42 +1,25 @@
 """Rice salt stress: salt-sensitive PL12 (group A) vs salt-tolerant Saltol introgression line IL22 (group B).
 
-Data: GEO GSE167342 (leaves, control vs 24 h 80 mM NaCl, 3 replicates).
+Data: GEO GSE167342 (leaves, control vs 24 h 80 mM NaCl, 3 replicates), bundled with the package.
 Requires: pip install "orthoresponse[all]"
 Run from this folder:  python run_python.py
 """
 
-import urllib.request
 from pathlib import Path
-
-import pandas as pd
 
 import orthoresponse as orr
 from orthoresponse.plotting import plot_model_patterns
 
 HERE = Path(__file__).parent
-DATA = HERE / "data"
-URL = "https://ftp.ncbi.nlm.nih.gov/geo/series/GSE167nnn/GSE167342/suppl/GSE167342_Raw_counts.xlsx"
-
-
-def download():
-    DATA.mkdir(exist_ok=True)
-    dest = DATA / "GSE167342_Raw_counts.xlsx"
-    if not dest.exists():
-        print("Downloading", URL)
-        urllib.request.urlretrieve(URL, dest)
-    return dest
 
 
 def main():
-    counts = pd.read_excel(download(), index_col=0)          # 36,844 genes x 12 samples (S40 ... S72)
-    samples = pd.read_csv(HERE / "samples.tsv", sep="\t", index_col=0)
+    ex = orr.load_example("rice_salt")        # counts: 36,844 genes x 12 samples (S40 ... S72)
+    print(ex.samples[["line", "treatment"]])
 
-    res = orr.run_orthoresponse(
-        counts, samples,
-        group_col="line", condition_col="treatment",
-        group_a="PL12", group_b="IL22",          # A = sensitive, B = tolerant
-        control="Control", stress="Salt",
-    )
+    # ex.params = group_col="line", condition_col="treatment", group_a="PL12", group_b="IL22",
+    #             control="Control", stress="Salt"
+    res = orr.run_orthoresponse(ex.counts, ex.samples, **ex.params)
     out = res.save(HERE / "results_python")
 
     print(res.summary.to_string(index=False, float_format=lambda x: f"{x:.1f}"))

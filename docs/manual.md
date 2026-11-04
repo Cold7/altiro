@@ -1,6 +1,6 @@
 # orthoresponse user manual
 
-Version 0.1.0 · Python and R
+Version 0.2.0 · Python and R
 
 `orthoresponse` classifies genes (within one species) or ortholog pairs (between
 two species) into **expression response models** in a 2 x 2 design: two
@@ -123,6 +123,24 @@ From a local clone: `R CMD INSTALL orthoresponse/r-package`.
 ---
 
 ## 3. Quick start
+
+### Bundled example data
+
+A real data set is included (rice salt stress, GEO GSE167342; see 10.1):
+
+```python
+ex = orr.load_example("rice_salt")      # ExampleData: .counts, .samples, .params
+res = orr.run_orthoresponse(ex.counts, ex.samples, **ex.params)
+orr.export_example("my_folder")         # counts.tsv.gz + samples.tsv, as templates
+```
+```r
+ex <- load_example("rice_salt")         # list: counts, samples, params
+res <- do.call(orthoresponse, c(list(ex$counts, ex$samples), ex$params))
+export_example("my_folder")
+```
+
+Command line: `orthoresponse example --out my_folder` writes the two files and
+prints the matching `orthoresponse run` command.
 
 ### Python
 
@@ -477,13 +495,23 @@ download the data on first use. Numbers below come from the R/DESeq2 run.
   the salt-tolerant introgression line **IL22** (B; derived from FL478 x PL12,
   carries the *Saltol* QTL), control vs 24 h 80 mM NaCl, 3 replicates.
 * **Data.** `GSE167342_Raw_counts.xlsx` from the GEO supplementary files
-  (gene-level raw counts, 36,844 genes x 12 samples; columns S40-S72 are mapped
-  to samples in `examples/rice_salt_GSE167342/samples.tsv`).
+  (gene-level raw counts, 36,844 genes x 12 samples). Columns S40-S72 are the
+  authors' library names; each GEO sample (GSM) lists its library name in the
+  *Description* field. Bundled with the package: `load_example("rice_salt")`.
   Publication: PMID 35126422.
+
+  | library | GSM | line | treatment | | library | GSM | line | treatment |
+  |---|---|---|---|---|---|---|---|---|
+  | S40 | GSM5102551 | PL12 | Control | | S58 | GSM5102557 | PL12 | Salt |
+  | S41 | GSM5102552 | PL12 | Control | | S59 | GSM5102558 | PL12 | Salt |
+  | S42 | GSM5102553 | PL12 | Control | | S60 | GSM5102559 | PL12 | Salt |
+  | S52 | GSM5102554 | IL22 | Control | | S70 | GSM5102560 | IL22 | Salt |
+  | S53 | GSM5102555 | IL22 | Control | | S71 | GSM5102561 | IL22 | Salt |
+  | S54 | GSM5102556 | IL22 | Control | | S72 | GSM5102562 | IL22 | Salt |
 
 ```bash
 cd examples/rice_salt_GSE167342
-python run_python.py     # or: Rscript run_r.R
+python run_python.py     # or: Rscript run_r.R   (uses the bundled data, no download)
 ```
 
 Results (25,045 genes after filtering):
@@ -649,6 +677,8 @@ To refit from counts with the published settings use
 | `plotting.plot_summary()` | `plot_summary()` | bar chart of models |
 | `plotting.plot_feature()` | - | normalized counts of one feature |
 | `OrthoResponseResult.save()` | `save_orthoresponse()` | write all outputs |
+| `load_example()`, `list_examples()` | same | bundled example data (rice, GSE167342) |
+| `example_files()`, `export_example()` | same | paths / copies of the example files |
 | `CONTRAST_KEYS` | `contrast_keys()` | the five contrast names |
 
 Every function is documented in place: `help(orr.classify_responses)` in
@@ -661,7 +691,8 @@ Python, `?classify_responses` in R.
 | message | cause and fix |
 |---|---|
 | `Counts are not integers` | you passed TPM/FPKM or estimated counts; use raw counts or `round_counts=True` |
-| `Empty design cell(s)` | a group x condition combination has no samples; check the level names |
+| `Empty design cell(s)` | a group x condition combination has no samples; `group_a`, `group_b`, `control` and `stress` must match the values in the sample table exactly (case-sensitive) |
+| `Expected N fields in line M` when reading the sample table | spaces instead of tabs (common after copy-paste); fix the file or read it with `sep=r"\s+"` |
 | `Samples missing from the count matrix` | sample table row names do not match count columns |
 | `Contrast tables cover different features` | the five tables were filtered differently; only shared features are used |
 | `equivalence_margin requires an 'lfcSE' column` | keep the standard-error column when exporting contrasts |

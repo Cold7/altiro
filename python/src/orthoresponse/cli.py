@@ -100,6 +100,18 @@ def cmd_merge(a) -> None:
     print(f"Merged matrix with {merged.shape[0]} orthologs x {merged.shape[1]} samples written to {a.out}")
 
 
+def cmd_example(a) -> None:
+    from .datasets import _EXAMPLES, export_example
+
+    out = export_example(a.out, a.name)
+    p = _EXAMPLES[a.name]["params"]
+    print(f"Wrote {out['counts']} and {out['samples']}")
+    print("Run it with:")
+    print(f"  orthoresponse run --counts {out['counts']} --samples {out['samples']} "
+          f"--group-col {p['group_col']} --condition-col {p['condition_col']} --group-a {p['group_a']} "
+          f"--group-b {p['group_b']} --control {p['control']} --stress {p['stress']} --out results")
+
+
 def cmd_models(a) -> None:
     names = tuple(a.group_names) if a.group_names else ("A", "B")
     print(model_definitions(names, include_extra=a.all).to_string(index=False))
@@ -152,6 +164,11 @@ def build_parser() -> argparse.ArgumentParser:
     m.add_argument("--length-normalize", action="store_true")
     m.add_argument("--out", required=True)
     m.set_defaults(func=cmd_merge)
+
+    e = sub.add_parser("example", help="write the bundled example data (counts + samples) to a folder")
+    e.add_argument("--name", default="rice_salt", choices=["rice_salt"])
+    e.add_argument("--out", default="orthoresponse_example")
+    e.set_defaults(func=cmd_example)
 
     d = sub.add_parser("models", help="print the definition of every model and case")
     d.add_argument("--group-names", nargs=2, metavar=("A", "B"), default=None)

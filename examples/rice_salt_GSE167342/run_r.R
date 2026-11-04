@@ -1,20 +1,13 @@
 # Rice salt stress: salt-sensitive PL12 (group A) vs salt-tolerant Saltol introgression line IL22 (group B).
-# Data: GEO GSE167342 (leaves, control vs 24 h 80 mM NaCl, 3 replicates).
-# Requires: orthoresponse, readxl.  Run from this folder:  Rscript run_r.R
+# Data: GEO GSE167342 (leaves, control vs 24 h 80 mM NaCl, 3 replicates), bundled with the package.
+# Run from this folder:  Rscript run_r.R
 
 library(orthoresponse)
 
-url <- "https://ftp.ncbi.nlm.nih.gov/geo/series/GSE167nnn/GSE167342/suppl/GSE167342_Raw_counts.xlsx"
-dir.create("data", showWarnings = FALSE)
-dest <- file.path("data", "GSE167342_Raw_counts.xlsx")
-if (!file.exists(dest)) download.file(url, dest, mode = "wb")
+ex <- load_example("rice_salt")   # counts: 36,844 genes x 12 samples (S40 ... S72)
+ex$samples[, c("line", "treatment")]
 
-raw <- as.data.frame(readxl::read_excel(dest))
-counts <- as.matrix(raw[, -1])
-rownames(counts) <- raw[[1]]
-samples <- read.delim("samples.tsv", row.names = 1)
-
-res <- orthoresponse(counts, samples,
+res <- orthoresponse(ex$counts, ex$samples,
                      group_col = "line", condition_col = "treatment",
                      group_a = "PL12", group_b = "IL22",   # A = sensitive, B = tolerant
                      control = "Control", stress = "Salt")

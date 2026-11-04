@@ -40,6 +40,41 @@ BiocManager::install("DESeq2")
 remotes::install_github("Cold7/orthoresponse", subdir = "r-package", build_vignettes = TRUE)
 ```
 
+## Try it with the bundled data
+
+The package ships a real data set (rice salt stress, GEO GSE167342: raw counts
+for 36,844 genes x 12 samples plus the sample table), so you can run it right
+after installing:
+
+```python
+import orthoresponse as orr
+ex = orr.load_example("rice_salt")            # ex.counts, ex.samples, ex.params
+res = orr.run_orthoresponse(ex.counts, ex.samples, **ex.params)
+print(res.summary)
+```
+
+```r
+library(orthoresponse)
+ex <- load_example("rice_salt")
+res <- do.call(orthoresponse, c(list(ex$counts, ex$samples), ex$params))
+res
+```
+
+To get the files as a template for your own data:
+`orthoresponse example --out my_folder` (command line), `orr.export_example("my_folder")`
+or `export_example("my_folder")` in R. The sample table looks like this
+(tab-separated; the values in `line` and `treatment` are what you pass as
+`group_a`/`group_b` and `control`/`stress`):
+
+```text
+sample  line  treatment
+S40     PL12  Control
+S52     IL22  Control
+S58     PL12  Salt
+S70     IL22  Salt
+...
+```
+
 ## Quick start
 
 ```python
