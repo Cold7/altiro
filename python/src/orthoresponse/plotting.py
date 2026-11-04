@@ -49,7 +49,17 @@ _TITLES = {
 }
 
 
-def _mini(ax, levels):
+DEFAULT_CONDITION_LABELS = ("C", "S")
+
+
+def _check_labels(condition_labels):
+    labels = tuple(str(x) for x in condition_labels)
+    if len(labels) != 2:
+        raise ValueError("condition_labels must have exactly two elements: (control, stress)")
+    return labels
+
+
+def _mini(ax, levels, condition_labels=DEFAULT_CONDITION_LABELS):
     a_c, a_s, b_c, b_s = levels
     ax.plot([0, 1, 2, 3], [a_c, a_c, a_s, a_s], color=COLOR_A, lw=2.5)
     ax.plot([3, 4, 5, 6], [b_c, b_c, b_s, b_s], color=COLOR_B, lw=2.5)
@@ -59,7 +69,9 @@ def _mini(ax, levels):
     ax.set_ylim(-1.3, 1.3)
     ax.set_xlim(0, 6)
     ax.set_xticks([0.75, 2.25, 3.75, 5.25])
-    ax.set_xticklabels(["C", "S", "C", "S"], fontsize=7)
+    c, st = condition_labels
+    size = 7 if max(len(c), len(st)) <= 8 else 6
+    ax.set_xticklabels([c, st, c, st], fontsize=size)
     ax.tick_params(top=True, labeltop=True, bottom=False, labelbottom=False, length=0)
     ax.set_yticks([])
 
@@ -67,13 +79,30 @@ def _mini(ax, levels):
 def plot_model_patterns(
     classification: Optional[pd.DataFrame] = None,
     group_names: Optional[Sequence[str]] = None,
+    condition_labels: Sequence[str] = DEFAULT_CONDITION_LABELS,
+    title: Optional[str] = None,
     figsize=(11, 10),
 ):
     """Draw the 15 expression patterns, annotated with counts if a classification is given.
 
-    C = control, S = stress. The first half of each panel is group A, the
-    second half group B.
+    The first half of each panel is group A, the second half group B; within
+    each half, the control condition is on the left and the stress on the right.
+
+    Parameters
+    ----------
+    classification:
+        Optional output of :func:`~orthoresponse.classify_responses`; adds the
+        number and percentage of features under each panel.
+    group_names:
+        Legend labels for groups A and B (default: taken from ``classification``).
+    condition_labels:
+        Two tick labels, ``(control, stress)``, shown above every panel.
+        Default ``("C", "S")``; e.g. ``("C", "D")`` for drought as in the
+        original publication, or ``("Ctrl", "NaCl")``.
+    title:
+        Figure title. By default it explains the condition labels.
     """
+    condition_labels = _check_labels(condition_labels)
     import matplotlib.pyplot as plt
     from matplotlib.lines import Line2D
 
@@ -89,7 +118,7 @@ def plot_model_patterns(
                 ax.axis("off")
                 continue
             case = cases[c]
-            _mini(ax, PATTERNS[(model, case)])
+            _mini(ax, PATTERNS[(model, case)], condition_labels)
             label = f"Case {case}"
             if summ is not None:
                 n = int(summ["n"].get((model, case), 0))
@@ -99,7 +128,12 @@ def plot_model_patterns(
         axes[r, 0].set_ylabel(_TITLES[model], fontsize=9)
     handles = [Line2D([0], [0], color=COLOR_A, lw=3), Line2D([0], [0], color=COLOR_B, lw=3)]
     fig.legend(handles, list(group_names), loc="lower right", bbox_to_anchor=(0.97, 0.08), frameon=False)
-    fig.suptitle("Expression models (C = control, S = stress); % of responsive features", fontsize=10)
+    if title is None:
+        c, st = condition_labels
+        title = f"Expression models ({c} = control, {st} = stress)"
+        if summ is not None:
+            title += "; % of responsive features"
+    fig.suptitle(title, fontsize=10)
     fig.tight_layout(rect=(0, 0, 1, 0.97))
     return fig
 

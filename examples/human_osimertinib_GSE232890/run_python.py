@@ -63,7 +63,7 @@ def main():
     print(top[["symbol", "a_response_log2FoldChange", "basal_log2FoldChange"]].to_string())
     top.to_csv(out / "top_stress_ready_3.tsv", sep="\t")
 
-    fig = plot_model_patterns(res.classification)
+    fig = plot_model_patterns(res.classification, condition_labels=("DMSO", "Osi"))
     fig.savefig(out / "model_patterns.png", dpi=150)
     print(f"\nResults in {out}/")
 

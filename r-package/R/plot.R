@@ -12,18 +12,33 @@
 
 #' Plot the expression model patterns
 #'
-#' Draws the 15 schematic patterns (C = control, S = stress; left half group A,
-#' right half group B), annotated with counts and percentages of responsive
-#' features when a classification is supplied. Uses base graphics.
+#' Draws the 15 schematic patterns (left half of each panel group A, right
+#' half group B; within each half, control on the left and stress on the
+#' right), annotated with counts and percentages of responsive features when a
+#' classification is supplied. Uses base graphics.
 #'
 #' @param classification Optional output of [classify_responses()].
 #' @param group_names Names for the legend; taken from `classification` when
 #'   available.
+#' @param condition_labels Character vector of length 2, `c(control, stress)`,
+#'   used as tick labels above every panel. Default `c("C", "S")`; e.g.
+#'   `c("C", "D")` for drought as in the original publication, or
+#'   `c("Ctrl", "NaCl")`.
+#' @param title Figure title. By default it explains the condition labels.
 #' @return Invisibly, `NULL`.
 #' @examples
 #' plot_model_patterns()
+#' plot_model_patterns(condition_labels = c("Ctrl", "Drought"), group_names = c("Sly", "Spenn"))
 #' @export
-plot_model_patterns <- function(classification = NULL, group_names = NULL) {
+plot_model_patterns <- function(classification = NULL, group_names = NULL, condition_labels = c("C", "S"),
+                                title = NULL) {
+  condition_labels <- as.character(condition_labels)
+  if (length(condition_labels) != 2) stop("condition_labels must have exactly two elements: c(control, stress)")
+  if (is.null(title)) {
+    title <- sprintf("Expression models (%s = control, %s = stress)", condition_labels[1], condition_labels[2])
+    if (!is.null(classification)) title <- paste0(title, "; % of responsive features")
+  }
+  tick_cex <- if (max(nchar(condition_labels)) <= 8) 0.7 else 0.6
   if (is.null(group_names)) {
     group_names <- if (!is.null(classification) && !is.null(attr(classification, "group_names"))) {
       attr(classification, "group_names")
@@ -47,8 +62,8 @@ plot_model_patterns <- function(classification = NULL, group_names = NULL) {
       graphics::abline(h = 0, lty = 2, col = "grey70")
       graphics::lines(c(0, 1, 2, 3), lv[c(1, 1, 2, 2)], col = .col_a, lwd = 3)
       graphics::lines(c(3, 4, 5, 6), lv[c(3, 3, 4, 4)], col = .col_b, lwd = 3)
-      graphics::axis(3, at = c(0.75, 2.25, 3.75, 5.25), labels = c("C", "S", "C", "S"),
-                     tick = FALSE, line = -0.9, cex.axis = 0.7)
+      graphics::axis(3, at = c(0.75, 2.25, 3.75, 5.25), labels = rep(condition_labels, 2),
+                     tick = FALSE, line = -0.9, cex.axis = tick_cex)
       lab <- paste("Case", j)
       if (!is.null(summ)) {
         r <- summ[summ$model == model & summ$case == j, ]
@@ -60,7 +75,7 @@ plot_model_patterns <- function(classification = NULL, group_names = NULL) {
       if (j == 1) graphics::mtext(.titles[[model]], side = 2, line = 0.8, cex = 0.65)
     }
   }
-  graphics::mtext("Expression models (C = control, S = stress)", outer = TRUE, side = 3, cex = 0.8)
+  graphics::mtext(title, outer = TRUE, side = 3, cex = 0.8)
   graphics::par(fig = c(0, 1, 0, 1), oma = c(0, 0, 0, 0), mar = c(0, 0, 0, 0), new = TRUE)
   graphics::plot.new()
   graphics::legend("bottom", legend = group_names, col = c(.col_a, .col_b), lwd = 3, horiz = TRUE, bty = "n",

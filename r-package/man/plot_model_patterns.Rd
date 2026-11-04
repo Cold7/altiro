@@ -4,22 +4,36 @@
 \alias{plot_model_patterns}
 \title{Plot the expression model patterns}
 \usage{
-plot_model_patterns(classification = NULL, group_names = NULL)
+plot_model_patterns(
+  classification = NULL,
+  group_names = NULL,
+  condition_labels = c("C", "S"),
+  title = NULL
+)
 }
 \arguments{
 \item{classification}{Optional output of \code{\link[=classify_responses]{classify_responses()}}.}
 
 \item{group_names}{Names for the legend; taken from \code{classification} when
 available.}
+
+\item{condition_labels}{Character vector of length 2, \code{c(control, stress)},
+used as tick labels above every panel. Default \code{c("C", "S")}; e.g.
+\code{c("C", "D")} for drought as in the original publication, or
+\code{c("Ctrl", "NaCl")}.}
+
+\item{title}{Figure title. By default it explains the condition labels.}
 }
 \value{
 Invisibly, \code{NULL}.
 }
 \description{
-Draws the 15 schematic patterns (C = control, S = stress; left half group A,
-right half group B), annotated with counts and percentages of responsive
-features when a classification is supplied. Uses base graphics.
+Draws the 15 schematic patterns (left half of each panel group A, right
+half group B; within each half, control on the left and stress on the
+right), annotated with counts and percentages of responsive features when a
+classification is supplied. Uses base graphics.
 }
 \examples{
 plot_model_patterns()
+plot_model_patterns(condition_labels = c("Ctrl", "Drought"), group_names = c("Sly", "Spenn"))
 }

@@ -26,5 +26,5 @@ cat("\nStress-ready genes, paper vs strict preset:",
     sum(res$classification$model == "stress_ready"), "->", sum(strict$model == "stress_ready"), "\n")
 
 png(file.path("results_r", "model_patterns.png"), width = 1600, height = 1500, res = 170)
-plot_model_patterns(res$classification)
+plot_model_patterns(res$classification, condition_labels = c("Ctrl", "NaCl"))
 dev.off()

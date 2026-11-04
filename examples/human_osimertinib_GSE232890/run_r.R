@@ -38,5 +38,5 @@ sr3 <- sr3[order(-sr3$a_response_log2FoldChange), c("symbol", "a_response_log2Fo
 print(head(sr3, 20))
 
 png(file.path("results_r", "model_patterns.png"), width = 1600, height = 1500, res = 170)
-plot_model_patterns(res$classification)
+plot_model_patterns(res$classification, condition_labels = c("DMSO", "Osi"))
 dev.off()

@@ -77,6 +77,14 @@ head(res$classification[, c("label", "primed_group", "description", "flags")], 3
 plot_model_patterns(res$classification)
 ```
 
+The condition tick labels ("C" and "S" by default) and the title can be set by
+hand, control first and stress second:
+
+```{r patterns-labels}
+plot_model_patterns(res$classification, condition_labels = c("Ctrl", "Salt"),
+                    group_names = c("sensitive", "tolerant"), title = "Simulated salt stress")
+```
+
 ## From existing contrast tables
 
 If you already have the five contrasts (from DESeq2, edgeR, limma...), give

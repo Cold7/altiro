@@ -174,6 +174,25 @@ save_orthoresponse(res, "results")
 plot_model_patterns(res$classification)
 ```
 
+### Figure labels
+
+`plot_model_patterns()` labels the two conditions "C" and "S" by default.
+Choose your own with `condition_labels` (control first, stress second) and
+optionally replace the title:
+
+```python
+from orthoresponse.plotting import plot_model_patterns
+fig = plot_model_patterns(res.classification, condition_labels=("Ctrl", "NaCl"))
+fig = plot_model_patterns(res.classification, condition_labels=("C", "D"),   # D = drought
+                          group_names=("S. lycopersicum", "S. pennellii"), title="Tomato drought")
+fig.savefig("model_patterns.png", dpi=150)
+```
+```r
+plot_model_patterns(res$classification, condition_labels = c("Ctrl", "NaCl"))
+plot_model_patterns(res$classification, condition_labels = c("C", "D"),
+                    group_names = c("S. lycopersicum", "S. pennellii"), title = "Tomato drought")
+```
+
 ---
 
 ## 4. Input data
@@ -621,7 +640,7 @@ To refit from counts with the published settings use
 | `reciprocal_best_hits()` | `reciprocal_best_hits()` | orthologs from two BLAST files |
 | `read_blast_tabular()`, `best_hits()` | same | BLAST helpers |
 | `merge_ortholog_counts()` | `merge_ortholog_counts()` | ortholog-level count matrix |
-| `plotting.plot_model_patterns()` | `plot_model_patterns()` | the 15 patterns with counts |
+| `plotting.plot_model_patterns()` | `plot_model_patterns()` | the 15 patterns with counts; custom `condition_labels`, `group_names`, `title` |
 | `plotting.plot_summary()` | `plot_summary()` | bar chart of models |
 | `plotting.plot_feature()` | - | normalized counts of one feature |
 | `OrthoResponseResult.save()` | `save_orthoresponse()` | write all outputs |

@@ -55,7 +55,7 @@ def main():
     top[["a_response_log2FoldChange", "a_response_padj", "basal_log2FoldChange"]].to_csv(
         out / "top_stress_ready_3.tsv", sep="\t")
 
-    fig = plot_model_patterns(res.classification)
+    fig = plot_model_patterns(res.classification, condition_labels=("Ctrl", "NaCl"))
     fig.savefig(out / "model_patterns.png", dpi=150)
     print(f"\nResults in {out}/")
 
