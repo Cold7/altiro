@@ -141,6 +141,7 @@ def run_orthoresponse(
     filter_alpha: Optional[float] = None,
     round_counts: bool = False,
     n_cpus: Optional[int] = None,
+    group_names: Optional[Sequence[str]] = None,
     **classification_overrides,
 ) -> OrthoResponseResult:
     """Run PyDESeq2 and classify every feature in one call.
@@ -148,7 +149,9 @@ def run_orthoresponse(
     All arguments are forwarded to :func:`~orthoresponse.run_contrasts` and
     :func:`~orthoresponse.classify_responses`. ``alpha`` is used both for the
     independent filtering (unless ``filter_alpha`` is set) and as the
-    classification threshold.
+    classification threshold. ``group_names`` sets the display names of groups
+    A and B in descriptions, summaries and figures (default: ``group_a`` and
+    ``group_b``, i.e. the values of the sample table).
 
     Examples
     --------
@@ -161,7 +164,10 @@ def run_orthoresponse(
         group_b=group_b, control=control, stress=stress, min_total_count=min_total_count,
         alpha=alpha, filter_alpha=filter_alpha, round_counts=round_counts, n_cpus=n_cpus,
     )
-    cls = classify_responses(cs, preset=preset, group_names=(str(group_a), str(group_b)), alpha=alpha,
-                             **classification_overrides)
+    names = tuple(str(g) for g in group_names) if group_names is not None else (str(group_a), str(group_b))
+    if len(names) != 2:
+        raise ValueError("group_names must have exactly two elements: (A, B)")
+    cs.group_names = names
+    cls = classify_responses(cs, preset=preset, group_names=names, alpha=alpha, **classification_overrides)
     return OrthoResponseResult(contrasts=cs, classification=cls, summary=summarize_classification(cls),
                                asymmetry=primed_asymmetry(cls))

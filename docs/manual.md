@@ -1,6 +1,6 @@
 # orthoresponse user manual
 
-Version 0.5.0 · Python and R
+Version 0.5.1 · Python and R
 
 `orthoresponse` classifies genes (within one species) or ortholog pairs (between
 two species) into **expression response models** in a 2 x 2 design: two
@@ -28,14 +28,15 @@ outputs, and give identical classifications for identical inputs.
 6. [The decision tree](#6-the-decision-tree)
 7. [Presets and options](#7-presets-and-options)
 8. [Outputs](#8-outputs)
-9. [Cross-species analyses (orthologs)](#9-cross-species-analyses-orthologs)
-10. [Worked examples](#10-worked-examples)
-11. [Reproducing the original publication](#11-reproducing-the-original-publication)
-12. [Python and R: what is identical and what is not](#12-python-and-r-what-is-identical-and-what-is-not)
-13. [Interpretation and statistical caveats](#13-interpretation-and-statistical-caveats)
-14. [Function reference](#14-function-reference)
-15. [Troubleshooting](#15-troubleshooting)
-16. [Citation and license](#16-citation-and-license)
+9. [Customizing names and labels](#9-customizing-names-and-labels)
+10. [Cross-species analyses (orthologs)](#10-cross-species-analyses-orthologs)
+11. [Worked examples](#11-worked-examples)
+12. [Reproducing the original publication](#12-reproducing-the-original-publication)
+13. [Python and R: what is identical and what is not](#13-python-and-r-what-is-identical-and-what-is-not)
+14. [Interpretation and statistical caveats](#14-interpretation-and-statistical-caveats)
+15. [Function reference](#15-function-reference)
+16. [Troubleshooting](#16-troubleshooting)
+17. [Citation and license](#17-citation-and-license)
 
 ---
 
@@ -207,7 +208,8 @@ Choose your own with `condition_labels` (control first, stress second), rename
 any of the row labels with `model_labels` (keys `primed`, `shared`,
 `unique`, `opposite`, `no_response`; the others keep their defaults), and
 optionally replace the title. Shared and opposite responses are drawn in the
-first and fourth columns.
+first and fourth columns. All naming options (groups, conditions, models,
+tables) are described in [section 9](#9-customizing-names-and-labels).
 
 ```python
 from orthoresponse.plotting import plot_model_patterns
@@ -234,7 +236,7 @@ plot_model_patterns(res$classification, condition_labels = c("C", "D"),
   samples in columns, feature ids in the first column / row names.
 * Estimated counts (e.g. Salmon/Kallisto `est_counts`) are accepted with
   `round_counts=True` / `round_counts = TRUE`.
-* For two species, first build an ortholog-level matrix (section 9).
+* For two species, first build an ortholog-level matrix (section 10).
 
 ### 4.2 Sample table
 
@@ -252,7 +254,7 @@ S70     IL22  Salt
 ```
 
 Every one of the four cells needs at least one sample; at least 3 replicates
-per cell are strongly recommended (section 13).
+per cell are strongly recommended (section 14).
 
 ### 4.3 Precomputed contrast tables (alternative entry point)
 
@@ -467,7 +469,180 @@ Command line: figures are written by `orthoresponse run` and
 
 ---
 
-## 9. Cross-species analyses (orthologs)
+## 9. Customizing names and labels
+
+Every name in the tables and figures can be changed. Some names are **data**
+(values of your sample table that tell the package which samples are A, B,
+control and stress); the rest are **display labels** that only change what you
+read.
+
+![Which parameter controls each element of the patterns figure](figures/custom_annotated.png)
+
+### 9.1 Which group is A and which is B
+
+`group_a` and `group_b` choose the roles: A is the reference, B the comparison.
+They must be values of `group_col`. Case numbers are defined relative to A and
+B, so swapping the groups swaps the cases:
+
+| model | case meaning | after swapping A and B |
+|---|---|---|
+| primed | 1-2: A is primed; 3-4: B is primed | 1 <-> 3, 2 <-> 4 |
+| unique | 1-2: only A responds; 3-4: only B responds | 1 <-> 3, 2 <-> 4 |
+| opposite | 1: A up, B down; 2: A down, B up | 1 <-> 2 |
+| no_response | 1: B higher; 2: B lower; 3: same level | 1 <-> 2 |
+| shared | 1: both up; 2: both down | unchanged |
+
+A common convention is A = sensitive (wild type, untreated line) and B =
+tolerant (mutant, resistant line), so that "B is primed" reads as "the
+tolerant line is already at the induced level".
+
+### 9.2 Display names of the groups
+
+By default the groups are called by their sample-table values. `group_names`
+(A first, B second) renames them without touching the data. Given to the
+pipeline, the names are used in the `description`, `primed_group` and
+`responding_group` columns, the asymmetry table, the printed result and the
+figures.
+
+```python
+res = orr.run_orthoresponse(ex.counts, ex.samples, **ex.params,
+                            group_names=("Sensitive", "Tolerant"))
+print(res)   # orthoresponse result: A = Sensitive | B = Tolerant
+```
+```r
+res <- orthoresponse(ex$counts, ex$samples, group_col = "line", condition_col = "treatment",
+                     group_a = "PL12", group_b = "IL22", control = "Control", stress = "Salt",
+                     group_names = c("Sensitive", "Tolerant"))
+```
+```bash
+orthoresponse run ... --group-a PL12 --group-b IL22 --group-names Sensitive Tolerant
+```
+
+`classify_responses(..., group_names=)` does the same for precomputed
+contrasts. In `save()` / `save_orthoresponse()`, `save_plots()` and
+`plot_model_patterns()`, `group_names` changes **only the figure legend**.
+
+### 9.3 Renaming values in the sample table
+
+To make the new names part of the data, rename the values first and use the
+new values in `group_a`, `group_b`, `control` and `stress`:
+
+```python
+samples["line"] = samples["line"].replace({"PL12": "Sensitive", "IL22": "Tolerant"})
+samples["treatment"] = samples["treatment"].replace({"Control": "Ctrl", "Salt": "NaCl"})
+res = orr.run_orthoresponse(counts, samples, group_col="line", condition_col="treatment",
+                            group_a="Sensitive", group_b="Tolerant", control="Ctrl", stress="NaCl")
+```
+```r
+samples$line[samples$line == "PL12"] <- "Sensitive"
+samples$line[samples$line == "IL22"] <- "Tolerant"
+```
+
+Column names are free too: `group_col` and `condition_col` name your columns,
+whatever they are called. "control" and "stress" are only parameter names; the
+second condition can be any treatment, drug, time point or environment.
+
+### 9.4 Condition labels (C and S)
+
+`condition_labels` sets the two tick labels (control first). Display only.
+
+```python
+res.save("results", condition_labels=("Ctrl", "NaCl"))
+```
+```r
+save_orthoresponse(res, "results", condition_labels = c("Veh", "BQ"))
+```
+Command line: `--condition-labels C D`.
+
+### 9.5 Model names: figure rows and table labels
+
+**Figure rows.** `model_labels` (dict in Python, named vector in R) is keyed by
+`primed`, `shared`, `unique`, `opposite`, `no_response`; keys you omit keep
+their defaults. The legacy key `stress_ready` is accepted for `primed`.
+
+```python
+res.save("results", model_labels={"primed": "Pre-adapted", "no_response": "Unchanged"})
+```
+```r
+save_orthoresponse(res, "results",
+                   model_labels = c(primed = "Pre-adapted", no_response = "Unchanged"))
+```
+
+**Tables.** `label` and `model` use fixed identifiers (`primed_3`,
+`unique_1`, ...) so results stay comparable and scriptable.
+`label_style="stress_ready"` (CLI `--label-style stress_ready`) gives the names
+of the original publication. For other wording, add your own column:
+
+```python
+my_names = {"primed": "Pre-adapted", "shared": "Shared", "unique": "Unique",
+            "opposite": "Opposite", "no_response": "Unchanged"}
+cls = res.classification
+cls["my_model"] = cls["model"].replace(my_names)
+cls["my_label"] = cls["my_model"] + " " + cls["case"].astype("Int64").astype(str)
+```
+```r
+my_names <- c(primed = "Pre-adapted", shared = "Shared", unique = "Unique",
+              opposite = "Opposite", no_response = "Unchanged")
+cls <- res$classification
+cls$my_model <- ifelse(cls$model %in% names(my_names), my_names[cls$model], cls$model)
+cls$my_label <- paste(cls$my_model, cls$case)
+```
+
+### 9.6 Title, formats and size
+
+`title` replaces the figure title. `formats`: `"png"` and `"pdf"` in both
+languages (Python also accepts any Matplotlib format, e.g. `"svg"`).
+Resolution: `dpi` (Python) or `res` (R); size in R: `width`, `height` (inches).
+`plots=False` writes tables only.
+
+```python
+res.save("results", title="Rice leaves, 80 mM NaCl", formats=("pdf", "svg"), dpi=300)
+```
+```r
+save_orthoresponse(res, "results", title = "Rice leaves, 80 mM NaCl",
+                   formats = "pdf", width = 11, height = 10)
+```
+
+The figure above was drawn with:
+
+```python
+from orthoresponse.plotting import plot_model_patterns
+fig = plot_model_patterns(res.classification,
+        group_names=("PL12 (sensitive)", "IL22 (tolerant)"),
+        condition_labels=("Ctrl", "NaCl"),
+        model_labels={"primed": "Pre-adapted", "no_response": "Unchanged"},
+        title="Rice under salt stress: customized labels")
+```
+
+### 9.7 Column names of precomputed contrast tables
+
+`read_contrasts()` accepts `id_col` (default: first column), `lfc_col`
+(`log2FoldChange`), `padj_col` (`padj`) and `se_col` (`lfcSE`). For edgeR or
+limma output:
+
+```python
+tabs = orr.read_contrasts(paths, id_col="gene", lfc_col="logFC", padj_col="FDR")
+```
+
+### 9.8 Quick reference
+
+| element | Python / R argument | command line |
+|---|---|---|
+| roles A and B (data) | `group_a`, `group_b` | `--group-a`, `--group-b` |
+| conditions (data) | `control`, `stress` | `--control`, `--stress` |
+| sample-table columns (data) | `group_col`, `condition_col` | `--group-col`, `--condition-col` |
+| group names in tables, text and figures | `group_names` in `run_orthoresponse()` / `orthoresponse()`, `classify_responses()` | `--group-names` |
+| group names in the legend only | `group_names` in `save()`, `save_plots()`, `plot_model_patterns()` | - |
+| condition ticks (C, S) | `condition_labels` | `--condition-labels` |
+| figure row labels | `model_labels` | - |
+| figure title | `title` | - |
+| label identifiers in tables | `label_style` (`"primed"` / `"stress_ready"`) | `--label-style` |
+| figure files | `formats`; `dpi` (Py) or `width`, `height`, `res` (R); `plots` | `--plot-formats`, `--no-plots` |
+| contrast-table columns (data) | `id_col`, `lfc_col`, `padj_col`, `se_col` in `read_contrasts()` | `--id-col` |
+
+---
+
+## 10. Cross-species analyses (orthologs)
 
 1. **Quantify each species against its own reference** (any aligner or
    pseudo-aligner) to obtain raw gene-level counts.
@@ -513,14 +688,14 @@ Basal differences between species mix biology with technical effects
 
 ---
 
-## 10. Worked examples
+## 11. Worked examples
 
 Both examples use raw count matrices deposited by the authors in GEO; no read
 alignment is needed. The data are bundled with the package and the scripts are
 in `examples/` (one Python and one R script each). Numbers below come from the
 R/DESeq2 run.
 
-### 10.1 Plant: rice salt stress (GEO GSE167342)
+### 11.1 Plant: rice salt stress (GEO GSE167342)
 
 * **Design.** Leaves of the salt-sensitive *japonica* cultivar **PL12** (A) and
   the salt-tolerant introgression line **IL22** (B; derived from FL478 x PL12,
@@ -574,7 +749,7 @@ Lessons from this data set:
 * With an equivalence margin of 0.5 log2 units and 3 replicates, only one gene
   can be shown to be primed; the rest become `unresolved`.
 
-### 10.2 Human: cisplatin-resistant ovarian cancer cells under brequinar (GEO GSE283381)
+### 11.2 Human: cisplatin-resistant ovarian cancer cells under brequinar (GEO GSE283381)
 
 * **Design.** OVCAR5 high-grade serous ovarian cancer cells: the
   cisplatin-sensitive parental line (**CisS**, A) and a cisplatin-resistant
@@ -624,7 +799,7 @@ Results (24,546 genes after filtering):
 * Primed 3 genes (induced by brequinar in CisS and constitutively high in
   CisR) are written to `results_python/top_primed_3_strict.tsv`.
 
-### 10.3 Finding other data sets
+### 11.3 Finding other data sets
 
 The method needs a full 2 x 2 design: both groups under both conditions. Good
 sources of public, already-counted matrices:
@@ -644,7 +819,7 @@ sources of public, already-counted matrices:
 
 ---
 
-## 11. Reproducing the original publication
+## 12. Reproducing the original publication
 
 The published script wrote five CSV files with DESeq2 results. Classify them
 directly:
@@ -673,7 +848,7 @@ To refit from counts with the published settings use
 
 ---
 
-## 12. Python and R: what is identical and what is not
+## 13. Python and R: what is identical and what is not
 
 * **Classifier**: identical. Given the same contrast tables, both languages
   return the same label for every feature (tested on 240,000 random
@@ -690,7 +865,7 @@ To refit from counts with the published settings use
 
 ---
 
-## 13. Interpretation and statistical caveats
+## 14. Interpretation and statistical caveats
 
 * **Absence of evidence.** Under the paper rules, "same level" means "not
   significantly different". Low power (few replicates, low counts) therefore
@@ -714,7 +889,7 @@ To refit from counts with the published settings use
 
 ---
 
-## 14. Function reference
+## 15. Function reference
 
 | Python | R | purpose |
 |---|---|---|
@@ -745,7 +920,7 @@ Python, `?classify_responses` in R.
 
 ---
 
-## 15. Troubleshooting
+## 16. Troubleshooting
 
 | message | cause and fix |
 |---|---|
@@ -760,7 +935,7 @@ Python, `?classify_responses` in R.
 
 ---
 
-## 16. Citation and license
+## 17. Citation and license
 
 If you use this package, please cite the software (see `CITATION.cff`).
 DESeq2 / PyDESeq2 should be cited as well:

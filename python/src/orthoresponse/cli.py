@@ -82,7 +82,7 @@ def cmd_run(a) -> None:
         counts, samples, group_col=a.group_col, condition_col=a.condition_col, group_a=a.group_a,
         group_b=a.group_b, control=a.control, stress=a.stress, preset=a.preset,
         min_total_count=a.min_total_count, filter_alpha=a.filter_alpha, round_counts=a.round_counts,
-        label_style=_label_style(a), **_overrides(a),
+        label_style=_label_style(a), group_names=a.group_names, **_overrides(a),
     )
     res.save(a.out, plots=not a.no_plots, condition_labels=a.condition_labels, formats=a.plot_formats)
     _write_outputs(res.classification, Path(a.out))

@@ -41,6 +41,11 @@ def test_pipeline_recovers_simulated_models(tmp_path):
     res = run_orthoresponse(counts, meta, group_col="line", condition_col="treatment", group_a="sens",
                             group_b="tol", control="ctrl", stress="salt")
     lab = res.classification["label"]
+    renamed = run_orthoresponse(counts.iloc[:300], meta, group_col="line", condition_col="treatment", group_a="sens",
+                                group_b="tol", control="ctrl", stress="salt", group_names=("Sensitive", "Tolerant"))
+    assert str(renamed).startswith("orthoresponse result: A = Sensitive | B = Tolerant")
+    assert set(renamed.classification["primed_group"]) <= {"Sensitive", "Tolerant", ""}
+    assert list(renamed.asymmetry["responding_group"]) == ["Sensitive", "Tolerant"]
     assert (lab.iloc[:150] == "primed_3").mean() > 0.9
     assert (lab.iloc[150:300] == "unique_1").mean() > 0.9
     assert (lab.iloc[300:450] == "shared_2").mean() > 0.9
@@ -63,8 +68,10 @@ def test_cli_run(tmp_path):
     meta.to_csv(tmp_path / "samples.tsv", sep="\t")
     rc = cli_main(["run", "--counts", str(tmp_path / "counts.tsv"), "--samples", str(tmp_path / "samples.tsv"),
                    "--group-col", "line", "--condition-col", "treatment", "--group-a", "sens", "--group-b", "tol",
-                   "--control", "ctrl", "--stress", "salt", "--out", str(tmp_path / "out")])
+                   "--control", "ctrl", "--stress", "salt", "--group-names", "Sensitive", "Tolerant",
+                   "--out", str(tmp_path / "out")])
     assert rc == 0
     cls = pd.read_csv(tmp_path / "out" / "classification.tsv", sep="\t", index_col=0)
     assert "label" in cls.columns and len(cls) > 1000
+    assert "Tolerant" in set(cls["primed_group"])
     assert (tmp_path / "out" / "model_patterns.png").exists() and (tmp_path / "out" / "model_summary.pdf").exists()

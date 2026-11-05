@@ -41,6 +41,12 @@ test_that("the pipeline recovers simulated models", {
   for (f in c("model_patterns.png", "model_patterns.pdf", "model_summary.png", "model_summary.pdf")) {
     expect_gt(file.size(file.path(out, f)), 1000)
   }
+  renamed <- suppressWarnings(orthoresponse(s$counts[1:300, ], s$meta, group_col = "line", condition_col = "treatment",
+                                            group_a = "sens", group_b = "tol", control = "ctrl", stress = "salt",
+                                            group_names = c("Sensitive", "Tolerant")))
+  expect_true(all(renamed$classification$primed_group %in% c("Sensitive", "Tolerant", "")))
+  expect_equal(renamed$asymmetry$responding_group, c("Sensitive", "Tolerant"))
+  expect_output(print(renamed), "A = Sensitive \\| B = Tolerant")
   out2 <- tempfile()
   save_orthoresponse(res, out2, plots = FALSE)
   expect_false(file.exists(file.path(out2, "model_patterns.png")))

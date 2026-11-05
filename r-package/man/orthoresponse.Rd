@@ -19,6 +19,7 @@ orthoresponse(
   filter_alpha = NULL,
   round_counts = FALSE,
   quiet = TRUE,
+  group_names = NULL,
   ...
 )
 }
@@ -49,6 +50,10 @@ classified with 0.05.}
 \item{round_counts}{Round non-integer input (e.g. estimated counts).}
 
 \item{quiet}{Silence DESeq2 messages.}
+
+\item{group_names}{Display names for groups A and B in descriptions,
+summaries and figures (default: \code{group_a} and \code{group_b}, i.e. the values of
+the sample table).}
 
 \item{...}{Classification options passed to \code{\link[=classify_responses]{classify_responses()}}, e.g.
 \code{equivalence_margin = 0.5}.}

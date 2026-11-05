@@ -161,7 +161,7 @@
     {Expression response models of orthologs and genes\\in two-by-two designs};
   \node[anchor=north west, text=white!80, font=\sffamily\normalsize]
     at ([xshift=2.45cm, yshift=-6.65cm]current page.north west)
-    {User manual \quad\textbullet\quad Version 0.5.0 \quad\textbullet\quad Python and R};
+    {User manual \quad\textbullet\quad Version 0.5.1 \quad\textbullet\quad Python and R};
   % pattern glyphs
   \node[anchor=north west] at ([xshift=2.3cm, yshift=-8.6cm]current page.north west) {%
     \begin{tabular}{@{}c@{\hspace{5mm}}c@{\hspace{5mm}}c@{\hspace{5mm}}c@{\hspace{5mm}}c@{}}
@@ -429,7 +429,7 @@ pip install "orthoresponse[all] @ \
 
 # a specific version
 pip install "orthoresponse[all] @ \
-  git+https://github.com/Cold7/orthoresponse.git@v0.5.0#subdirectory=python"
+  git+https://github.com/Cold7/orthoresponse.git@v0.5.1#subdirectory=python"
 
 orthoresponse --version
 \end{shcode}
@@ -743,7 +743,7 @@ and case, and \code{model\_patterns}, the fifteen patterns annotated with counts
 \textbf{\sffamily model\_summary} -- genes per model and case (left, rice example).\\[6pt]
 \textbf{\sffamily model\_patterns} -- the fifteen patterns annotated with counts and percentages
 (Figures~\ref{fig:rice} and \ref{fig:ovarian}).\\[6pt]
-Customize them:
+Customize them (Section~\ref{sec:custom}):
 \begin{lstlisting}[style=py, basicstyle=\ttfamily\scriptsize]
 res.save("results",
   condition_labels=("Ctrl", "NaCl"),
@@ -755,6 +755,228 @@ res.save("results",
 \end{figure}
 
 % ================================================================== 9
+\section{Customizing names and labels}
+\label{sec:custom}
+
+Every name that appears in the tables and figures can be changed. Some names are \emph{data}
+(the values in your sample table, which tell the package which samples are A, B, control and
+stress); the rest are \emph{display labels}, which change only what you read. Figure~\ref{fig:custom}
+shows which parameter controls each part of the patterns figure, and Table~\ref{tab:custom} at the
+end of this section is a quick reference.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\linewidth]{figures/custom_annotated.pdf}
+\caption{The rice example drawn with customized labels. Each orange box names the parameter that
+controls that element. The counts under the panels come from the classification and are not labels.}
+\label{fig:custom}
+\end{figure}
+
+\subsection{Which group is A and which is B}
+
+\code{group\_a} and \code{group\_b} choose the \emph{roles}: A is the reference and B the comparison.
+They must be values of \code{group\_col} in the sample table. The roles matter for the results, not
+only for display: the case numbers are defined relative to A and B, so swapping the two groups swaps
+the cases.
+
+\begin{center}
+\small
+\begin{tabularx}{\linewidth}{l Y Y}
+\toprule
+\textsf{\textbf{model}} & \textsf{\textbf{case meaning}} & \textsf{\textbf{after swapping A and B}}\\
+\midrule
+primed & 1--2: A is primed; 3--4: B is primed & 1\,$\leftrightarrow$\,3, 2\,$\leftrightarrow$\,4\\
+unique & 1--2: only A responds; 3--4: only B responds & 1\,$\leftrightarrow$\,3, 2\,$\leftrightarrow$\,4\\
+opposite & 1: A up, B down; 2: A down, B up & 1\,$\leftrightarrow$\,2\\
+no\_response & 1: B higher; 2: B lower; 3: same level & 1\,$\leftrightarrow$\,2\\
+shared & 1: both up; 2: both down & unchanged\\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+A common convention is A = sensitive (or wild type, or untreated line) and B = tolerant (or mutant,
+or resistant line), so that ``B is primed'' reads as ``the tolerant line is already at the induced
+level''.
+
+\subsection{Display names of the groups}
+
+By default the groups are called by their values in the sample table (\code{PL12}, \code{IL22}). To
+use other names without touching the data, pass \code{group\_names} (A first, B second). Given to
+the pipeline, they are used everywhere: the \code{description}, \code{primed\_group} and
+\code{responding\_group} columns, the asymmetry table, the printed result and the figures.
+
+\begin{pycode}
+res = orr.run_orthoresponse(ex.counts, ex.samples, **ex.params,
+                            group_names=("Sensitive", "Tolerant"))
+print(res)        # orthoresponse result: A = Sensitive | B = Tolerant
+\end{pycode}
+
+\begin{rcode}
+res <- orthoresponse(ex$counts, ex$samples,
+                     group_col = "line", condition_col = "treatment",
+                     group_a = "PL12", group_b = "IL22",
+                     control = "Control", stress = "Salt",
+                     group_names = c("Sensitive", "Tolerant"))
+\end{rcode}
+
+\begin{terminal}{Terminal}
+$ orthoresponse run ... --group-a PL12 --group-b IL22 --group-names Sensitive Tolerant
+\end{terminal}
+
+The same argument exists at the other levels. \code{classify\_responses(..., group\_names=)} names the
+groups of a classification of precomputed contrasts. \code{save()} / \code{save\_orthoresponse()},
+\code{save\_plots()} and \code{plot\_model\_patterns()} accept \code{group\_names} too, but there it
+changes \emph{only the figure legend}; the tables keep the names of the run.
+
+\subsection{Renaming values in the sample table}
+
+If you prefer the new names to be the data itself (for example because the same sample table feeds
+other analyses), rename the values before running, and use the new values in \code{group\_a},
+\code{group\_b}, \code{control} and \code{stress}:
+
+\begin{pycode}
+samples["line"] = samples["line"].replace({"PL12": "Sensitive", "IL22": "Tolerant"})
+samples["treatment"] = samples["treatment"].replace({"Control": "Ctrl", "Salt": "NaCl"})
+res = orr.run_orthoresponse(counts, samples,
+                            group_col="line", condition_col="treatment",
+                            group_a="Sensitive", group_b="Tolerant",
+                            control="Ctrl", stress="NaCl")
+\end{pycode}
+
+\begin{rcode}
+samples$line[samples$line == "PL12"] <- "Sensitive"
+samples$line[samples$line == "IL22"] <- "Tolerant"
+\end{rcode}
+
+The column names are free as well: \code{group\_col} and \code{condition\_col} name the two columns
+of your table, whatever they are called (\code{genotype}, \code{cell\_line}, \code{drug},
+\code{time}\ldots). The words \emph{control} and \emph{stress} are only the names of the two
+parameters; the second condition can be any treatment, drug, time point or environment.
+
+\subsection{Condition labels (C and S)}
+
+The tick labels above each panel are \code{C} and \code{S} by default. \code{condition\_labels} takes
+two strings, control first. They are display labels only, so they need not match the sample table.
+
+\begin{pycode}
+res.save("results", condition_labels=("Ctrl", "NaCl"))
+\end{pycode}
+\begin{rcode}
+save_orthoresponse(res, "results", condition_labels = c("Veh", "BQ"))
+\end{rcode}
+\begin{terminal}{Terminal}
+$ orthoresponse run ... --condition-labels C D
+\end{terminal}
+
+Short labels (up to eight characters) are drawn at a larger font size.
+
+\subsection{Model names: row labels and table labels}
+
+There are two separate things to rename.
+
+\textbf{Row labels of the figure.} \code{model\_labels} is a dictionary (Python) or named vector (R)
+keyed by \code{primed}, \code{shared}, \code{unique}, \code{opposite} and \code{no\_response}. Only the
+keys you give change; the others keep their defaults (\emph{Primed}, \emph{Shared response},
+\emph{Unique response}, \emph{Opposite response}, \emph{No response}). The legacy key
+\code{stress\_ready} is accepted for \code{primed}.
+
+\begin{pycode}
+res.save("results", model_labels={"primed": "Pre-adapted", "no_response": "Unchanged"})
+\end{pycode}
+\begin{rcode}
+save_orthoresponse(res, "results",
+                   model_labels = c(primed = "Pre-adapted", no_response = "Unchanged"))
+\end{rcode}
+
+\textbf{Labels in the tables.} The \code{label} and \code{model} columns use fixed identifiers
+(\code{primed\_3}, \code{unique\_1}\ldots) so that results stay comparable between data sets and
+code can rely on them. \code{label\_style="stress\_ready"} (CLI \code{--label-style stress\_ready})
+restores the names of the original publication (\code{stress\_ready\_1} \ldots). For any other
+wording, add your own column rather than overwriting the identifiers:
+
+\begin{pycode}
+my_names = {"primed": "Pre-adapted", "shared": "Shared", "unique": "Unique",
+         "opposite": "Opposite", "no_response": "Unchanged"}
+cls = res.classification
+cls["my_model"] = cls["model"].replace(my_names)
+cls["my_label"] = cls["my_model"] + " " + cls["case"].astype("Int64").astype(str)
+\end{pycode}
+\begin{rcode}
+my_names <- c(primed = "Pre-adapted", shared = "Shared", unique = "Unique",
+           opposite = "Opposite", no_response = "Unchanged")
+cls <- res$classification
+cls$my_model <- ifelse(cls$model %in% names(my_names), my_names[cls$model], cls$model)
+cls$my_label <- paste(cls$my_model, cls$case)
+\end{rcode}
+
+\subsection{Title, formats and size}
+
+\code{title} replaces the figure title (by default it explains the condition labels). \code{formats}
+chooses the files written: \code{"png"} and \code{"pdf"} in both languages, and in Python any other
+Matplotlib format such as \code{"svg"}. The resolution is
+\code{dpi} in Python and \code{res} in R, where \code{width} and \code{height} (inches) set the size.
+\code{plots=False} / \code{plots = FALSE} writes the tables only.
+
+\begin{pycode}
+res.save("results", title="Rice leaves, 80 mM NaCl", formats=("pdf", "svg"), dpi=300)
+\end{pycode}
+\begin{rcode}
+save_orthoresponse(res, "results", title = "Rice leaves, 80 mM NaCl",
+                   formats = "pdf", width = 11, height = 10)
+\end{rcode}
+
+To build a figure yourself, call \code{plot\_model\_patterns()} with the same arguments; in Python it
+returns a Matplotlib figure that you can edit further. Figure~\ref{fig:custom} was made with:
+
+\begin{pycode}
+from orthoresponse.plotting import plot_model_patterns
+fig = plot_model_patterns(res.classification,
+        group_names=("PL12 (sensitive)", "IL22 (tolerant)"),
+        condition_labels=("Ctrl", "NaCl"),
+        model_labels={"primed": "Pre-adapted", "no_response": "Unchanged"},
+        title="Rice under salt stress: customized labels")
+fig.savefig("my_patterns.pdf")
+\end{pycode}
+
+\subsection{Column names of precomputed contrast tables}
+
+When you classify contrast tables made elsewhere, \code{read\_contrasts()} accepts the names of
+their columns: \code{id\_col} (feature identifier; default: the first column), \code{lfc\_col}
+(default: \code{log2FoldChange}), \code{padj\_col} (default: \code{padj}) and \code{se\_col}
+(default: \code{lfcSE}; only needed for the equivalence test). For example, for edgeR or limma output:
+
+\begin{pycode}
+tabs = orr.read_contrasts(paths, id_col="gene", lfc_col="logFC", padj_col="FDR")
+\end{pycode}
+
+\subsection{Quick reference}
+
+\begin{table}[H]
+\centering
+\small
+\caption{Where each name comes from and how to change it. ``Data'' entries must match your input;
+the others are display labels.}
+\label{tab:custom}
+\begin{tabularx}{\linewidth}{>{\raggedright\arraybackslash}p{2.9cm} Y >{\raggedright\arraybackslash}p{3.3cm}}
+\toprule
+\textsf{\textbf{element}} & \textsf{\textbf{Python / R argument}} & \textsf{\textbf{command line}}\\
+\midrule
+roles A and B (data) & \code{group\_a}, \code{group\_b} & \code{--group-a}, \code{--group-b}\\
+conditions (data) & \code{control}, \code{stress} & \code{--control}, \code{--stress}\\
+sample-table columns (data) & \code{group\_col}, \code{condition\_col} & \code{--group-col}, \code{--condition-col}\\
+group names in tables, text and figures & \code{group\_names} in \code{run\_orthoresponse()} / \code{orthoresponse()}, \code{classify\_responses()} & \code{--group-names}\\
+group names in the legend only & \code{group\_names} in \code{save()}, \code{save\_plots()}, \code{plot\_model\_patterns()} & --\\
+condition ticks (C, S) & \code{condition\_labels} & \code{--condition-labels}\\
+row labels of the figure & \code{model\_labels} & --\\
+figure title & \code{title} & --\\
+label identifiers in tables & \code{label\_style} (\code{"primed"} or \code{"stress\_ready"}) & \code{--label-style}\\
+figure files & \code{formats}; \code{dpi} (Py) or \code{width}, \code{height}, \code{res} (R); \code{plots} & \code{--plot-formats}, \code{--no-plots}\\
+contrast-table columns (data) & \code{id\_col}, \code{lfc\_col}, \code{padj\_col}, \code{se\_col} in \code{read\_contrasts()} & \code{--id-col}\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+% ================================================================== 10
 \section{Worked examples}
 \label{sec:examples}
 
@@ -871,7 +1093,7 @@ unclassified & 0 & 2\,855\\
         10.8\% vs 11.4\% under \code{strict} (\(p=0.43\)).
 \end{itemize}
 
-% ================================================================== 10
+% ================================================================== 11
 \section{Interpreting results}
 \label{sec:interpret}
 
@@ -905,7 +1127,7 @@ rules a small asymmetry appears in both data sets; under \code{strict} it disapp
   \item \textbf{Replicates.} At least 3 per cell; with 2, results are exploratory.
 \end{itemize}
 
-% ================================================================== 11
+% ================================================================== 12
 \section{Cross-species analyses}
 
 When the two groups are different species, each gene must be paired with its ortholog first.
@@ -937,7 +1159,7 @@ correction \(Q=\mathrm{round}(E/L_{\mathrm{kb}})\) of the original tomato study;
 analysis or as a sensitivity check. Remember that basal differences between species mix biology with
 technical effects such as reference quality, transcript length and annotation.
 
-% ================================================================== 12
+% ================================================================== 13
 \section{Python and R}
 
 \begin{itemize}
@@ -955,7 +1177,7 @@ Compute the contrasts once (e.g. in R), write them with \code{write\_contrasts()
 tables in either language.
 \end{tip}
 
-% ================================================================== 13
+% ================================================================== 14
 \section{Function reference}
 
 \begin{center}
@@ -988,7 +1210,7 @@ example\_files() / export\_example() & {\color{grpB!85!black}same} & paths / cop
 Every function is documented in place. In Python use, for example,
 \code{help(orr.classify\_responses)}; in R, \code{?classify\_responses}.
 
-% ================================================================== 14
+% ================================================================== 15
 \section{Troubleshooting}
 
 \begin{center}
@@ -1014,7 +1236,7 @@ No figures in the results folder & update to version 0.4.0 or later, and install
 \end{tabularx}
 \end{center}
 
-% ================================================================== 15
+% ================================================================== 16
 \section{Citation and license}
 
 If you use \pkg{}, please cite the software using the metadata in \code{CITATION.cff}

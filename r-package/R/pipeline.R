@@ -5,6 +5,9 @@
 #'
 #' @inheritParams run_contrasts
 #' @param preset `"paper"` (default) or `"strict"`.
+#' @param group_names Display names for groups A and B in descriptions,
+#'   summaries and figures (default: `group_a` and `group_b`, i.e. the values of
+#'   the sample table).
 #' @param ... Classification options passed to [classify_responses()], e.g.
 #'   `equivalence_margin = 0.5`.
 #' @return An object of class `orthoresponse` with elements `contrasts`,
@@ -19,12 +22,16 @@
 #' @export
 orthoresponse <- function(counts, samples, group_col, condition_col, group_a, group_b, control, stress,
                           preset = c("paper", "strict"), min_total_count = 10, alpha = 0.05,
-                          filter_alpha = NULL, round_counts = FALSE, quiet = TRUE, ...) {
+                          filter_alpha = NULL, round_counts = FALSE, quiet = TRUE, group_names = NULL, ...) {
   preset <- match.arg(preset)
   cs <- run_contrasts(counts, samples, group_col = group_col, condition_col = condition_col,
                       group_a = group_a, group_b = group_b, control = control, stress = stress,
                       min_total_count = min_total_count, alpha = alpha, filter_alpha = filter_alpha,
                       round_counts = round_counts, quiet = quiet)
+  if (!is.null(group_names)) {
+    if (length(group_names) != 2) stop("group_names must have exactly two elements: c(A, B)")
+    cs$group_names <- as.character(group_names)
+  }
   cls <- classify_responses(cs, preset = preset, group_names = cs$group_names, alpha = alpha, ...)
   structure(list(contrasts = cs, classification = cls, summary = summarize_classification(cls),
                  asymmetry = primed_asymmetry(cls)), class = "orthoresponse")

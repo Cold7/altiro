@@ -1,3 +1,8 @@
+# orthoresponse 0.5.1
+
+* `orthoresponse()` / `run_orthoresponse()` gain `group_names` to set display names of groups A and B independently of the sample-table values; the CLI option `run --group-names` now works.
+* Manual: new section on customizing names and labels.
+
 # orthoresponse 0.5.0
 
 * The stress-ready model is now called **primed** (`primed_1` ... `primed_4`), a neutral name for any treatment, organism or group. The classification is unchanged.
