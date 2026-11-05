@@ -2,7 +2,7 @@
 % Please edit documentation in R/classify.R
 \name{primed_asymmetry}
 \alias{primed_asymmetry}
-\title{Test whether stress-ready states are more frequent in one direction}
+\title{Test whether primed states are more frequent in one direction}
 \usage{
 primed_asymmetry(classification)
 }
@@ -11,12 +11,12 @@ primed_asymmetry(classification)
 }
 \value{
 A data frame with one row per responding group, the counts,
-\code{fraction_stress_ready}, the sample \code{odds_ratio} and \code{fisher_pvalue}.
+\code{fraction_primed}, the sample \code{odds_ratio} and \code{fisher_pvalue}.
 }
 \description{
 Among features that respond to stress in only one group, compares the
-fraction that reaches the other group's control level (stress-ready) for
+fraction that reaches the other group's control level (primed) for
 A-only and B-only responders with Fisher's exact test. A larger raw count of
-stress-ready genes in one direction can simply reflect more responsive genes
+primed genes in one direction can simply reflect more responsive genes
 in that group; this comparison conditions on it.
 }

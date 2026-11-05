@@ -29,6 +29,8 @@ def _add_classification_args(p: argparse.ArgumentParser) -> None:
     g.add_argument("--require-basal-difference", action="store_true", default=None)
     g.add_argument("--equivalence-margin", type=float, default=None)
     g.add_argument("--group-names", nargs=2, metavar=("A", "B"), default=None)
+    g.add_argument("--label-style", choices=["primed", "stress_ready"], default="primed",
+                   help="name of the primed model in the output (stress_ready = legacy name)")
 
 
 def _overrides(a) -> dict:
@@ -39,6 +41,10 @@ def _overrides(a) -> dict:
         "require_basal_difference": a.require_basal_difference,
         "equivalence_margin": a.equivalence_margin,
     }
+
+
+def _label_style(a) -> str:
+    return getattr(a, "label_style", "primed")
 
 
 def _add_plot_args(p: argparse.ArgumentParser) -> None:
@@ -76,7 +82,7 @@ def cmd_run(a) -> None:
         counts, samples, group_col=a.group_col, condition_col=a.condition_col, group_a=a.group_a,
         group_b=a.group_b, control=a.control, stress=a.stress, preset=a.preset,
         min_total_count=a.min_total_count, filter_alpha=a.filter_alpha, round_counts=a.round_counts,
-        **_overrides(a),
+        label_style=_label_style(a), **_overrides(a),
     )
     res.save(a.out, plots=not a.no_plots, condition_labels=a.condition_labels, formats=a.plot_formats)
     _write_outputs(res.classification, Path(a.out))
@@ -88,7 +94,8 @@ def cmd_classify(a) -> None:
     paths = {k: getattr(a, k) for k in CONTRAST_KEYS}
     tables = read_contrasts(paths, id_col=a.id_col)
     names = tuple(a.group_names) if a.group_names else ("A", "B")
-    cls = classify_responses(tables, preset=a.preset, group_names=names, **_overrides(a))
+    cls = classify_responses(tables, preset=a.preset, group_names=names, label_style=_label_style(a),
+                             **_overrides(a))
     _write_outputs(cls, Path(a.out), a)
 
 

@@ -3,7 +3,7 @@ simulate_counts <- function(seed = 3) {
   n <- 1500
   base <- exp(stats::runif(n, log(30), log(3000)))
   f <- matrix(1, n, 4)
-  f[1:150, 2:4] <- 4          # stress_ready_3
+  f[1:150, 2:4] <- 4          # primed_3
   f[151:300, 2] <- 4          # unique_1
   f[301:450, c(2, 4)] <- 0.25 # shared_2
   f[451:600, 3:4] <- 3        # no_response_1
@@ -30,7 +30,7 @@ test_that("the pipeline recovers simulated models", {
   res <- suppressWarnings(orthoresponse(s$counts, s$meta, group_col = "line", condition_col = "treatment",
                                         group_a = "sens", group_b = "tol", control = "ctrl", stress = "salt"))
   lab <- res$classification[paste0("gene", 1:600), "label"]
-  expect_gt(mean(lab[1:150] == "stress_ready_3"), 0.9)
+  expect_gt(mean(lab[1:150] == "primed_3"), 0.9)
   expect_gt(mean(lab[151:300] == "unique_1"), 0.9)
   expect_gt(mean(lab[301:450] == "shared_2"), 0.9)
   expect_gt(mean(lab[451:600] == "no_response_1"), 0.85)

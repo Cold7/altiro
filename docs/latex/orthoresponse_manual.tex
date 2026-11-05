@@ -161,12 +161,12 @@
     {Expression response models of orthologs and genes\\in two-by-two designs};
   \node[anchor=north west, text=white!80, font=\sffamily\normalsize]
     at ([xshift=2.45cm, yshift=-6.65cm]current page.north west)
-    {User manual \quad\textbullet\quad Version 0.4.1 \quad\textbullet\quad Python and R};
+    {User manual \quad\textbullet\quad Version 0.5.0 \quad\textbullet\quad Python and R};
   % pattern glyphs
   \node[anchor=north west] at ([xshift=2.3cm, yshift=-8.6cm]current page.north west) {%
     \begin{tabular}{@{}c@{\hspace{5mm}}c@{\hspace{5mm}}c@{\hspace{5mm}}c@{\hspace{5mm}}c@{}}
       \glyph{0}{1}{1}{1} & \glyph{0}{1}{0}{1} & \glyph{0}{1}{0}{0} & \glyph{0}{1}{0}{-1} & \glyph{0}{0}{1}{1}\\[2pt]
-      \textcolor{white}{\sffamily\scriptsize stress-ready} & \textcolor{white}{\sffamily\scriptsize shared} &
+      \textcolor{white}{\sffamily\scriptsize primed} & \textcolor{white}{\sffamily\scriptsize shared} &
       \textcolor{white}{\sffamily\scriptsize unique} & \textcolor{white}{\sffamily\scriptsize opposite} &
       \textcolor{white}{\sffamily\scriptsize no response}
     \end{tabular}};
@@ -215,7 +215,7 @@ response models} describes the data best:
 \begin{center}
 \begin{tabularx}{0.94\linewidth}{>{\sffamily\bfseries}l Y}
 \toprule
-\textcolor{navy}{stress-ready} & one group responds, and under stress it reaches the level that the
+\textcolor{navy}{primed} & one group responds, and under stress it reaches the level that the
 other group already has \emph{without} stress. The other group is \emph{primed}.\\
 \textcolor{navy}{shared} & both groups respond in the same direction.\\
 \textcolor{navy}{unique} & only one group responds.\\
@@ -232,12 +232,16 @@ settings \pkg{} reproduces exactly the decision tree used by Contreras-Riquelme 
 (2025, \emph{PLoS One} 20(5): e0324724) to compare cultivated tomato and the desert-adapted
 \emph{Solanum pennellii} under drought, and adds stricter, optional rules.
 
+\pkg{} calls these genes \emph{primed}, a neutral term that applies to any treatment (a drug,
+an infection, a nutrient, a temperature) and to any kind of group, not only to stress in plants.
+The original name is available with \code{label\_style="stress\_ready"}.
+
 \subsection{Key features}
 \begin{itemize}
   \item \textbf{One call from counts to answers}: a single DESeq2 (R) or PyDESeq2 (Python) fit, five
         contrasts, classification, summaries and figures.
   \item \textbf{Two presets}: \code{paper} (the published rules) and \code{strict} (handles missing
-        statistics and requires a basal difference for stress-ready calls), plus an optional formal
+        statistics and requires a basal difference for primed calls), plus an optional formal
         equivalence test.
   \item \textbf{Identical in Python and R}: same function names, options and outputs; both
         implementations give the same label for every feature given the same contrasts.
@@ -312,10 +316,10 @@ the other group's stressed level.}
 \toprule
 \textsf{\textbf{label}} & \textsf{\textbf{meaning}} & \textsf{\textbf{primed}}\\
 \midrule
-stress\_ready\_1 & B is induced under stress up to the control level of A & \A\\
-stress\_ready\_2 & B is repressed under stress down to the control level of A & \A\\
-stress\_ready\_3 & A is induced under stress up to the control level of B & \B\\
-stress\_ready\_4 & A is repressed under stress down to the control level of B & \B\\
+primed\_1 & B is induced under stress up to the control level of A & \A\\
+primed\_2 & B is repressed under stress down to the control level of A & \A\\
+primed\_3 & A is induced under stress up to the control level of B & \B\\
+primed\_4 & A is repressed under stress down to the control level of B & \B\\
 \midrule
 shared\_1 / \_2 & induced / repressed in both groups & --\\
 unique\_1 / \_2 & induced / repressed only in A & --\\
@@ -331,7 +335,7 @@ unclassified & only with \code{na\_action="unclassified"}: missing statistics & 
 \end{table}
 
 \begin{note}[In short]
-Stress-ready cases 1--2 mean that \A{} is primed; cases 3--4 mean that \B{} is primed. If \B{} is your
+Primed cases 1--2 mean that \A{} is primed; cases 3--4 mean that \B{} is primed. If \B{} is your
 tolerant group, cases 3 and 4 are the ones that support pre-adaptation of \B.
 \end{note}
 
@@ -392,11 +396,11 @@ the log2 fold change.
         [{no\_response\_2\\(B lower)}, fill=white]
         [{no\_response\_3\\(none)}, fill=white]]
       [{\textbf{B stress = A control?}\\\code{b\_stress\_vs\_a\_control}}, edge label={node[midway, right, font=\sffamily\scriptsize\bfseries, fill=white, inner sep=1pt, text=okgreen]{yes}}
-        [{\textbf{stress\_ready\_1/2}\\(B up / down)}, fill=grpB!15, edge label={node[midway, left, font=\sffamily\scriptsize\bfseries, fill=white, inner sep=1pt, text=okgreen]{yes}}]
+        [{\textbf{primed\_1/2}\\(B up / down)}, fill=grpB!15, edge label={node[midway, left, font=\sffamily\scriptsize\bfseries, fill=white, inner sep=1pt, text=okgreen]{yes}}]
         [{unique\_3/4\\(B up / down)}, fill=white, edge label={node[midway, right, font=\sffamily\scriptsize\bfseries, fill=white, inner sep=1pt, text=warnred]{no}}]]]
     [{\textbf{Does B respond?}\\\code{b\_response}}, edge label={node[midway, right, font=\sffamily\scriptsize\bfseries, fill=white, inner sep=1pt, text=okgreen]{yes}}
       [{\textbf{A stress = B control?}\\\code{a\_stress\_vs\_b\_control}}, edge label={node[midway, left, font=\sffamily\scriptsize\bfseries, fill=white, inner sep=1pt, text=warnred]{no}}
-        [{\textbf{stress\_ready\_3/4}\\(A up / down)}, fill=grpA!15, edge label={node[midway, left, font=\sffamily\scriptsize\bfseries, fill=white, inner sep=1pt, text=okgreen]{yes}}]
+        [{\textbf{primed\_3/4}\\(A up / down)}, fill=grpA!15, edge label={node[midway, left, font=\sffamily\scriptsize\bfseries, fill=white, inner sep=1pt, text=okgreen]{yes}}]
         [{unique\_1/2\\(A up / down)}, fill=white, edge label={node[midway, right, font=\sffamily\scriptsize\bfseries, fill=white, inner sep=1pt, text=warnred]{no}}]]
       [{\textbf{Same direction?}}, edge label={node[midway, right, font=\sffamily\scriptsize\bfseries, fill=white, inner sep=1pt, text=okgreen]{yes}}
         [{shared\_1/2}, fill=white, edge label={node[midway, left, font=\sffamily\scriptsize\bfseries, fill=white, inner sep=1pt, text=okgreen]{yes}}]
@@ -408,9 +412,9 @@ the log2 fold change.
 \end{figure}
 
 \begin{caution}[Absence of evidence is not evidence of equality]
-Under the \code{paper} preset a gene is stress-ready when the responding group's stressed level is
+Under the \code{paper} preset a gene is primed when the responding group's stressed level is
 \emph{not significantly different} from the other group's control level. With few replicates this
-inflates the stress-ready class. The \code{strict} preset and the equivalence test exist for this
+inflates the primed class. The \code{strict} preset and the equivalence test exist for this
 reason; see Sections~\ref{sec:options} and \ref{sec:interpret}.
 \end{caution}
 
@@ -425,7 +429,7 @@ pip install "orthoresponse[all] @ \
 
 # a specific version
 pip install "orthoresponse[all] @ \
-  git+https://github.com/Cold7/orthoresponse.git@v0.4.1#subdirectory=python"
+  git+https://github.com/Cold7/orthoresponse.git@v0.5.0#subdirectory=python"
 
 orthoresponse --version
 \end{shcode}
@@ -475,24 +479,24 @@ in format):
 orthoresponse result: A = PL12 | B = IL22
 25045 features classified
 
-          label        model case     n pct_of_responsive pct_of_all
- stress_ready_1 stress_ready    1   281               4.1        1.1
- stress_ready_2 stress_ready    2   407               6.0        1.6
- stress_ready_3 stress_ready    3  1744              25.5        7.0
- stress_ready_4 stress_ready    4  1793              26.2        7.2
-       shared_1       shared    1   563               8.2        2.2
-       shared_2       shared    2   335               4.9        1.3
-       unique_1       unique    1   617               9.0        2.5
-       unique_2       unique    2   628               9.2        2.5
-       unique_3       unique    3   152               2.2        0.6
-       unique_4       unique    4   185               2.7        0.7
-     opposite_1     opposite    1    88               1.3        0.4
-     opposite_2     opposite    2    41               0.6        0.2
-  no_response_1  no_response    1   174                NA        0.7
-  no_response_2  no_response    2   196                NA        0.8
-  no_response_3  no_response    3 17841                NA       71.2
+         label       model case     n pct_of_responsive pct_of_all
+      primed_1      primed    1   281               4.1        1.1
+      primed_2      primed    2   407               6.0        1.6
+      primed_3      primed    3  1744              25.5        7.0
+      primed_4      primed    4  1793              26.2        7.2
+      shared_1      shared    1   563               8.2        2.2
+      shared_2      shared    2   335               4.9        1.3
+      unique_1      unique    1   617               9.0        2.5
+      unique_2      unique    2   628               9.2        2.5
+      unique_3      unique    3   152               2.2        0.6
+      unique_4      unique    4   185               2.7        0.7
+    opposite_1    opposite    1    88               1.3        0.4
+    opposite_2    opposite    2    41               0.6        0.2
+ no_response_1 no_response    1   174                NA        0.7
+ no_response_2 no_response    2   196                NA        0.8
+ no_response_3 no_response    3 17841                NA       71.2
 
-Stress-ready among single-group responders: PL12-only 74.0%, IL22-only 67.1% (Fisher p = 1.22e-05)
+Single-group responses ending primed: PL12-only 74.0%, IL22-only 67.1% (Fisher p = 1.22e-05)
 \end{terminal}
 
 \subsection{Run it on your own data}
@@ -622,7 +626,7 @@ The sign convention matters: a positive log2 fold change must mean \emph{higher 
 alpha & 0.05 & 0.05 & adjusted p-value threshold\\
 min\_abs\_lfc & 0 & 0 & minimum \(|\log_2\mathrm{FC}|\) for a significant change\\
 na\_action & \code{not\_de} & \code{unclassified} & how a missing \code{padj} is treated\\
-require\_basal\_difference & no & yes & stress-ready needs a significant basal difference\\
+require\_basal\_difference & no & yes & primed calls need a significant basal difference\\
 equivalence\_margin & none & none & if set, ``same level'' must pass a TOST equivalence test\\
 sign\_digits & 2 & 2 & rounding of log2FC before taking its sign\\
 \bottomrule
@@ -637,12 +641,12 @@ orr.classify_responses(tabs, preset="paper", equivalence_margin=0.5, alpha=0.01)
 \subsubsection*{Missing adjusted p-values}
 DESeq2 sets \code{padj} to missing for low-count genes (independent filtering) and outliers. Under
 \code{paper} a missing value counts as ``not significant'', which pushes features towards
-stress-ready; the \code{flags} column marks them with \code{na\_treated\_as\_not\_de}. With
+the primed class; the \code{flags} column marks them with \code{na\_treated\_as\_not\_de}. With
 \code{na\_action="unclassified"} they are labelled \code{unclassified} instead.
 
 \subsubsection*{Basal difference}
-If A is induced up to B's control level (stress-ready 3), B's control level must be higher than A's.
-The \code{paper} rules never check this. With \code{require\_basal\_difference=True}, a stress-ready call
+If A is induced up to B's control level (primed 3), B's control level must be higher than A's.
+The \code{paper} rules never check this. With \code{require\_basal\_difference=True}, a primed call
 also needs a significant \code{basal} contrast in the expected direction; otherwise the feature becomes
 the corresponding unique response and is flagged \code{basal\_difference\_not\_significant}.
 
@@ -679,7 +683,7 @@ groups are near-isogenic. Reporting both is the most informative choice.
   \foreach \y/\f/\d in {
       {-0.45}/{classification.tsv}/{one row per gene: label, model, case, groups, flags, statistics},
       {-0.95}/{summary.tsv}/{counts and percentages per model and case},
-      {-1.45}/{primed\_asymmetry.tsv}/{direction test for stress-ready states},
+      {-1.45}/{primed\_asymmetry.tsv}/{direction test for primed states},
       {-1.95}/{normalized\_counts.tsv}/{size-factor normalized counts},
       {-2.45}/{contrasts/contrast\_<key>.tsv}/{full DESeq2 tables of the five contrasts},
       {-2.95}/{model\_patterns.png / .pdf}/{the fifteen patterns with counts and percentages},
@@ -703,9 +707,9 @@ groups are near-isogenic. Reporting both is the most informative choice.
 \toprule
 \textsf{\textbf{column}} & \textsf{\textbf{content}}\\
 \midrule
-label & e.g. \code{stress\_ready\_3}\\
+label & e.g. \code{primed\_3}\\
 model, case & the two parts of the label\\
-primed\_group & group whose control level equals the other's stressed level (stress-ready only)\\
+primed\_group & group whose control level equals the other's stressed level (primed only)\\
 responding\_group & A, B, \code{both} or \code{none} (with your group names)\\
 description & a readable sentence, e.g. ``PL12 is induced under stress up to the control level of IL22''\\
 flags & \code{na\_treated\_as\_not\_de}, \code{basal\_difference\_not\_significant}\\
@@ -721,8 +725,8 @@ in at least one group, and \code{pct\_of\_all} uses every classified gene. Mixin
 a common source of confusion when reporting results.
 
 \code{primed\_asymmetry()} asks whether one group is \emph{more often} primed. A larger raw number of
-stress-ready genes in one direction can simply mean that one group has more responsive genes; the test
-compares the \emph{fraction} of single-group responses that end in a stress-ready state, with Fisher's
+primed genes in one direction can simply mean that one group has more responsive genes; the test
+compares the \emph{fraction} of single-group responses that end in a primed state, with Fisher's
 exact test.
 
 \subsection{Figures}
@@ -743,7 +747,7 @@ Customize them:
 \begin{lstlisting}[style=py, basicstyle=\ttfamily\scriptsize]
 res.save("results",
   condition_labels=("Ctrl", "NaCl"),
-  model_labels={"stress_ready": "Primed"},
+  model_labels={"primed": "Pre-adapted"},
   formats=("png",))
 \end{lstlisting}
 \end{minipage}
@@ -795,7 +799,7 @@ python run_python.py        # or: Rscript run_r.R
 \toprule
 \textsf{\textbf{model}} & \textsf{\textbf{paper}} & \textsf{\textbf{strict}}\\
 \midrule
-stress-ready 1 / 2 / 3 / 4 & 281 / 407 / 1\,744 / 1\,793 & 35 / 72 / 297 / 189\\
+primed 1 / 2 / 3 / 4 & 281 / 407 / 1\,744 / 1\,793 & 35 / 72 / 297 / 189\\
 shared 1 / 2 & 563 / 335 & 563 / 335\\
 unique 1 / 2 / 3 / 4 & 617 / 628 / 152 / 185 & 2\,024 / 2\,180 / 389 / 514\\
 opposite 1 / 2 & 88 / 41 & 88 / 41\\
@@ -810,7 +814,7 @@ unclassified & 0 & 4\,361\\
   \item The sensitive line reacts much more: 4\,782 single-line responses in PL12 against 1\,025 in IL22,
         consistent with IL22 experiencing less stress.
   \item The lines are nearly isogenic, so basal differences are rare (370 non-responsive genes). Under
-        the \code{paper} rules 62\% of the responsive genes are called stress-ready, mostly because a gene
+        the \code{paper} rules 62\% of the responsive genes are called primed, mostly because a gene
         that responds in one line is ``not significantly different'' from the unchanged level of the other.
         Requiring a basal difference keeps 593 of 4\,225.
   \item The apparent asymmetry (74.0\% vs 67.1\%, \(p=1.2\times10^{-5}\)) disappears under \code{strict}
@@ -837,7 +841,7 @@ were merged into one matrix without any transformation.
 \includegraphics[width=\linewidth]{figures/ovarian_genes.pdf}
 \caption{Real genes from the ovarian example, one per model (normalized counts; dots are replicates,
 bars are means). \textsf{MDGA1}: induced by brequinar in the sensitive cells up to the constitutive level of
-the resistant cells (stress-ready 3, \code{strict} preset).}
+the resistant cells (primed 3, \code{strict} preset).}
 \label{fig:genes}
 \end{figure}
 
@@ -848,7 +852,7 @@ the resistant cells (stress-ready 3, \code{strict} preset).}
 \toprule
 \textsf{\textbf{model}} & \textsf{\textbf{paper}} & \textsf{\textbf{strict}}\\
 \midrule
-stress-ready 1 / 2 / 3 / 4 & 476 / 487 / 617 / 435 & 162 / 179 / 159 / 146\\
+primed 1 / 2 / 3 / 4 & 476 / 487 / 617 / 435 & 162 / 179 / 159 / 146\\
 shared 1 / 2 & 4\,096 / 3\,585 & 4\,096 / 3\,585\\
 unique 1 / 2 / 3 / 4 & 1\,036 / 868 / 1\,281 / 781 & 1\,409 / 1\,123 / 1\,568 / 1\,072\\
 opposite 1 / 2 & 37 / 46 & 37 / 46\\
@@ -862,7 +866,7 @@ unclassified & 0 & 2\,855\\
 \begin{itemize}
   \item Brequinar changes many genes in both lines: most responsive genes are shared (7\,681 of 13\,745).
   \item The two cell lines differ at basal level for many genes, so \code{strict} keeps about a third of
-        the stress-ready calls (646 of 2\,015), compared with one in seven in rice.
+        the primed calls (646 of 2\,015), compared with one in seven in rice.
   \item Neither line is globally more primed: 35.6\% vs 31.8\% under \code{paper} (\(p=0.002\)) and
         10.8\% vs 11.4\% under \code{strict} (\(p=0.43\)).
 \end{itemize}
@@ -874,7 +878,7 @@ unclassified & 0 & 2\,855\\
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=0.95\linewidth]{figures/paper_vs_strict.pdf}
-\caption{Stress-ready genes under the two presets. The reduction is strongest when the groups have few
+\caption{Primed genes under the two presets. The reduction is strongest when the groups have few
 basal differences (rice).}
 \label{fig:pvs}
 \end{figure}
@@ -882,14 +886,14 @@ basal differences (rice).}
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=0.95\linewidth]{figures/asymmetry.pdf}
-\caption{Fraction of single-group responses that end in a stress-ready state. Under the \code{paper}
+\caption{Fraction of single-group responses that end in a primed state. Under the \code{paper}
 rules a small asymmetry appears in both data sets; under \code{strict} it disappears.}
 \label{fig:asym}
 \end{figure}
 
 \begin{itemize}
-  \item \textbf{False positives flow into stress-ready.} A false-positive response in one group, for a gene
-        whose basal level does not differ between groups, is classified as stress-ready under the
+  \item \textbf{False positives flow into the primed class.} A false-positive response in one group, for a gene
+        whose basal level does not differ between groups, is classified as primed under the
         \code{paper} rules. \code{require\_basal\_difference} blocks this route.
   \item \textbf{Unique vs shared.} ``Significant in A and not in B'' does not prove that the responses
         differ. If the difference of responses is your question, test the interaction
@@ -967,7 +971,7 @@ classify\_responses() & classify\_responses() & the decision tree\\
 classification\_options() & classification\_options() & presets and options\\
 model\_definitions() & model\_definitions() & table of models and cases\\
 summarize\_classification() & summarize\_classification() & counts and percentages\\
-primed\_asymmetry() & primed\_asymmetry() & direction test for stress-ready states\\
+primed\_asymmetry() & primed\_asymmetry() & direction test for primed states\\
 equivalence\_test() & equivalence\_test() & TOST for log2 fold changes\\
 read\_contrasts() / write\_contrasts() & {\color{grpB!85!black}same} & contrast tables from / to files\\
 reciprocal\_best\_hits() & reciprocal\_best\_hits() & orthologs from two BLAST files\\

@@ -16,5 +16,5 @@ res
 save_orthoresponse(res, "results_r", condition_labels = c("Ctrl", "NaCl"))
 
 strict <- classify_responses(res$contrasts, preset = "strict", group_names = c("PL12", "IL22"))
-cat("\nStress-ready genes, paper vs strict preset:",
-    sum(res$classification$model == "stress_ready"), "->", sum(strict$model == "stress_ready"), "\n")
+cat("\nPrimed genes, paper vs strict preset:",
+    sum(res$classification$model == "primed"), "->", sum(strict$model == "primed"), "\n")

@@ -1,17 +1,17 @@
 Package: orthoresponse
 Type: Package
 Title: Expression Response Models of Orthologs in Two-by-Two Designs
-Version: 0.4.1
+Version: 0.5.0
 Authors@R:
     person(given = "J. Sebastián", family = "Contreras-Riquelme",
            email = "contrerasriquelme.sebastian@gmail.com", role = c("aut", "cre", "cph"))
 Description: Classifies orthologs (between species) or genes (within a species)
-    into stress-ready, shared, unique, opposite and no-response expression models
+    into primed, shared, unique, opposite and no-response expression models
     from five differential-expression contrasts between two groups (species,
     genotypes or cell lines) measured under control and stress conditions. The
     default rules reproduce the decision tree of Contreras-Riquelme et al. (2025)
     <doi:10.1371/journal.pone.0324724>; optional rules treat missing statistics
-    explicitly, require a basal difference for stress-ready calls, or replace
+    explicitly, require a basal difference for primed calls, or replace
     "not significantly different" by a formal equivalence test. Includes helpers
     for reciprocal best BLAST hits and ortholog-level count matrices.
 License: MIT + file LICENSE

@@ -10,6 +10,7 @@ classify_responses(
   group_names = c("A", "B"),
   options = NULL,
   keep_statistics = TRUE,
+  label_style = c("primed", "stress_ready"),
   ...
 )
 }
@@ -29,6 +30,10 @@ names; columns \code{log2FoldChange}, \code{padj} and, for equivalence tests,
 
 \item{keep_statistics}{Append \verb{<key>_log2FoldChange} and \verb{<key>_padj}.}
 
+\item{label_style}{\code{"primed"} (default) or \code{"stress_ready"}, the name used
+before version 0.5.0 and in the original publication. Only the names in
+the \code{label} and \code{model} columns change; the classification is the same.}
+
 \item{...}{Individual options passed to \code{\link[=classification_options]{classification_options()}}, e.g.
 \code{alpha = 0.01} or \code{equivalence_margin = 0.5}.}
 }
@@ -41,7 +46,8 @@ statistics of each contrast.
 \description{
 Applies the decision tree of Contreras-Riquelme et al. (2025) to the five
 contrasts of a 2 x 2 design and assigns each feature (ortholog pair or gene)
-to one model: stress-ready (cases 1-4), shared (1-2), unique (1-4),
+to one model: primed (cases 1-4; called stress-ready in the original
+publication), shared (1-2), unique (1-4),
 opposite (1-2) or no response (1-3). With the default \code{preset = "paper"}
 the result is identical to the published script, where A =
 \emph{S. lycopersicum} and B = \emph{S. pennellii}.

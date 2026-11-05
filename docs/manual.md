@@ -1,6 +1,6 @@
 # orthoresponse user manual
 
-Version 0.4.1 · Python and R
+Version 0.5.0 · Python and R
 
 `orthoresponse` classifies genes (within one species) or ortholog pairs (between
 two species) into **expression response models** in a 2 x 2 design: two
@@ -51,7 +51,7 @@ outputs, and give identical classifications for identical inputs.
 | stress | treatment | 11 days of drought |
 
 Which group you call A and which B only changes the case numbers, not the
-biology: stress-ready cases 1-2 always describe **A primed**, cases 3-4
+biology: primed cases 1-2 always describe **A primed**, cases 3-4
 **B primed**.
 
 ### The five models
@@ -60,10 +60,10 @@ biology: stress-ready cases 1-2 always describe **A primed**, cases 3-4
 
 | label | description | primed group |
 |---|---|---|
-| `stress_ready_1` | B is induced under stress up to the control level of A | A |
-| `stress_ready_2` | B is repressed under stress down to the control level of A | A |
-| `stress_ready_3` | A is induced under stress up to the control level of B | B |
-| `stress_ready_4` | A is repressed under stress down to the control level of B | B |
+| `primed_1` | B is induced under stress up to the control level of A | A |
+| `primed_2` | B is repressed under stress down to the control level of A | A |
+| `primed_3` | A is induced under stress up to the control level of B | B |
+| `primed_4` | A is repressed under stress down to the control level of B | B |
 | `shared_1` / `shared_2` | induced / repressed in both groups | - |
 | `unique_1` / `unique_2` | induced / repressed only in A | - |
 | `unique_3` / `unique_4` | induced / repressed only in B | - |
@@ -72,11 +72,17 @@ biology: stress-ready cases 1-2 always describe **A primed**, cases 3-4
 | `no_response_1` / `_2` | no response; B basal level higher / lower than A | - |
 | `no_response_3` | no response; no basal difference detected | - |
 
+**Terminology.** Primed features are called *stress-ready* in the original
+publication. *Primed* is used here because the method applies to any treatment
+(a drug, an infection, a nutrient, a temperature...) and any kind of group, not
+only to stress in plants. `classify_responses(..., label_style="stress_ready")`
+returns the old names (`stress_ready_1` ... `stress_ready_4`).
+
 Two extra labels exist only with non-default options:
 `unresolved_<case>` (equivalence test inconclusive, see 7.3) and
 `unclassified` (missing statistics, see 7.1).
 
-A **stress-ready** (or *primed*, *pre-adapted*) gene is one whose constitutive
+A **primed** (or *primed*, *pre-adapted*) gene is one whose constitutive
 expression in one group already matches the stress-induced (or stress-repressed)
 expression of the other group.
 
@@ -198,7 +204,7 @@ plot_model_patterns(res$classification)
 
 `plot_model_patterns()` labels the two conditions "C" and "S" by default.
 Choose your own with `condition_labels` (control first, stress second), rename
-any of the row labels with `model_labels` (keys `stress_ready`, `shared`,
+any of the row labels with `model_labels` (keys `primed`, `shared`,
 `unique`, `opposite`, `no_response`; the others keep their defaults), and
 optionally replace the title. Shared and opposite responses are drawn in the
 first and fourth columns.
@@ -208,14 +214,14 @@ from orthoresponse.plotting import plot_model_patterns
 fig = plot_model_patterns(res.classification, condition_labels=("Ctrl", "NaCl"))
 fig = plot_model_patterns(res.classification, condition_labels=("C", "D"),   # D = drought
                           group_names=("S. lycopersicum", "S. pennellii"), title="Tomato drought",
-                          model_labels={"stress_ready": "Primed", "no_response": "Unchanged"})
+                          model_labels={"primed": "Pre-adapted", "no_response": "Unchanged"})
 fig.savefig("model_patterns.png", dpi=150)
 ```
 ```r
 plot_model_patterns(res$classification, condition_labels = c("Ctrl", "NaCl"))
 plot_model_patterns(res$classification, condition_labels = c("C", "D"),
                     group_names = c("S. lycopersicum", "S. pennellii"), title = "Tomato drought",
-                    model_labels = c(stress_ready = "Primed", no_response = "Unchanged"))
+                    model_labels = c(primed = "Pre-adapted", no_response = "Unchanged"))
 ```
 
 ---
@@ -308,13 +314,13 @@ log2 fold change rounded to `sign_digits` (default 2) decimals.
       no /          \ yes                        no /            \ yes
  NO RESPONSE      B up or down?             A up or down?     SHARED / OPPOSITE
  basal signif.?   B stress vs A control     A stress vs B control   by the two signs:
- +  -> NR 1       not signif.  -> SR 1 (up) not signif. -> SR 3 (up)   + +  -> shared 1
- -  -> NR 2                       SR 2 (down)              SR 4 (down) - -  -> shared 2
+ +  -> NR 1       not signif.  -> PR 1 (up) not signif. -> PR 3 (up)   + +  -> shared 1
+ -  -> NR 2                       PR 2 (down)              PR 4 (down) - -  -> shared 2
  ns -> NR 3       significant  -> UR 3 (up) significant -> UR 1 (up)   + -  -> opposite 1
                                   UR 4 (down)              UR 2 (down) other -> opposite 2
 ```
 
-(SR = stress-ready, UR = unique response, NR = no response.)
+(PR = primed, UR = unique response, NR = no response.)
 
 ### Flags
 
@@ -324,7 +330,7 @@ The `flags` column records why a call may deserve attention:
   a missing adjusted p-value and, under `na_action="not_de"`, it was read as
   "not significant". Missing values come from DESeq2's independent filtering
   (low counts) and Cook's outlier detection.
-* `basal_difference_not_significant`: the feature would be stress-ready under
+* `basal_difference_not_significant`: the feature would be primed under
   the paper rules but was demoted to unique because no significant basal
   difference supports it (only with `require_basal_difference`).
 
@@ -337,7 +343,7 @@ The `flags` column records why a call may deserve attention:
 | `alpha` | 0.05 | 0.05 | adjusted p-value threshold |
 | `min_abs_lfc` | 0 | 0 | minimum absolute log2FC for "significant" |
 | `na_action` | `not_de` | `unclassified` | how missing `padj` is handled |
-| `require_basal_difference` | False | True | stress-ready needs a basal difference |
+| `require_basal_difference` | False | True | primed calls need a basal difference |
 | `equivalence_margin` | none | none | TOST equivalence for "same level" |
 | `sign_digits` | 2 | 2 | rounding before taking the sign |
 
@@ -354,18 +360,18 @@ classify_responses(tables, preset = "strict", equivalence_margin = 0.5)
 
 Under the paper rules a missing value counts as "not different". In the
 contrasts that test whether two levels are *equal*, this pushes features
-towards stress-ready. With `na_action="unclassified"` such features get the
+towards the primed class. With `na_action="unclassified"` such features get the
 label `unclassified` instead. Most of them are low-count genes removed by the
 independent filtering of one contrast.
 
 ### 7.2 Basal difference (`require_basal_difference`)
 
-If A is induced up to B's control level (stress-ready 3), B's control level must
+If A is induced up to B's control level (primed 3), B's control level must
 be higher than A's control level. The paper rules never check this: they only
 check that A-stress is *not significantly different* from B-control. When the
 two groups have the same basal level, a gene that responds in A alone (a unique
 response) can pass that check simply because the induction is modest. With
-this option, a stress-ready call also requires a significant `basal` contrast in
+this option, a primed call also requires a significant `basal` contrast in
 the expected direction (negative for cases 1 and 4, positive for cases 2 and 3);
 otherwise the feature becomes the corresponding unique response.
 
@@ -399,9 +405,9 @@ One row per feature (index / row names = feature id):
 
 | column | content |
 |---|---|
-| `label` | e.g. `stress_ready_3` |
+| `label` | e.g. `primed_3` |
 | `model`, `case` | the two parts of the label |
-| `primed_group` | group whose control level equals the other's stressed level (stress-ready only) |
+| `primed_group` | group whose control level equals the other's stressed level (primed only) |
 | `responding_group` | A, B, `both` or `none` |
 | `description` | human-readable sentence with your group names |
 | `flags` | see section 6 |
@@ -413,15 +419,15 @@ One row per feature (index / row names = feature id):
 reported on purpose:
 
 * `pct_of_responsive`: features that respond in at least one group
-  (stress-ready, shared, unique, opposite, unresolved). The percentages in
+  (primed, shared, unique, opposite, unresolved). The percentages in
   Fig. 3 of the original publication use this denominator.
 * `pct_of_all`: every classified feature.
 
 ### 8.3 `asymmetry` (`primed_asymmetry()`)
 
 Among features that respond in only one group, the fraction that ends in a
-stress-ready state, for A-only and B-only responders, compared with Fisher's
-exact test. A larger raw number of stress-ready genes in one direction can
+primed state, for A-only and B-only responders, compared with Fisher's
+exact test. A larger raw number of primed genes in one direction can
 simply reflect that one group has more responsive genes; this test removes that
 effect. The odds ratio reported is the sample odds ratio
 `(SR_A * U_B) / (U_A * SR_B)`.
@@ -444,13 +450,13 @@ them off:
 
 ```python
 res.save("results", condition_labels=("Ctrl", "NaCl"),
-         model_labels={"stress_ready": "Primed"}, formats=("png",))
+         model_labels={"primed": "Pre-adapted"}, formats=("png",))
 res.save("results", plots=False)                     # tables only
 orr.save_plots(classification, "figures")            # figures for any classification
 ```
 ```r
 save_orthoresponse(res, "results", condition_labels = c("Ctrl", "NaCl"),
-                   model_labels = c(stress_ready = "Primed"), formats = "png")
+                   model_labels = c(primed = "Pre-adapted"), formats = "png")
 save_orthoresponse(res, "results", plots = FALSE)
 save_plots(classification, "figures")
 ```
@@ -503,7 +509,7 @@ Command line: figures are written by `orthoresponse run` and
 
 Basal differences between species mix biology with technical effects
 (reference quality, transcript length, mappability, annotation of UTRs). Treat
-`no_response_1/2` and the basal part of stress-ready calls with that in mind.
+`no_response_1/2` and the basal part of primed calls with that in mind.
 
 ---
 
@@ -543,7 +549,7 @@ Results (25,045 genes after filtering):
 
 | model | paper | strict |
 |---|---|---|
-| stress-ready 1 / 2 / 3 / 4 | 281 / 407 / 1,744 / 1,793 | 35 / 72 / 297 / 189 |
+| primed 1 / 2 / 3 / 4 | 281 / 407 / 1,744 / 1,793 | 35 / 72 / 297 / 189 |
 | shared 1 / 2 | 563 / 335 | 563 / 335 |
 | unique 1 / 2 / 3 / 4 | 617 / 628 / 152 / 185 | 2,024 / 2,180 / 389 / 514 |
 | opposite 1 / 2 | 88 / 41 | 88 / 41 |
@@ -558,7 +564,7 @@ Lessons from this data set:
   single-line responses), consistent with IL22 experiencing less stress.
 * IL22 and PL12 are nearly isogenic, so basal differences are rare (only 370
   non-responsive genes differ between the lines).
-  Under the paper rules, 62 % of responsive genes are called stress-ready,
+  Under the paper rules, 62 % of responsive genes are called primed,
   mostly because a gene that responds in one line is "not significantly
   different" from the unchanged basal level of the other. Requiring a basal
   difference (`strict`) keeps 593 of 4,225.
@@ -566,7 +572,7 @@ Lessons from this data set:
   67.1 % in the other direction, p = 1.2e-5) disappears under `strict`
   (10.4 % vs 10.6 %, p = 0.82).
 * With an equivalence margin of 0.5 log2 units and 3 replicates, only one gene
-  can be shown to be stress-ready; the rest become `unresolved`.
+  can be shown to be primed; the rest become `unresolved`.
 
 ### 10.2 Human: cisplatin-resistant ovarian cancer cells under brequinar (GEO GSE283381)
 
@@ -600,7 +606,7 @@ Results (24,546 genes after filtering):
 
 | model | paper | strict |
 |---|---|---|
-| stress-ready 1 / 2 / 3 / 4 | 476 / 487 / 617 / 435 | 162 / 179 / 159 / 146 |
+| primed 1 / 2 / 3 / 4 | 476 / 487 / 617 / 435 | 162 / 179 / 159 / 146 |
 | shared 1 / 2 | 4,096 / 3,585 | 4,096 / 3,585 |
 | unique 1 / 2 / 3 / 4 | 1,036 / 868 / 1,281 / 781 | 1,409 / 1,123 / 1,568 / 1,072 |
 | opposite 1 / 2 | 37 / 46 | 37 / 46 |
@@ -610,13 +616,13 @@ Results (24,546 genes after filtering):
 * Brequinar changes the expression of many genes in both lines: most
   responsive genes are shared (7,681 of 13,745).
 * Unlike the near-isogenic rice lines, the two cell lines differ at basal level
-  for many genes, so the strict preset keeps about a third of the stress-ready
+  for many genes, so the strict preset keeps about a third of the primed
   calls (646 of 2,015) rather than one in seven.
 * Neither line is globally more primed: under the paper rules 35.6 % of
   CisS-only and 31.8 % of CisR-only responses end at the other line's level
   (p = 0.002); under `strict` the fractions are 10.8 % and 11.4 % (p = 0.43).
-* Stress-ready 3 genes (induced by brequinar in CisS and constitutively high in
-  CisR) are written to `results_python/top_stress_ready_3_strict.tsv`.
+* Primed 3 genes (induced by brequinar in CisS and constitutively high in
+  CisR) are written to `results_python/top_primed_3_strict.tsv`.
 
 ### 10.3 Finding other data sets
 
@@ -688,17 +694,17 @@ To refit from counts with the published settings use
 
 * **Absence of evidence.** Under the paper rules, "same level" means "not
   significantly different". Low power (few replicates, low counts) therefore
-  inflates stress-ready calls. Report the `strict` preset alongside, or use an
+  inflates primed calls. Report the `strict` preset alongside, or use an
   equivalence margin.
-* **False positives flow into stress-ready.** A false-positive response in one
+* **False positives flow into the primed class.** A false-positive response in one
   group, for a gene whose basal level does not differ between groups, is
-  classified as stress-ready under the paper rules. `require_basal_difference`
+  classified as primed under the paper rules. `require_basal_difference`
   blocks this route.
 * **Unique vs shared.** "Significant in A and not in B" does not prove that the
   responses differ. If the difference of responses itself is your question,
   test the interaction (`~ group + group:condition`) separately.
 * **Directional claims.** Use `primed_asymmetry()` before concluding that one
-  group is "more pre-adapted": raw counts of stress-ready cases depend on how
+  group is "more pre-adapted": raw counts of primed cases depend on how
   many genes respond in each group.
 * **Equal stress?** The same treatment may be perceived differently by the two
   groups (e.g. a tolerant genotype uses less water). Fewer responses in one
@@ -719,7 +725,7 @@ To refit from counts with the published settings use
 | `classification_options()` | `classification_options()` | presets and options |
 | `model_definitions()` | `model_definitions()` | table of models and cases |
 | `summarize_classification()` | `summarize_classification()` | counts and percentages |
-| `primed_asymmetry()` | `primed_asymmetry()` | direction test for stress-ready |
+| `primed_asymmetry()` | `primed_asymmetry()` | direction test for primed states |
 | `equivalence_test()` | `equivalence_test()` | TOST for log2 fold changes |
 | `read_contrasts()` / `write_contrasts()` | same | contrast tables from / to files |
 | `reciprocal_best_hits()` | `reciprocal_best_hits()` | orthologs from two BLAST files |

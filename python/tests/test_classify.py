@@ -35,7 +35,7 @@ def test_paper_preset_matches_published_notebook(tmp_path, seed):
     _write_paper_csvs(tables, tmp_path)
     expected = classify_like_notebook(tmp_path)
     paths = {k: tmp_path / f for k, f in PAPER_FILES.items()}
-    got = classify_responses(read_contrasts(paths, id_col="Row.names"))
+    got = classify_responses(read_contrasts(paths, id_col="Row.names"), label_style="stress_ready")
     assert set(expected.index) == set(got.index)
     assert (got.loc[expected.index, "label"] == expected).all()
 
@@ -54,10 +54,10 @@ def test_single_gene_rules():
         return classify_responses(tabs)["label"].iloc[0]
 
     ns, de = 0.5, 0.001
-    assert one((ns, 0.1), (de, 2), (de, -2), (ns, 0.1), (de, 2)) == "stress_ready_1"
-    assert one((ns, 0.1), (de, -2), (de, 2), (ns, 0.1), (de, -2)) == "stress_ready_2"
-    assert one((de, 2), (ns, 0.1), (de, 2), (de, -2), (ns, 0.1)) == "stress_ready_3"
-    assert one((de, -2), (ns, 0.1), (de, -2), (de, 2), (ns, 0.1)) == "stress_ready_4"
+    assert one((ns, 0.1), (de, 2), (de, -2), (ns, 0.1), (de, 2)) == "primed_1"
+    assert one((ns, 0.1), (de, -2), (de, 2), (ns, 0.1), (de, -2)) == "primed_2"
+    assert one((de, 2), (ns, 0.1), (de, 2), (de, -2), (ns, 0.1)) == "primed_3"
+    assert one((de, -2), (ns, 0.1), (de, -2), (de, 2), (ns, 0.1)) == "primed_4"
     assert one((de, 2), (ns, 0.1), (ns, 0.1), (de, 2), (de, 2)) == "unique_1"
     assert one((ns, 0.1), (de, -2), (ns, 0.1), (de, -2), (ns, 0.1)) == "unique_4"
     assert one((de, 2), (de, 2), (ns, 0), (de, 2), (de, 2)) == "shared_1"
@@ -73,7 +73,7 @@ def test_strict_requires_basal_difference():
             "b_stress_vs_a_control": (0.2, 0.5), "a_stress_vs_b_control": (0.4, 0.3)}
     for k, (p, l) in vals.items():
         tabs[k] = pd.DataFrame({"padj": [p], "log2FoldChange": [l]}, index=["g"])
-    assert classify_responses(tabs)["label"].iloc[0] == "stress_ready_3"
+    assert classify_responses(tabs)["label"].iloc[0] == "primed_3"
     strict = classify_responses(tabs, preset="strict")
     assert strict["label"].iloc[0] == "unique_1"
     assert "basal_difference_not_significant" in strict["flags"].iloc[0]
@@ -88,11 +88,11 @@ def test_na_handling(contrasts):
     assert (strict.loc[~flagged, "label"] == paper.loc[~flagged, "label"]).all()
 
 
-def test_equivalence_only_moves_stress_ready(contrasts):
+def test_equivalence_only_moves_primed(contrasts):
     paper = classify_responses(contrasts)
     eq = classify_responses(contrasts, equivalence_margin=0.5)
     changed = paper["label"] != eq["label"]
-    assert (paper.loc[changed, "model"] == "stress_ready").all()
+    assert (paper.loc[changed, "model"] == "primed").all()
     assert (eq.loc[changed, "model"] == "unresolved").all()
 
 
@@ -122,7 +122,7 @@ def test_summary_denominators(contrasts):
 
 def test_primed_asymmetry(contrasts):
     t = primed_asymmetry(classify_responses(contrasts))
-    assert list(t.columns[:4]) == ["responding_group", "primed_group", "stress_ready", "unique"]
+    assert list(t.columns[:4]) == ["responding_group", "primed_group", "primed", "unique"]
     assert 0 <= t["fisher_pvalue"].iloc[0] <= 1
 
 
@@ -157,7 +157,20 @@ def test_shared_fixture_matches_expected():
 
 def test_format_asymmetry_matches_r_wording():
     from orthoresponse import format_asymmetry
-    t = pd.DataFrame({"responding_group": ["PL12", "IL22"], "fraction_stress_ready": [0.7396, 0.6712],
+    t = pd.DataFrame({"responding_group": ["PL12", "IL22"], "fraction_primed": [0.7396, 0.6712],
                       "fisher_pvalue": [1.2241e-05, 1.2241e-05]})
-    assert format_asymmetry(t) == ("Stress-ready among single-group responders: PL12-only 74.0%, "
+    assert format_asymmetry(t) == ("Single-group responses ending primed: PL12-only 74.0%, "
                                    "IL22-only 67.1% (Fisher p = 1.22e-05)")
+
+
+def test_label_style_only_renames(contrasts):
+    new = classify_responses(contrasts)
+    old = classify_responses(contrasts, label_style="stress_ready")
+    assert (new["label"].str.replace("primed_", "stress_ready_") == old["label"]).all()
+    assert (new.drop(columns=["label", "model"]) .equals(old.drop(columns=["label", "model"])))
+    assert set(new["model"]) & {"stress_ready"} == set() and "primed" in set(new["model"])
+    pd.testing.assert_frame_equal(summarize_classification(new).drop(columns=["label", "model"]),
+                                  summarize_classification(old).drop(columns=["label", "model"]))
+    pd.testing.assert_frame_equal(primed_asymmetry(new), primed_asymmetry(old))
+    with pytest.raises(ValueError):
+        classify_responses(contrasts, label_style="ready")

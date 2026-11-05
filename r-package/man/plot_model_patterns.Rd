@@ -24,9 +24,9 @@ used as tick labels above every panel. Default \code{c("C", "S")}; e.g.
 \code{c("Ctrl", "NaCl")}.}
 
 \item{model_labels}{Row labels: a named character vector (or list) with
-any of the names \code{stress_ready}, \code{shared}, \code{unique}, \code{opposite},
+any of the names \code{primed}, \code{shared}, \code{unique}, \code{opposite},
 \code{no_response}. Only the names you give are changed, e.g.
-\code{c(stress_ready = "Primed", no_response = "Unchanged")}.}
+\code{c(primed = "Stress-ready", no_response = "Unchanged")}.}
 
 \item{title}{Figure title. By default it explains the condition labels.}
 }
@@ -42,5 +42,5 @@ classification is supplied. Uses base graphics.
 \examples{
 plot_model_patterns()
 plot_model_patterns(condition_labels = c("Ctrl", "Drought"), group_names = c("Sly", "Spenn"),
-                    model_labels = c(stress_ready = "Primed", no_response = "Unchanged"))
+                    model_labels = c(primed = "Pre-adapted", no_response = "Unchanged"))
 }

@@ -17,11 +17,11 @@ res
 save_orthoresponse(res, "results_r", condition_labels = c("Veh", "BQ"))
 
 strict <- classify_responses(res$contrasts, preset = "strict", group_names = c("CisS", "CisR"))
-cat("\nStress-ready genes, paper vs strict preset:",
-    sum(res$classification$model == "stress_ready"), "->", sum(strict$model == "stress_ready"), "\n")
+cat("\nPrimed genes, paper vs strict preset:",
+    sum(res$classification$model == "primed"), "->", sum(strict$model == "primed"), "\n")
 print(table(strict$label))
 print(primed_asymmetry(strict))
 
-sr3 <- subset(strict, label == "stress_ready_3")
+sr3 <- subset(strict, label == "primed_3")
 sr3 <- sr3[order(-sr3$a_response_log2FoldChange), c("a_response_log2FoldChange", "basal_log2FoldChange")]
 print(round(head(sr3, 20), 2))

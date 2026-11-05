@@ -1,7 +1,8 @@
 #' orthoresponse: Expression Response Models of Orthologs in 2 x 2 Designs
 #'
 #' Classifies orthologs (cross-species) or genes (within species) into
-#' stress-ready, shared, unique, opposite and no-response models from five
+#' primed (called stress-ready in the original publication), shared, unique,
+#' opposite and no-response models from five
 #' differential-expression contrasts between two groups (species, genotypes,
 #' cell lines) under control and stress conditions. The default rules
 #' reproduce the decision tree of Contreras-Riquelme et al. (2025)

@@ -43,9 +43,13 @@ def test_shared_and_opposite_use_outer_columns():
 
 
 def test_custom_model_labels():
-    fig = plot_model_patterns(model_labels={"stress_ready": "Primed", "no_response": "Unchanged"})
+    fig = plot_model_patterns(model_labels={"primed": "Pre-adapted", "no_response": "Unchanged"})
     rows = [fig.axes[i].get_ylabel() for i in range(0, 20, 4)]
-    assert rows == ["Primed", "Shared response", "Unique response", "Opposite response", "Unchanged"]
+    assert rows == ["Pre-adapted", "Shared response", "Unique response", "Opposite response", "Unchanged"]
+    rows = [plot_model_patterns().axes[i].get_ylabel() for i in range(0, 20, 4)]
+    assert rows[0] == "Primed"
+    fig = plot_model_patterns(model_labels={"stress_ready": "Stress-ready"})   # legacy key still accepted
+    assert fig.axes[0].get_ylabel() == "Stress-ready"
     with pytest.raises(ValueError):
         plot_model_patterns(model_labels={"stressready": "x"})
 
@@ -56,3 +60,9 @@ def test_save_plots(contrasts, tmp_path):
     paths = save_plots(cls, tmp_path, condition_labels=("C", "D"), formats=("png",))
     assert sorted(p.name for p in paths) == ["model_patterns.png", "model_summary.png"]
     assert all(p.stat().st_size > 1000 for p in paths)
+
+
+def test_plot_accepts_legacy_labels(contrasts):
+    cls = classify_responses(contrasts, label_style="stress_ready")
+    fig = plot_model_patterns(cls)
+    assert any("Case 3: " in ax.get_xlabel() and "(" in ax.get_xlabel() for ax in fig.axes)

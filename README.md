@@ -8,17 +8,20 @@ under a control and a stress condition.
 
 | model | meaning |
 |---|---|
-| **stress-ready** (1-4) | one group responds and reaches the *constitutive* level of the other group, which is therefore primed |
+| **primed** (1-4) | one group responds and reaches the *constitutive* level of the other group, which is therefore primed |
 | **shared** (1-2) | both groups respond in the same direction |
 | **unique** (1-4) | only one group responds |
 | **opposite** (1-2) | both respond, in opposite directions |
 | **no response** (1-3) | neither responds (basal level higher, lower or equal) |
 
+*Primed* features are called *stress-ready* in the original publication;
+`label_style="stress_ready"` returns the old label names.
+
 The default rules reproduce exactly the decision tree of
 Contreras-Riquelme *et al.* (2025) *PLoS One* 20(5): e0324724
 ([doi:10.1371/journal.pone.0324724](https://doi.org/10.1371/journal.pone.0324724)).
 Optional stricter rules handle missing statistics, require a basal difference
-for stress-ready calls, and can replace "not significantly different" by a
+for primed calls, and can replace "not significantly different" by a
 formal equivalence test.
 
 The same functionality is available in **Python** and **R** with the same

@@ -1,13 +1,13 @@
 .patterns <- list(
-  stress_ready = list(c(0, 0, -1, 0), c(0, 0, 1, 0), c(0, 1, 1, 1), c(0, -1, -1, -1)),
+  primed = list(c(0, 0, -1, 0), c(0, 0, 1, 0), c(0, 1, 1, 1), c(0, -1, -1, -1)),
   shared = list(c(0, 1, 0, 1), c(0, -1, 0, -1)),
   unique = list(c(0, 1, 0, 0), c(0, -1, 0, 0), c(0, 0, 0, 1), c(0, 0, 0, -1)),
   opposite = list(c(0, 1, 0, -1), c(0, -1, 0, 1)),
   no_response = list(c(0, 0, 1, 1), c(0, 0, -1, -1), c(0, 0, 0, 0))
 )
 # panel column (1-4) of each case; shared and opposite use the outer columns, as in the original Fig. 3
-.columns <- list(stress_ready = 1:4, shared = c(1, 4), unique = 1:4, opposite = c(1, 4), no_response = 1:3)
-.default_model_labels <- c(stress_ready = "Stress-ready", shared = "Shared response", unique = "Unique response",
+.columns <- list(primed = 1:4, shared = c(1, 4), unique = 1:4, opposite = c(1, 4), no_response = 1:3)
+.default_model_labels <- c(primed = "Primed", shared = "Shared response", unique = "Unique response",
                            opposite = "Opposite response", no_response = "No response")
 .col_a <- "#1f77b4"
 .col_b <- "#ff7f0e"
@@ -27,21 +27,22 @@
 #'   `c("C", "D")` for drought as in the original publication, or
 #'   `c("Ctrl", "NaCl")`.
 #' @param model_labels Row labels: a named character vector (or list) with
-#'   any of the names `stress_ready`, `shared`, `unique`, `opposite`,
+#'   any of the names `primed`, `shared`, `unique`, `opposite`,
 #'   `no_response`. Only the names you give are changed, e.g.
-#'   `c(stress_ready = "Primed", no_response = "Unchanged")`.
+#'   `c(primed = "Stress-ready", no_response = "Unchanged")`.
 #' @param title Figure title. By default it explains the condition labels.
 #' @return Invisibly, `NULL`.
 #' @examples
 #' plot_model_patterns()
 #' plot_model_patterns(condition_labels = c("Ctrl", "Drought"), group_names = c("Sly", "Spenn"),
-#'                     model_labels = c(stress_ready = "Primed", no_response = "Unchanged"))
+#'                     model_labels = c(primed = "Pre-adapted", no_response = "Unchanged"))
 #' @export
 plot_model_patterns <- function(classification = NULL, group_names = NULL, condition_labels = c("C", "S"),
                                 model_labels = NULL, title = NULL) {
   row_labels <- .default_model_labels
   if (!is.null(model_labels)) {
     model_labels <- unlist(model_labels)
+    names(model_labels)[names(model_labels) == "stress_ready"] <- "primed"
     bad <- setdiff(names(model_labels), names(row_labels))
     if (is.null(names(model_labels)) || any(names(model_labels) == "") || length(bad)) {
       stop("model_labels must be named with any of: ", paste(names(row_labels), collapse = ", "))
@@ -61,6 +62,7 @@ plot_model_patterns <- function(classification = NULL, group_names = NULL, condi
     } else c("A", "B")
   }
   summ <- if (!is.null(classification)) summarize_classification(classification) else NULL
+  if (!is.null(summ)) summ$model[summ$model == "stress_ready"] <- "primed"
   op <- graphics::par(mfrow = c(5, 4), mar = c(2.2, 1, 1.6, 0.5), oma = c(2, 3, 2, 0))
   on.exit(graphics::par(op))
   for (model in names(.patterns)) {

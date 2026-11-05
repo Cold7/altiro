@@ -34,6 +34,7 @@ __all__ = [
     "CONTRAST_KEYS",
     "CONTRAST_LABELS",
     "ClassificationOptions",
+    "PRIMED_MODELS",
     "classification_options",
     "model_definitions",
     "equivalence_test",
@@ -59,7 +60,10 @@ CONTRAST_LABELS: Dict[str, str] = {
     "a_stress_vs_b_control": "A stress vs B control",
 }
 
-RESPONSIVE_MODELS = ("stress_ready", "shared", "unique", "opposite", "unresolved")
+RESPONSIVE_MODELS = ("primed", "stress_ready", "shared", "unique", "opposite", "unresolved")
+# "stress_ready" is the legacy name of "primed" (label_style="stress_ready"), kept for compatibility
+PRIMED_MODELS = ("primed", "stress_ready")
+LABEL_STYLES = ("primed", "stress_ready")
 
 _NA_ACTIONS = ("not_de", "unclassified")
 
@@ -81,7 +85,7 @@ class ClassificationOptions:
         ``"unclassified"``: features with a missing value in any contrast that
         the decision tree consults are labelled ``unclassified``.
     require_basal_difference:
-        If True, a stress-ready call also requires a significant basal
+        If True, a primed call also requires a significant basal
         difference (``basal`` contrast) in the direction implied by the case.
         Features failing this check are labelled as the corresponding unique
         response.
@@ -150,10 +154,10 @@ def classification_options(preset: str = "paper", **overrides) -> Classification
 
 _DEFINITIONS = [
     # model, case, primed, responding, description template
-    ("stress_ready", 1, "A", "B", "{B} is induced under stress up to the control level of {A} ({A} is primed)"),
-    ("stress_ready", 2, "A", "B", "{B} is repressed under stress down to the control level of {A} ({A} is primed)"),
-    ("stress_ready", 3, "B", "A", "{A} is induced under stress up to the control level of {B} ({B} is primed)"),
-    ("stress_ready", 4, "B", "A", "{A} is repressed under stress down to the control level of {B} ({B} is primed)"),
+    ("primed", 1, "A", "B", "{B} is induced under stress up to the control level of {A} ({A} is primed)"),
+    ("primed", 2, "A", "B", "{B} is repressed under stress down to the control level of {A} ({A} is primed)"),
+    ("primed", 3, "B", "A", "{A} is induced under stress up to the control level of {B} ({B} is primed)"),
+    ("primed", 4, "B", "A", "{A} is repressed under stress down to the control level of {B} ({B} is primed)"),
     ("shared", 1, "", "both", "Induced under stress in both {A} and {B}"),
     ("shared", 2, "", "both", "Repressed under stress in both {A} and {B}"),
     ("unique", 1, "", "A", "Induced under stress only in {A}"),
@@ -307,6 +311,7 @@ def classify_responses(
     group_names: Sequence[str] = ("A", "B"),
     options: Optional[ClassificationOptions] = None,
     keep_statistics: bool = True,
+    label_style: str = "primed",
     **overrides,
 ) -> pd.DataFrame:
     """Assign every feature to an expression model.
@@ -328,6 +333,10 @@ def classify_responses(
         A :class:`ClassificationOptions` instance; overrides ``preset``.
     keep_statistics:
         Append ``<key>_log2FoldChange`` and ``<key>_padj`` columns.
+    label_style:
+        ``"primed"`` (default) or ``"stress_ready"``, the name used before
+        version 0.5.0 and in the original publication. Only the names in the
+        ``label`` and ``model`` columns change; the classification is the same.
     **overrides:
         Any field of :class:`ClassificationOptions`, e.g. ``alpha=0.01``.
 
@@ -337,6 +346,8 @@ def classify_responses(
         Indexed by feature with columns ``label``, ``model``, ``case``,
         ``primed_group``, ``responding_group``, ``description`` and ``flags``.
     """
+    if label_style not in LABEL_STYLES:
+        raise ValueError(f"label_style must be one of {LABEL_STYLES}")
     opts = options if options is not None else classification_options(preset, **overrides)
     tables = _as_tables(contrasts)
     index, t = _align(tables)
@@ -381,9 +392,9 @@ def classify_responses(
     both = de_a & de_b
     none = ~de_a & ~de_b
 
-    # --- only group B responds: stress-ready 1/2 or unique 3/4 -----------------
+    # --- only group B responds: primed 1/2 or unique 3/4 -----------------------
     b_up = s_b == 1
-    model[only_b & same_b] = "stress_ready"
+    model[only_b & same_b] = "primed"
     case[only_b & same_b] = np.where(b_up, 1, 2)[only_b & same_b]
     sel = only_b & de_mb
     model[sel] = "unique"
@@ -392,9 +403,9 @@ def classify_responses(
     model[sel] = "unresolved"
     case[sel] = np.where(b_up, 1, 2)[sel]
 
-    # --- only group A responds: stress-ready 3/4 or unique 1/2 -----------------
+    # --- only group A responds: primed 3/4 or unique 1/2 -----------------------
     a_up = s_a == 1
-    model[only_a & same_a] = "stress_ready"
+    model[only_a & same_a] = "primed"
     case[only_a & same_a] = np.where(a_up, 3, 4)[only_a & same_a]
     sel = only_a & de_ma
     model[sel] = "unique"
@@ -421,9 +432,9 @@ def classify_responses(
     sel = none & (model == "")
     model[sel], case[sel] = "no_response", 3
 
-    # --- optional: require a significant basal difference for stress-ready -------
+    # --- optional: require a significant basal difference for primed calls -------
     if opts.require_basal_difference:
-        sr = model == "stress_ready"
+        sr = model == "primed"
         expected = np.select([case == 1, case == 2, case == 3, case == 4], [-1, 1, 1, -1], 0)
         ok = de_bas & (s_bas == expected)
         demote = sr & ~ok
@@ -448,9 +459,11 @@ def classify_responses(
 
     defs = model_definitions(group_names, include_extra=True).set_index(["model", "case"])
     keys = list(zip(model, case))
+    if label_style != "primed":
+        model = np.where(model == "primed", label_style, model)
     out = pd.DataFrame(
         {
-            "label": [m if m == "unclassified" else f"{m}_{c}" for m, c in keys],
+            "label": [m if m == "unclassified" else f"{m}_{c}" for m, c in zip(model, case)],
             "model": model.astype(str),
             "case": case,
             "primed_group": [defs.loc[k, "primed_group"] for k in keys],
@@ -467,6 +480,7 @@ def classify_responses(
             out[f"{key}_padj"] = pd.to_numeric(t[key]["padj"], errors="coerce").to_numpy()
     out.attrs["options"] = opts
     out.attrs["group_names"] = tuple(group_names)
+    out.attrs["label_style"] = label_style
     return out
 
 
@@ -478,12 +492,12 @@ def summarize_classification(classification: pd.DataFrame) -> pd.DataFrame:
     """Counts per model and case.
 
     ``pct_of_responsive`` uses as denominator the features that respond to the
-    stress in at least one group (stress-ready, shared, unique, opposite and
+    stress in at least one group (primed, shared, unique, opposite and
     unresolved); ``pct_of_all`` uses every classified feature. Reporting both
     avoids confusing the two denominators.
     """
     counts = classification.groupby(["model", "case"]).size().rename("n").reset_index()
-    order = {m: i for i, m in enumerate(("stress_ready", "shared", "unique", "opposite", "no_response", "unresolved", "unclassified"))}
+    order = {m: i for i, m in enumerate(("primed", "stress_ready", "shared", "unique", "opposite", "no_response", "unresolved", "unclassified"))}
     counts["_o"] = counts["model"].map(order)
     counts = counts.sort_values(["_o", "case"]).drop(columns="_o").reset_index(drop=True)
     counts.insert(0, "label", [m if m == "unclassified" else f"{m}_{c}" for m, c in zip(counts["model"], counts["case"])])
@@ -497,29 +511,29 @@ def summarize_classification(classification: pd.DataFrame) -> pd.DataFrame:
 
 
 def primed_asymmetry(classification: pd.DataFrame) -> pd.DataFrame:
-    """Compare how often single-group responses end in a stress-ready state.
+    """Compare how often single-group responses end in a primed state.
 
     Among features that respond to stress in only one group, the fraction that
     reaches the other group's control level is computed separately for A-only
     and B-only responders, and compared with Fisher's exact test. A larger raw
-    number of stress-ready cases in one direction can simply reflect more
+    number of primed cases in one direction can simply reflect more
     responsive genes in that group; this test conditions on that.
     """
     m, c = classification["model"], classification["case"]
-    a_sr = int(((m == "stress_ready") & c.isin([3, 4])).sum())
+    a_sr = int((m.isin(PRIMED_MODELS) & c.isin([3, 4])).sum())
     a_un = int(((m == "unique") & c.isin([1, 2])).sum())
-    b_sr = int(((m == "stress_ready") & c.isin([1, 2])).sum())
+    b_sr = int((m.isin(PRIMED_MODELS) & c.isin([1, 2])).sum())
     b_un = int(((m == "unique") & c.isin([3, 4])).sum())
     names = classification.attrs.get("group_names", ("A", "B"))
     table = pd.DataFrame(
         {
             "responding_group": [names[0], names[1]],
             "primed_group": [names[1], names[0]],
-            "stress_ready": [a_sr, b_sr],
+            "primed": [a_sr, b_sr],
             "unique": [a_un, b_un],
         }
     )
-    table["fraction_stress_ready"] = table["stress_ready"] / (table["stress_ready"] + table["unique"]).replace(0, np.nan)
+    table["fraction_primed"] = table["primed"] / (table["primed"] + table["unique"]).replace(0, np.nan)
     odds, p = fisher_exact([[a_sr, a_un], [b_sr, b_un]])
     table.attrs["odds_ratio"] = odds
     table.attrs["fisher_pvalue"] = p

@@ -31,10 +31,10 @@ one <- function(a, b, basal, mb, ma, ...) {
 
 test_that("single-feature rules follow the published decision tree", {
   ns <- 0.5; de <- 0.001
-  expect_equal(one(c(ns, .1), c(de, 2), c(de, -2), c(ns, .1), c(de, 2)), "stress_ready_1")
-  expect_equal(one(c(ns, .1), c(de, -2), c(de, 2), c(ns, .1), c(de, -2)), "stress_ready_2")
-  expect_equal(one(c(de, 2), c(ns, .1), c(de, 2), c(de, -2), c(ns, .1)), "stress_ready_3")
-  expect_equal(one(c(de, -2), c(ns, .1), c(de, -2), c(de, 2), c(ns, .1)), "stress_ready_4")
+  expect_equal(one(c(ns, .1), c(de, 2), c(de, -2), c(ns, .1), c(de, 2)), "primed_1")
+  expect_equal(one(c(ns, .1), c(de, -2), c(de, 2), c(ns, .1), c(de, -2)), "primed_2")
+  expect_equal(one(c(de, 2), c(ns, .1), c(de, 2), c(de, -2), c(ns, .1)), "primed_3")
+  expect_equal(one(c(de, -2), c(ns, .1), c(de, -2), c(de, 2), c(ns, .1)), "primed_4")
   expect_equal(one(c(de, 2), c(ns, .1), c(ns, .1), c(de, 2), c(de, 2)), "unique_1")
   expect_equal(one(c(ns, .1), c(de, -2), c(ns, .1), c(de, -2), c(ns, .1)), "unique_4")
   expect_equal(one(c(de, 2), c(de, 2), c(ns, 0), c(de, 2), c(de, 2)), "shared_1")
@@ -45,7 +45,7 @@ test_that("single-feature rules follow the published decision tree", {
 
 test_that("strict preset requires a basal difference", {
   args <- list(c(0.001, 1), c(0.6, 0.1), c(0.3, 0.4), c(0.2, 0.5), c(0.4, 0.3))
-  expect_equal(do.call(one, args), "stress_ready_3")
+  expect_equal(do.call(one, args), "primed_3")
   expect_equal(do.call(one, c(args, preset = "strict")), "unique_1")
 })
 
@@ -90,4 +90,16 @@ test_that("wide input gives the same result", {
 test_that("options are validated", {
   expect_error(classification_options("paper", na_action = "drop"))
   expect_error(classification_options("paper", alpha = 2))
+})
+
+test_that("label_style only renames the primed model", {
+  tabs <- fixture_tables()
+  new <- classify_responses(tabs)
+  old <- classify_responses(tabs, label_style = "stress_ready")
+  expect_identical(sub("^primed_", "stress_ready_", new$label), old$label)
+  expect_false("stress_ready" %in% new$model)
+  expect_true("primed" %in% new$model)
+  expect_equal(summarize_classification(new)$n, summarize_classification(old)$n)
+  expect_equal(primed_asymmetry(new), primed_asymmetry(old))
+  expect_error(classify_responses(tabs, label_style = "ready"))
 })

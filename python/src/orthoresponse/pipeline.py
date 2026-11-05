@@ -77,9 +77,9 @@ class OrthoResponseResult:
 def format_asymmetry(asymmetry: pd.DataFrame) -> str:
     """One-line description of :func:`~orthoresponse.primed_asymmetry` (same wording as the R package)."""
     a = asymmetry
-    return ("Stress-ready among single-group responders: "
-            f"{a['responding_group'].iloc[0]}-only {100 * a['fraction_stress_ready'].iloc[0]:.1f}%, "
-            f"{a['responding_group'].iloc[1]}-only {100 * a['fraction_stress_ready'].iloc[1]:.1f}% "
+    return ("Single-group responses ending primed: "
+            f"{a['responding_group'].iloc[0]}-only {100 * a['fraction_primed'].iloc[0]:.1f}%, "
+            f"{a['responding_group'].iloc[1]}-only {100 * a['fraction_primed'].iloc[1]:.1f}% "
             f"(Fisher p = {a['fisher_pvalue'].iloc[0]:.3g})")
 
 

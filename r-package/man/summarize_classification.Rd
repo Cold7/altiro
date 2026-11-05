@@ -15,6 +15,6 @@ A data frame with \code{label}, \code{model}, \code{case}, \code{n},
 }
 \description{
 Counts per model and case. \code{pct_of_responsive} uses as denominator the
-features that respond in at least one group (stress-ready, shared, unique,
+features that respond in at least one group (primed, shared, unique,
 opposite and unresolved); \code{pct_of_all} uses every feature.
 }

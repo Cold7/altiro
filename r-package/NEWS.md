@@ -1,3 +1,9 @@
+# orthoresponse 0.5.0
+
+* The stress-ready model is now called **primed** (`primed_1` ... `primed_4`), a neutral name for any treatment, organism or group. The classification is unchanged.
+* `classify_responses(label_style = "stress_ready")` (and the Python/CLI equivalents) returns the old names.
+* `primed_asymmetry()` columns are now `primed` and `fraction_primed`; `plot_model_patterns()` uses the row label "Primed" and the key `primed` in `model_labels` (the old key `stress_ready` is still accepted).
+
 # orthoresponse 0.4.1
 
 * Python: `print(res)` shows the same summary as `print(res)` in R, including the stress-ready asymmetry line with its Fisher p-value; the command line prints it too. New `format_asymmetry()`.

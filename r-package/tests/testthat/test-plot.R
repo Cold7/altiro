@@ -6,7 +6,8 @@ test_that("plot_model_patterns accepts custom condition labels and title", {
   expect_null(plot_model_patterns(condition_labels = c("Ctrl", "Drought"), group_names = c("Sly", "Spenn"),
                                   title = "Tomato drought"))
   expect_error(plot_model_patterns(condition_labels = "Control"), "exactly two")
-  expect_null(plot_model_patterns(model_labels = c(stress_ready = "Primed", no_response = "Unchanged")))
+  expect_null(plot_model_patterns(model_labels = c(primed = "Pre-adapted", no_response = "Unchanged")))
+  expect_null(plot_model_patterns(model_labels = c(stress_ready = "Stress-ready")))   # legacy key
   expect_null(plot_model_patterns(model_labels = list(opposite = "Inverse")))
   expect_error(plot_model_patterns(model_labels = c(stressready = "x")), "model_labels")
   expect_error(plot_model_patterns(model_labels = "Primed"), "model_labels")

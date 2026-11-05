@@ -4,13 +4,13 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "orthoresponse"
-version = "0.4.1"
-description = "Classify expression response models (stress-ready, shared, unique, opposite, no response) of orthologs or genes in 2 x 2 designs."
+version = "0.5.0"
+description = "Classify expression response models (primed, shared, unique, opposite, no response) of orthologs or genes in 2 x 2 designs."
 readme = "README.md"
 license = { text = "MIT" }
 authors = [{ name = "J. Sebastián Contreras-Riquelme", email = "contrerasriquelme.sebastian@gmail.com" }]
 requires-python = ">=3.9"
-keywords = ["RNA-seq", "orthologs", "differential expression", "stress-ready", "comparative transcriptomics", "DESeq2"]
+keywords = ["RNA-seq", "orthologs", "differential expression", "primed", "stress-ready", "comparative transcriptomics", "DESeq2"]
 classifiers = [
   "Programming Language :: Python :: 3",
   "License :: OSI Approved :: MIT License",

@@ -25,12 +25,14 @@ contrast_keys <- function() {
   )
 }
 
-.responsive_models <- c("stress_ready", "shared", "unique", "opposite", "unresolved")
-.model_order <- c("stress_ready", "shared", "unique", "opposite", "no_response", "unresolved", "unclassified")
+# "stress_ready" is the legacy name of "primed" (label_style = "stress_ready")
+.primed_models <- c("primed", "stress_ready")
+.responsive_models <- c("primed", "stress_ready", "shared", "unique", "opposite", "unresolved")
+.model_order <- c("primed", "stress_ready", "shared", "unique", "opposite", "no_response", "unresolved", "unclassified")
 
 .definitions <- function() {
   data.frame(
-    model = c(rep("stress_ready", 4), rep("shared", 2), rep("unique", 4), rep("opposite", 2),
+    model = c(rep("primed", 4), rep("shared", 2), rep("unique", 4), rep("opposite", 2),
               rep("no_response", 3), rep("unresolved", 4), "unclassified"),
     case = c(1:4, 1:2, 1:4, 1:2, 1:3, 1:4, 0L),
     primed = c("A", "A", "B", "B", rep("", 16)),
@@ -105,7 +107,7 @@ model_definitions <- function(group_names = c("A", "B"), include_extra = FALSE) 
 #'   differentially expressed (paper behaviour). `"unclassified"`: features
 #'   with a missing value in any contrast consulted by the tree are labelled
 #'   `unclassified`.
-#' @param require_basal_difference If `TRUE`, stress-ready calls also require
+#' @param require_basal_difference If `TRUE`, primed calls also require
 #'   a significant basal difference in the direction implied by the case;
 #'   otherwise the feature is labelled as the corresponding unique response.
 #' @param equivalence_margin `NULL` (default) or a positive number (log2
@@ -216,7 +218,8 @@ equivalence_test <- function(log2fc, lfc_se, margin) {
 #'
 #' Applies the decision tree of Contreras-Riquelme et al. (2025) to the five
 #' contrasts of a 2 x 2 design and assigns each feature (ortholog pair or gene)
-#' to one model: stress-ready (cases 1-4), shared (1-2), unique (1-4),
+#' to one model: primed (cases 1-4; called stress-ready in the original
+#' publication), shared (1-2), unique (1-4),
 #' opposite (1-2) or no response (1-3). With the default `preset = "paper"`
 #' the result is identical to the published script, where A =
 #' *S. lycopersicum* and B = *S. pennellii*.
@@ -231,6 +234,9 @@ equivalence_test <- function(log2fc, lfc_se, margin) {
 #' @param options An object from [classification_options()]; overrides
 #'   `preset` and `...`.
 #' @param keep_statistics Append `<key>_log2FoldChange` and `<key>_padj`.
+#' @param label_style `"primed"` (default) or `"stress_ready"`, the name used
+#'   before version 0.5.0 and in the original publication. Only the names in
+#'   the `label` and `model` columns change; the classification is the same.
 #' @param ... Individual options passed to [classification_options()], e.g.
 #'   `alpha = 0.01` or `equivalence_margin = 0.5`.
 #' @return A data frame (one row per feature, row names = feature ids) with
@@ -245,8 +251,10 @@ equivalence_test <- function(log2fc, lfc_se, margin) {
 #' table(res$label)
 #' @export
 classify_responses <- function(contrasts, preset = c("paper", "strict"), group_names = c("A", "B"),
-                               options = NULL, keep_statistics = TRUE, ...) {
+                               options = NULL, keep_statistics = TRUE,
+                               label_style = c("primed", "stress_ready"), ...) {
   preset <- match.arg(preset)
+  label_style <- match.arg(label_style)
   opts <- if (is.null(options)) classification_options(preset, ...) else options
   tabs <- .as_tables(contrasts)
   keys <- names(contrast_keys())
@@ -295,11 +303,11 @@ classify_responses <- function(contrasts, preset = c("paper", "strict"), group_n
   b_up <- B$s == 1L
   a_up <- A$s == 1L
 
-  sel <- only_b & same_b; model[sel] <- "stress_ready"; case[sel] <- ifelse(b_up, 1L, 2L)[sel]
+  sel <- only_b & same_b; model[sel] <- "primed"; case[sel] <- ifelse(b_up, 1L, 2L)[sel]
   sel <- only_b & MB$de; model[sel] <- "unique"; case[sel] <- ifelse(b_up, 3L, 4L)[sel]
   sel <- only_b & !MB$de & !same_b; model[sel] <- "unresolved"; case[sel] <- ifelse(b_up, 1L, 2L)[sel]
 
-  sel <- only_a & same_a; model[sel] <- "stress_ready"; case[sel] <- ifelse(a_up, 3L, 4L)[sel]
+  sel <- only_a & same_a; model[sel] <- "primed"; case[sel] <- ifelse(a_up, 3L, 4L)[sel]
   sel <- only_a & MA$de; model[sel] <- "unique"; case[sel] <- ifelse(a_up, 1L, 2L)[sel]
   sel <- only_a & !MA$de & !same_a; model[sel] <- "unresolved"; case[sel] <- ifelse(a_up, 3L, 4L)[sel]
 
@@ -315,7 +323,7 @@ classify_responses <- function(contrasts, preset = c("paper", "strict"), group_n
   add_flag <- function(idx, flag) for (i in which(idx)) flags[[i]] <<- c(flags[[i]], flag)
 
   if (isTRUE(opts$require_basal_difference)) {
-    sr <- model == "stress_ready"
+    sr <- model == "primed"
     expected <- c(-1L, 1L, 1L, -1L)[pmax(case, 1L)]
     ok <- BAS$de & BAS$s == expected
     demote <- sr & !ok
@@ -336,6 +344,7 @@ classify_responses <- function(contrasts, preset = c("paper", "strict"), group_n
   defs <- model_definitions(group_names, include_extra = TRUE)
   key <- paste(model, case)
   m <- match(key, paste(defs$model, defs$case))
+  if (label_style != "primed") model[model == "primed"] <- label_style
   out <- data.frame(
     feature = ids,
     label = ifelse(model == "unclassified", "unclassified", paste0(model, "_", case)),
@@ -356,13 +365,14 @@ classify_responses <- function(contrasts, preset = c("paper", "strict"), group_n
   rownames(out) <- ids
   attr(out, "options") <- opts
   attr(out, "group_names") <- group_names
+  attr(out, "label_style") <- label_style
   out
 }
 
 #' Summarise a classification
 #'
 #' Counts per model and case. `pct_of_responsive` uses as denominator the
-#' features that respond in at least one group (stress-ready, shared, unique,
+#' features that respond in at least one group (primed, shared, unique,
 #' opposite and unresolved); `pct_of_all` uses every feature.
 #'
 #' @param classification Output of [classify_responses()].
@@ -382,24 +392,24 @@ summarize_classification <- function(classification) {
   tab
 }
 
-#' Test whether stress-ready states are more frequent in one direction
+#' Test whether primed states are more frequent in one direction
 #'
 #' Among features that respond to stress in only one group, compares the
-#' fraction that reaches the other group's control level (stress-ready) for
+#' fraction that reaches the other group's control level (primed) for
 #' A-only and B-only responders with Fisher's exact test. A larger raw count of
-#' stress-ready genes in one direction can simply reflect more responsive genes
+#' primed genes in one direction can simply reflect more responsive genes
 #' in that group; this comparison conditions on it.
 #'
 #' @param classification Output of [classify_responses()].
 #' @return A data frame with one row per responding group, the counts,
-#'   `fraction_stress_ready`, the sample `odds_ratio` and `fisher_pvalue`.
+#'   `fraction_primed`, the sample `odds_ratio` and `fisher_pvalue`.
 #' @export
 primed_asymmetry <- function(classification) {
   m <- classification$model
   cs <- classification$case
-  a_sr <- sum(m == "stress_ready" & cs %in% 3:4)
+  a_sr <- sum(m %in% .primed_models & cs %in% 3:4)
   a_un <- sum(m == "unique" & cs %in% 1:2)
-  b_sr <- sum(m == "stress_ready" & cs %in% 1:2)
+  b_sr <- sum(m %in% .primed_models & cs %in% 1:2)
   b_un <- sum(m == "unique" & cs %in% 3:4)
   gn <- attr(classification, "group_names")
   if (is.null(gn)) gn <- c("A", "B")
@@ -409,8 +419,8 @@ primed_asymmetry <- function(classification) {
   frac <- function(sr, un) if (sr + un == 0) NA_real_ else sr / (sr + un)
   data.frame(
     responding_group = gn, primed_group = rev(gn),
-    stress_ready = c(a_sr, b_sr), unique = c(a_un, b_un),
-    fraction_stress_ready = c(frac(a_sr, a_un), frac(b_sr, b_un)),
+    primed = c(a_sr, b_sr), unique = c(a_un, b_un),
+    fraction_primed = c(frac(a_sr, a_un), frac(b_sr, b_un)),
     odds_ratio = or, fisher_pvalue = p,
     stringsAsFactors = FALSE
   )

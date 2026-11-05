@@ -39,9 +39,9 @@ print.orthoresponse <- function(x, ...) {
   s$pct_of_all <- round(s$pct_of_all, 1)
   print(s, row.names = FALSE)
   a <- x$asymmetry
-  cat(sprintf("\nStress-ready among single-group responders: %s-only %.1f%%, %s-only %.1f%% (Fisher p = %.3g)\n",
-              a$responding_group[1], 100 * a$fraction_stress_ready[1],
-              a$responding_group[2], 100 * a$fraction_stress_ready[2], a$fisher_pvalue[1]))
+  cat(sprintf("\nSingle-group responses ending primed: %s-only %.1f%%, %s-only %.1f%% (Fisher p = %.3g)\n",
+              a$responding_group[1], 100 * a$fraction_primed[1],
+              a$responding_group[2], 100 * a$fraction_primed[2], a$fisher_pvalue[1]))
   invisible(x)
 }
 

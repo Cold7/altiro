@@ -1,16 +1,18 @@
 """orthoresponse: classify expression response models of orthologs (or genes) in 2 x 2 designs.
 
 Two groups (species, genotypes, cell lines) x two conditions (control, stress).
-Each feature is assigned to one of five models -- stress-ready, shared, unique,
+Each feature is assigned to one of five models -- primed (called stress-ready in
+the original publication), shared, unique,
 opposite or no response -- with the decision tree of Contreras-Riquelme et al.
 (2025) PLoS One 20(5): e0324724.
 """
 
-__version__ = "0.4.1"
+__version__ = "0.5.0"
 
 from .classify import (  # noqa: E402
     CONTRAST_KEYS,
     CONTRAST_LABELS,
+    PRIMED_MODELS,
     ClassificationOptions,
     adjust_bh,
     classification_options,
@@ -30,6 +32,7 @@ __all__ = [
     "CONTRAST_KEYS",
     "CONTRAST_LABELS",
     "ClassificationOptions",
+    "PRIMED_MODELS",
     "ContrastSet",
     "ExampleData",
     "OrthoResponseResult",

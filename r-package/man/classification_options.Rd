@@ -29,7 +29,7 @@ differentially expressed (paper behaviour). \code{"unclassified"}: features
 with a missing value in any contrast consulted by the tree are labelled
 \code{unclassified}.}
 
-\item{require_basal_difference}{If \code{TRUE}, stress-ready calls also require
+\item{require_basal_difference}{If \code{TRUE}, primed calls also require
 a significant basal difference in the direction implied by the case;
 otherwise the feature is labelled as the corresponding unique response.}
 

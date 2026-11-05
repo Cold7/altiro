@@ -14,7 +14,7 @@ def _simulate(seed=3):
     base = np.exp(rng.uniform(np.log(30), np.log(3000), n))
     # columns: A_control, A_stress, B_control, B_stress
     f = np.ones((n, 4))
-    f[:150, [1, 2, 3]] = 4.0        # stress_ready_3: A induced to B's constitutive level
+    f[:150, [1, 2, 3]] = 4.0        # primed_3: A induced to B's constitutive level
     f[150:300, 1] = 4.0             # unique_1: induced only in A
     f[300:450, [1, 3]] = 0.25       # shared_2
     f[450:600, [2, 3]] = 3.0        # no_response_1
@@ -41,13 +41,13 @@ def test_pipeline_recovers_simulated_models(tmp_path):
     res = run_orthoresponse(counts, meta, group_col="line", condition_col="treatment", group_a="sens",
                             group_b="tol", control="ctrl", stress="salt")
     lab = res.classification["label"]
-    assert (lab.iloc[:150] == "stress_ready_3").mean() > 0.9
+    assert (lab.iloc[:150] == "primed_3").mean() > 0.9
     assert (lab.iloc[150:300] == "unique_1").mean() > 0.9
     assert (lab.iloc[300:450] == "shared_2").mean() > 0.9
     assert (lab.iloc[450:600] == "no_response_1").mean() > 0.9
     text = str(res)
     assert text.startswith("orthoresponse result: A = sens | B = tol")
-    assert "Stress-ready among single-group responders: sens-only" in text and "(Fisher p = " in text
+    assert "Single-group responses ending primed: sens-only" in text and "(Fisher p = " in text
     assert repr(res) == text
     out = res.save(tmp_path / "res", condition_labels=("Ctrl", "Salt"))
     assert (out / "classification.tsv").exists() and (out / "contrasts" / "contrast_basal.tsv").exists()

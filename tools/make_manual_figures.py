@@ -29,7 +29,7 @@ for key, (d, names, cond, exname) in EX.items():
     norm.index = norm.index.astype(str); norm_all[key] = norm
     plt.close("all")
 
-# real genes, one per model (ovarian, strict preset for stress-ready)
+# real genes, one per model (ovarian, strict preset for primed)
 def gene_panel(key, picks, fname):
     d, names, cond, exname = EX[key]
     ex = orr.load_example(exname)
@@ -60,7 +60,7 @@ def top(df, label, col="a_response_log2FoldChange", asc=False, coding=True):
     expr = norm_all["ovarian"].mean(axis=1)
     sub = sub[expr.reindex(sub.index).fillna(0) >= 300]
     return sub.sort_values(col, ascending=asc).index[0]
-picks = [(top(strict, "stress_ready_3"), "stress_ready_3"),
+picks = [(top(strict, "primed_3"), "primed_3"),
          (top(cls, "shared_1"), "shared_1"),
          (top(cls, "unique_1"), "unique_1"),
          (top(cls, "unique_3", col="b_response_log2FoldChange"), "unique_3")]
@@ -71,7 +71,7 @@ gene_panel("ovarian", picks, "ovarian_genes.pdf")
 fig, axes = plt.subplots(1, 2, figsize=(8.6, 3.0))
 for ax, key, title in zip(axes, ["rice", "ovarian"], ["Rice (GSE167342)", "Ovarian cells (GSE283381)"]):
     c, s = cls_all[key]
-    labs = [f"stress_ready_{i}" for i in range(1, 5)]
+    labs = [f"primed_{i}" for i in range(1, 5)]
     pv = [int((c.label == l).sum()) for l in labs]; sv = [int((s.label == l).sum()) for l in labs]
     x = np.arange(4)
     ax.bar(x - 0.2, pv, 0.4, color="#9aa7c7", label="paper preset")
@@ -79,9 +79,9 @@ for ax, key, title in zip(axes, ["rice", "ovarian"], ["Rice (GSE167342)", "Ovari
     for xi, a, b in zip(x, pv, sv):
         ax.text(xi - 0.2, a, str(a), ha="center", va="bottom", fontsize=6.5)
         ax.text(xi + 0.2, b, str(b), ha="center", va="bottom", fontsize=6.5)
-    ax.set_xticks(x); ax.set_xticklabels([f"SR {i}" for i in range(1, 5)], fontsize=8)
+    ax.set_xticks(x); ax.set_xticklabels([f"primed {i}" for i in range(1, 5)], fontsize=8)
     ax.set_title(title, fontsize=9); ax.spines[["top", "right"]].set_visible(False); ax.tick_params(axis="y", labelsize=7)
-axes[0].set_ylabel("Stress-ready genes", fontsize=8); axes[1].legend(fontsize=7, frameon=False)
+axes[0].set_ylabel("Primed genes", fontsize=8); axes[1].legend(fontsize=7, frameon=False)
 fig.tight_layout(); fig.savefig(f"{OUT}/paper_vs_strict.pdf", bbox_inches="tight"); plt.close(fig)
 
 # asymmetry fractions
@@ -90,10 +90,10 @@ for ax, key, title in zip(axes, ["rice", "ovarian"], ["Rice (GSE167342)", "Ovari
     c, s = cls_all[key]
     a_p, a_s = orr.primed_asymmetry(c), orr.primed_asymmetry(s)
     x = np.arange(2)
-    ax.bar(x - 0.2, 100 * a_p.fraction_stress_ready, 0.4, color="#9aa7c7", label="paper")
-    ax.bar(x + 0.2, 100 * a_s.fraction_stress_ready, 0.4, color="#2f4b8a", label="strict")
+    ax.bar(x - 0.2, 100 * a_p.fraction_primed, 0.4, color="#9aa7c7", label="paper")
+    ax.bar(x + 0.2, 100 * a_s.fraction_primed, 0.4, color="#2f4b8a", label="strict")
     ax.set_xticks(x); ax.set_xticklabels([f"{g}-only\nresponders" for g in a_p.responding_group], fontsize=7.5)
-    ax.set_ylim(0, 100); ax.set_ylabel("% ending stress-ready", fontsize=7.5); ax.tick_params(axis="y", labelsize=7)
+    ax.set_ylim(0, 100); ax.set_ylabel("% ending primed", fontsize=7.5); ax.tick_params(axis="y", labelsize=7)
     ax.set_title(f"{title}\nFisher p: paper {a_p.fisher_pvalue[0]:.1g}, strict {a_s.fisher_pvalue[0]:.2f}", fontsize=8.5)
     ax.spines[["top", "right"]].set_visible(False)
 axes[1].legend(fontsize=7, frameon=False)

@@ -15,10 +15,10 @@ COLOR_B = "#ff7f0e"
 
 # Schematic levels (A control, A stress, B control, B stress) for each model/case.
 PATTERNS = {
-    ("stress_ready", 1): (0, 0, -1, 0),
-    ("stress_ready", 2): (0, 0, 1, 0),
-    ("stress_ready", 3): (0, 1, 1, 1),
-    ("stress_ready", 4): (0, -1, -1, -1),
+    ("primed", 1): (0, 0, -1, 0),
+    ("primed", 2): (0, 0, 1, 0),
+    ("primed", 3): (0, 1, 1, 1),
+    ("primed", 4): (0, -1, -1, -1),
     ("shared", 1): (0, 1, 0, 1),
     ("shared", 2): (0, -1, 0, -1),
     ("unique", 1): (0, 1, 0, 0),
@@ -34,7 +34,7 @@ PATTERNS = {
 
 # (model, [(case, column), ...]); shared and opposite use the outer columns, as in the original Fig. 3
 _ROWS = [
-    ("stress_ready", [(1, 0), (2, 1), (3, 2), (4, 3)]),
+    ("primed", [(1, 0), (2, 1), (3, 2), (4, 3)]),
     ("shared", [(1, 0), (2, 3)]),
     ("unique", [(1, 0), (2, 1), (3, 2), (4, 3)]),
     ("opposite", [(1, 0), (2, 3)]),
@@ -42,7 +42,7 @@ _ROWS = [
 ]
 
 DEFAULT_MODEL_LABELS = {
-    "stress_ready": "Stress-ready",
+    "primed": "Primed",
     "shared": "Shared response",
     "unique": "Unique response",
     "opposite": "Opposite response",
@@ -53,6 +53,7 @@ DEFAULT_MODEL_LABELS = {
 def _model_labels(model_labels):
     labels = dict(DEFAULT_MODEL_LABELS)
     if model_labels:
+        model_labels = {("primed" if k == "stress_ready" else k): v for k, v in model_labels.items()}
         unknown = set(model_labels) - set(labels)
         if unknown:
             raise ValueError(f"Unknown model(s) in model_labels: {sorted(unknown)}; "
@@ -113,9 +114,9 @@ def plot_model_patterns(
         Default ``("C", "S")``; e.g. ``("C", "D")`` for drought as in the
         original publication, or ``("Ctrl", "NaCl")``.
     model_labels:
-        Row labels, as a dict keyed by model: ``"stress_ready"``, ``"shared"``,
+        Row labels, as a dict keyed by model: ``"primed"``, ``"shared"``,
         ``"unique"``, ``"opposite"``, ``"no_response"``. Only the keys you give
-        are changed, e.g. ``{"stress_ready": "Primed", "no_response": "Unchanged"}``.
+        are changed, e.g. ``{"primed": "Stress-ready", "no_response": "Unchanged"}``.
     title:
         Figure title. By default it explains the condition labels.
     """
@@ -126,7 +127,11 @@ def plot_model_patterns(
 
     if group_names is None:
         group_names = classification.attrs.get("group_names", ("A", "B")) if classification is not None else ("A", "B")
-    summ = summarize_classification(classification).set_index(["model", "case"]) if classification is not None else None
+    summ = None
+    if classification is not None:
+        summ = summarize_classification(classification)
+        summ["model"] = summ["model"].replace({"stress_ready": "primed"})
+        summ = summ.set_index(["model", "case"])
 
     fig, axes = plt.subplots(len(_ROWS), 4, figsize=figsize)
     for r, (model, layout) in enumerate(_ROWS):
