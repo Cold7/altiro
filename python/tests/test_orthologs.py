@@ -45,6 +45,11 @@ def test_merge_and_length_normalization():
     m2 = merge_ortholog_counts(ca, cb, orth, lengths_a=pd.Series({"a1": 2000, "a2": 500}),
                                lengths_b=pd.Series({"b1": 1000, "b2": 4000}), length_normalize=True)
     assert m2.loc["o1", "a_c1"] == 50 and m2.loc["o2", "a_c1"] == 20 and m2.loc["o2", "b_c1"] == 1
+    # normalized values stay integer counts (rounded), as DESeq2 requires
+    assert all(pd.api.types.is_integer_dtype(t) for t in m2.dtypes)
+    m3 = merge_ortholog_counts(ca, cb, orth, lengths_a=pd.Series({"a1": 3000, "a2": 700}),
+                               lengths_b=pd.Series({"b1": 1300, "b2": 4100}), length_normalize=True)
+    assert all(pd.api.types.is_integer_dtype(t) for t in m3.dtypes)
 
 
 def test_merge_rejects_non_one_to_one():

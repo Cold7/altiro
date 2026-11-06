@@ -173,5 +173,7 @@ res <- altiro(counts, samples, group_col = "species", condition_col = "treatment
 Each species should be quantified against its own reference. Expression is then
 compared between orthologs; differences in transcript length, mappability and
 annotation between the two references can create apparent basal differences,
-which is why the original publication tested a length correction
-(`length_normalize = TRUE`).
+which is why the original publication applied a length correction. It is
+available as `merge_ortholog_counts(..., lengths_a = , lengths_b = , length_normalize = TRUE)`:
+counts are divided by gene length in kb and rounded, so the matrix stays integer.
+Use it to replicate that analysis or as a sensitivity check, not by default.

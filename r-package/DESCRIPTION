@@ -1,7 +1,7 @@
 Package: altiro
 Type: Package
 Title: Analysis of Latent Transcriptional Induction and Response Outcomes
-Version: 0.6.0
+Version: 0.6.1
 Authors@R:
     person(given = "J. Sebastián", family = "Contreras-Riquelme",
            email = "contrerasriquelme.sebastian@gmail.com", role = c("aut", "cre", "cph"))

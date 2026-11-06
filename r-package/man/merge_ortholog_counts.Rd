@@ -32,8 +32,9 @@ B. Sample names must be unique across both.}
 when \code{length_normalize = TRUE}.}
 
 \item{length_normalize}{Apply \code{Q = round(E / L_kb)} per species, as in the
-original publication. This changes the count distribution assumed by
-DESeq2; keep \code{FALSE} unless replicating that analysis.}
+original publication. Values are rounded, so the matrix stays integer.
+This changes the count distribution assumed by DESeq2; keep \code{FALSE}
+unless replicating that analysis.}
 }
 \value{
 A count matrix (orthologs x samples of A followed by B).

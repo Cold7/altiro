@@ -95,8 +95,9 @@ reciprocal_best_hits <- function(blast_ab, blast_ba, max_evalue = NULL, min_bits
 #' @param lengths_a,lengths_b Named numeric vectors of lengths (bp). Required
 #'   when `length_normalize = TRUE`.
 #' @param length_normalize Apply `Q = round(E / L_kb)` per species, as in the
-#'   original publication. This changes the count distribution assumed by
-#'   DESeq2; keep `FALSE` unless replicating that analysis.
+#'   original publication. Values are rounded, so the matrix stays integer.
+#'   This changes the count distribution assumed by DESeq2; keep `FALSE`
+#'   unless replicating that analysis.
 #' @return A count matrix (orthologs x samples of A followed by B).
 #' @export
 merge_ortholog_counts <- function(counts_a, counts_b, orthologs, gene_a_col = "gene_a", gene_b_col = "gene_b",

@@ -2,7 +2,7 @@
 
 *Analysis of Latent Transcriptional Induction and Response Outcomes* (package `altiro`, formerly `orthoresponse`)
 
-Version 0.6.0 · Python and R
+Version 0.6.1 · Python and R
 
 `altiro` classifies genes (within one species) or ortholog pairs (between
 two species) into **expression response models** in a 2 x 2 design: two
@@ -677,11 +677,30 @@ tabs = alt.read_contrasts(paths, id_col="gene", lfc_col="logFC", padj_col="FDR")
    ```
 
    Rows become ortholog ids; columns are the samples of A followed by B
-   (sample names must be unique). `length_normalize=True` applies the
-   correction of the original publication, `Q = round(E / L_kb)`, using
-   per-gene lengths. It puts orthologs of different lengths on one scale but
-   changes the count distribution DESeq2 assumes, so use it to replicate that
-   analysis or as a sensitivity check rather than by default.
+   (sample names must be unique).
+
+   **Optional length correction.** `length_normalize=True` applies the
+   correction of the original publication, `Q = round(E / L_kb)`: the count of
+   each gene is divided by its length in kilobases and rounded, separately for
+   each species and before merging. The result is still an **integer** matrix,
+   ready for DESeq2/PyDESeq2. Lengths are given in base pairs, one vector per
+   species indexed by gene id:
+
+   ```python
+   counts = alt.merge_ortholog_counts(counts_a, counts_b, orth,
+                                      lengths_a=lengths_a, lengths_b=lengths_b,
+                                      length_normalize=True)
+   ```
+   ```r
+   counts <- merge_ortholog_counts(counts_a, counts_b, orth,
+                                   lengths_a = lengths_a, lengths_b = lengths_b,
+                                   length_normalize = TRUE)
+   ```
+
+   The corrected values are no longer raw read counts, which changes the
+   mean-variance relationship DESeq2 models. The option is off by default; use
+   it to replicate the published analysis or as a sensitivity check, and never
+   when both groups share a genome.
 4. **Run the workflow** with the species as groups.
 
 Basal differences between species mix biology with technical effects

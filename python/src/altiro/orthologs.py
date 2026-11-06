@@ -159,7 +159,8 @@ def merge_ortholog_counts(
         ``length_normalize`` is True.
     length_normalize:
         Apply the length correction used in the original publication,
-        ``Q = round(E / L_kb)``, to each species before merging. This puts
+        ``Q = round(E / L_kb)``, to each species before merging. Values are
+        rounded, so the merged matrix stays integer (as DESeq2 requires). This puts
         orthologs of different lengths on a comparable scale but changes the
         count distribution assumed by DESeq2; keep it False unless you want to
         replicate that analysis.

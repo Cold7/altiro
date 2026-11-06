@@ -1,3 +1,9 @@
+# altiro 0.6.1
+
+* Manual: new subsection on the optional length correction of `merge_ortholog_counts()`
+  (how to pass `lengths_a`/`lengths_b`, integer output, caveats for DESeq2).
+* Tests now check that length-normalised matrices stay integer in Python and R.
+
 # altiro 0.6.0
 
 * The package is renamed from `orthoresponse` to `altiro` (ALTIRO, Analysis of Latent Transcriptional Induction and Response Outcomes).

@@ -43,6 +43,11 @@ test_that("merge and length normalisation", {
                               length_normalize = TRUE)
   expect_equal(unname(m2[, "a_c1"]), c(50L, 20L))
   expect_equal(m2["o2", "b_c1"], 1L)
+  # normalized values stay integer counts (rounded), as DESeq2 requires
+  expect_true(is.integer(m2))
+  m3 <- merge_ortholog_counts(ca, cb, orth, lengths_a = c(a1 = 3000, a2 = 700),
+                              lengths_b = c(b1 = 1300, b2 = 4100), length_normalize = TRUE)
+  expect_true(is.integer(m3))
   orth2 <- data.frame(ortholog_id = c("o1", "o2"), gene_a = c("a1", "a2"), gene_b = c("b1", "b1"))
   expect_error(merge_ortholog_counts(ca, cb, orth2))
 })
