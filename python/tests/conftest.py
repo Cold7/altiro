@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from orthoresponse import CONTRAST_KEYS
+from altiro import CONTRAST_KEYS
 
 
 def random_contrasts(n=2000, seed=0, na_frac=0.05):

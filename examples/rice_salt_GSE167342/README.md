@@ -9,10 +9,10 @@ the scripts work after a plain installation.
 
 | file | location in the repository |
 |---|---|
-| raw counts (36,844 genes x 12 samples) | `python/src/orthoresponse/data/rice_GSE167342_counts.tsv.gz` (also `r-package/inst/extdata/`) |
-| sample table | `python/src/orthoresponse/data/rice_GSE167342_samples.tsv` (also `r-package/inst/extdata/`); `samples.tsv` in this folder is the same table |
+| raw counts (36,844 genes x 12 samples) | `python/src/altiro/data/rice_GSE167342_counts.tsv.gz` (also `r-package/inst/extdata/`) |
+| sample table | `python/src/altiro/data/rice_GSE167342_samples.tsv` (also `r-package/inst/extdata/`); `samples.tsv` in this folder is the same table |
 
-Load them with `orr.load_example("rice_salt")` (Python) or
+Load them with `alt.load_example("rice_salt")` (Python) or
 `load_example("rice_salt")` (R), or read the files directly; see the main
 README, section *Example data*.
 

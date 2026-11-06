@@ -1,4 +1,4 @@
 library(testthat)
-library(orthoresponse)
+library(altiro)
 
-test_check("orthoresponse")
+test_check("altiro")

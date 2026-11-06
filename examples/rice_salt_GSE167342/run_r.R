@@ -2,18 +2,18 @@
 # Data: GEO GSE167342 (leaves, control vs 24 h 80 mM NaCl, 3 replicates), bundled with the package.
 # Run from this folder:  Rscript run_r.R
 
-library(orthoresponse)
+library(altiro)
 
 ex <- load_example("rice_salt")   # counts: 36,844 genes x 12 samples (S40 ... S72)
 ex$samples[, c("line", "treatment")]
 
-res <- orthoresponse(ex$counts, ex$samples,
-                     group_col = "line", condition_col = "treatment",
-                     group_a = "PL12", group_b = "IL22",   # A = sensitive, B = tolerant
-                     control = "Control", stress = "Salt")
+res <- altiro(ex$counts, ex$samples,
+              group_col = "line", condition_col = "treatment",
+              group_a = "PL12", group_b = "IL22",   # A = sensitive, B = tolerant
+              control = "Control", stress = "Salt")
 res
 # tables + figures (model_patterns.png/pdf, model_summary.png/pdf)
-save_orthoresponse(res, "results_r", condition_labels = c("Ctrl", "NaCl"))
+save_altiro(res, "results_r", condition_labels = c("Ctrl", "NaCl"))
 
 strict <- classify_responses(res$contrasts, preset = "strict", group_names = c("PL12", "IL22"))
 cat("\nPrimed genes, paper vs strict preset:",

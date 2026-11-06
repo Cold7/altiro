@@ -13,7 +13,7 @@ venv/
 .Rhistory
 .RData
 *.Rcheck/
-orthoresponse_*.tar.gz
+altiro_*.tar.gz
 r-package/inst/doc/
 r-package/doc/
 r-package/Meta/
@@ -36,5 +36,5 @@ docs/latex/*.fls
 docs/latex/*.fdb_latexmk
 docs/latex/*.xdv
 docs/latex/build.log
-docs/latex/orthoresponse_manual.pdf
+docs/latex/altiro_manual.pdf
 docs/latex/*.listing

@@ -12,10 +12,10 @@ The data files are bundled with the packages (not in this folder):
 
 | file | location in the repository |
 |---|---|
-| raw counts (59,453 genes x 12 samples) | `python/src/orthoresponse/data/ovarian_GSE283381_counts.tsv.gz` (also `r-package/inst/extdata/`) |
-| sample table | `python/src/orthoresponse/data/ovarian_GSE283381_samples.tsv` (also `r-package/inst/extdata/`); `samples.tsv` in this folder has the same first three columns |
+| raw counts (59,453 genes x 12 samples) | `python/src/altiro/data/ovarian_GSE283381_counts.tsv.gz` (also `r-package/inst/extdata/`) |
+| sample table | `python/src/altiro/data/ovarian_GSE283381_samples.tsv` (also `r-package/inst/extdata/`); `samples.tsv` in this folder has the same first three columns |
 
-Load them with `orr.load_example("ovarian_brequinar")` (Python) or
+Load them with `alt.load_example("ovarian_brequinar")` (Python) or
 `load_example("ovarian_brequinar")` (R), or read the files directly as shown
 in the main README.
 

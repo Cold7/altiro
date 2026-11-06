@@ -1,4 +1,4 @@
-"""Command-line interface: ``orthoresponse <command> --help``."""
+"""Command-line interface: ``altiro <command> --help``."""
 
 from __future__ import annotations
 
@@ -74,11 +74,11 @@ def _write_outputs(cls: pd.DataFrame, outdir: Path, a=None) -> None:
 
 
 def cmd_run(a) -> None:
-    from .pipeline import run_orthoresponse
+    from .pipeline import run_altiro
 
     counts = _read_table(a.counts)
     samples = _read_table(a.samples)
-    res = run_orthoresponse(
+    res = run_altiro(
         counts, samples, group_col=a.group_col, condition_col=a.condition_col, group_a=a.group_a,
         group_b=a.group_b, control=a.control, stress=a.stress, preset=a.preset,
         min_total_count=a.min_total_count, filter_alpha=a.filter_alpha, round_counts=a.round_counts,
@@ -129,7 +129,7 @@ def cmd_example(a) -> None:
     p = _EXAMPLES[a.name]["params"]
     print(f"Wrote {out['counts']} and {out['samples']}")
     print("Run it with:")
-    print(f"  orthoresponse run --counts {out['counts']} --samples {out['samples']} "
+    print(f"  altiro run --counts {out['counts']} --samples {out['samples']} "
           f"--group-col {p['group_col']} --condition-col {p['condition_col']} --group-a {p['group_a']} "
           f"--group-b {p['group_b']} --control {p['control']} --stress {p['stress']} --out results")
 
@@ -140,8 +140,8 @@ def cmd_models(a) -> None:
 
 
 def build_parser() -> argparse.ArgumentParser:
-    p = argparse.ArgumentParser(prog="orthoresponse", description="Classify expression response models in 2 x 2 designs.")
-    p.add_argument("--version", action="version", version=f"orthoresponse {__version__}")
+    p = argparse.ArgumentParser(prog="altiro", description="Classify expression response models in 2 x 2 designs.")
+    p.add_argument("--version", action="version", version=f"altiro {__version__}")
     sub = p.add_subparsers(dest="command", required=True)
 
     r = sub.add_parser("run", help="counts + sample table -> PyDESeq2 -> classification")
@@ -191,7 +191,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     e = sub.add_parser("example", help="write the bundled example data (counts + samples) to a folder")
     e.add_argument("--name", default="rice_salt", choices=["rice_salt", "ovarian_brequinar"])
-    e.add_argument("--out", default="orthoresponse_example")
+    e.add_argument("--out", default="altiro_example")
     e.set_defaults(func=cmd_example)
 
     d = sub.add_parser("models", help="print the definition of every model and case")

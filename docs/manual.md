@@ -1,8 +1,10 @@
-# orthoresponse user manual
+# ALTIRO user manual
 
-Version 0.5.1 · Python and R
+*Analysis of Latent Transcriptional Induction and Response Outcomes* (package `altiro`, formerly `orthoresponse`)
 
-`orthoresponse` classifies genes (within one species) or ortholog pairs (between
+Version 0.6.0 · Python and R
+
+`altiro` classifies genes (within one species) or ortholog pairs (between
 two species) into **expression response models** in a 2 x 2 design: two
 **groups** (species, genotypes, cultivars, cell lines...) measured under a
 **control** and a **stress** condition. The default rules reproduce exactly the
@@ -97,21 +99,21 @@ Replace `Cold7` with the GitHub account that hosts the repository.
 
 ```bash
 # everything: PyDESeq2, plotting and Excel support
-pip install "orthoresponse[all] @ git+https://github.com/Cold7/orthoresponse.git#subdirectory=python"
+pip install "altiro[all] @ git+https://github.com/Cold7/altiro.git#subdirectory=python"
 
 # classifier only (numpy, pandas, scipy) - enough if you already have contrast tables
-pip install "git+https://github.com/Cold7/orthoresponse.git#subdirectory=python"
+pip install "git+https://github.com/Cold7/altiro.git#subdirectory=python"
 ```
 
 Optional extras: `deseq` (PyDESeq2), `plot` (matplotlib), `excel` (openpyxl),
-`all`, `test` (pytest). Check the installation with `orthoresponse --version`.
+`all`, `test` (pytest). Check the installation with `altiro --version`.
 
 From a local clone (development mode):
 
 ```bash
-git clone https://github.com/Cold7/orthoresponse.git
-pip install -e "orthoresponse/python[all,test]"
-pytest orthoresponse/python/tests
+git clone https://github.com/Cold7/altiro.git
+pip install -e "altiro/python[all,test]"
+pytest altiro/python/tests
 ```
 
 ### R (>= 4.1)
@@ -119,13 +121,13 @@ pytest orthoresponse/python/tests
 ```r
 install.packages(c("BiocManager", "remotes"))
 BiocManager::install("DESeq2")
-remotes::install_github("Cold7/orthoresponse", subdir = "r-package",
+remotes::install_github("Cold7/altiro", subdir = "r-package",
                         build_vignettes = TRUE)
-library(orthoresponse)
-vignette("orthoresponse")
+library(altiro)
+vignette("altiro")
 ```
 
-From a local clone: `R CMD INSTALL orthoresponse/r-package`.
+From a local clone: `R CMD INSTALL altiro/r-package`.
 
 ---
 
@@ -137,29 +139,29 @@ Two real data sets are included: `rice_salt` (GEO GSE167342, see 10.1) and
 `ovarian_brequinar` (GEO GSE283381, see 10.2):
 
 ```python
-ex = orr.load_example("rice_salt")      # ExampleData: .counts, .samples, .params
-res = orr.run_orthoresponse(ex.counts, ex.samples, **ex.params)
-orr.export_example("my_folder")         # counts.tsv.gz + samples.tsv, as templates
+ex = alt.load_example("rice_salt")      # ExampleData: .counts, .samples, .params
+res = alt.run_altiro(ex.counts, ex.samples, **ex.params)
+alt.export_example("my_folder")         # counts.tsv.gz + samples.tsv, as templates
 ```
 ```r
 ex <- load_example("rice_salt")         # list: counts, samples, params
-res <- do.call(orthoresponse, c(list(ex$counts, ex$samples), ex$params))
+res <- do.call(altiro, c(list(ex$counts, ex$samples), ex$params))
 export_example("my_folder")
 ```
 
-Command line: `orthoresponse example --out my_folder` writes the two files and
-prints the matching `orthoresponse run` command.
+Command line: `altiro example --out my_folder` writes the two files and
+prints the matching `altiro run` command.
 
 ### Python
 
 ```python
 import pandas as pd
-import orthoresponse as orr
+import altiro as alt
 
 counts = pd.read_csv("counts.tsv", sep="\t", index_col=0)    # raw counts, genes x samples
 samples = pd.read_csv("samples.tsv", sep="\t", index_col=0)  # one row per sample
 
-res = orr.run_orthoresponse(
+res = alt.run_altiro(
     counts, samples,
     group_col="line", condition_col="treatment",
     group_a="PL12", group_b="IL22",          # A = sensitive, B = tolerant
@@ -174,30 +176,30 @@ res.save("results")         # TSV files + contrast tables + normalized counts
 ### Command line (installed with the Python package)
 
 ```bash
-orthoresponse run --counts counts.tsv --samples samples.tsv \
+altiro run --counts counts.tsv --samples samples.tsv \
   --group-col line --condition-col treatment \
   --group-a PL12 --group-b IL22 --control Control --stress Salt \
   --out results
 
-orthoresponse models --group-names PL12 IL22     # print the model definitions
-orthoresponse classify --help                     # classify precomputed contrasts
-orthoresponse rbh --help                          # reciprocal best BLAST hits
-orthoresponse merge --help                        # merge two species' counts
+altiro models --group-names PL12 IL22     # print the model definitions
+altiro classify --help                     # classify precomputed contrasts
+altiro rbh --help                          # reciprocal best BLAST hits
+altiro merge --help                        # merge two species' counts
 ```
 
 ### R
 
 ```r
-library(orthoresponse)
+library(altiro)
 counts  <- read.delim("counts.tsv", row.names = 1, check.names = FALSE)
 samples <- read.delim("samples.tsv", row.names = 1)
 
-res <- orthoresponse(counts, samples,
-                     group_col = "line", condition_col = "treatment",
-                     group_a = "PL12", group_b = "IL22",
-                     control = "Control", stress = "Salt")
+res <- altiro(counts, samples,
+              group_col = "line", condition_col = "treatment",
+              group_a = "PL12", group_b = "IL22",
+              control = "Control", stress = "Salt")
 res                               # printed summary
-save_orthoresponse(res, "results")
+save_altiro(res, "results")
 plot_model_patterns(res$classification)
 ```
 
@@ -212,7 +214,7 @@ first and fourth columns. All naming options (groups, conditions, models,
 tables) are described in [section 9](#9-customizing-names-and-labels).
 
 ```python
-from orthoresponse.plotting import plot_model_patterns
+from altiro.plotting import plot_model_patterns
 fig = plot_model_patterns(res.classification, condition_labels=("Ctrl", "NaCl"))
 fig = plot_model_patterns(res.classification, condition_labels=("C", "D"),   # D = drought
                           group_names=("S. lycopersicum", "S. pennellii"), title="Tomato drought",
@@ -281,7 +283,7 @@ You can also pass a single wide table whose columns are
 
 ## 5. What the workflow does
 
-`run_orthoresponse()` (Python) / `orthoresponse()` (R):
+`run_altiro()` (Python) / `altiro()` (R):
 
 1. **Design.** Samples are mapped to four cells, `A_control`, `A_stress`,
    `B_control`, `B_stress`.
@@ -352,7 +354,7 @@ The `flags` column records why a call may deserve attention:
 Any option can be combined with any preset:
 
 ```python
-orr.classify_responses(tables, preset="strict", equivalence_margin=0.5)
+alt.classify_responses(tables, preset="strict", equivalence_margin=0.5)
 ```
 ```r
 classify_responses(tables, preset = "strict", equivalence_margin = 0.5)
@@ -434,7 +436,7 @@ simply reflect that one group has more responsive genes; this test removes that
 effect. The odds ratio reported is the sample odds ratio
 `(SR_A * U_B) / (U_A * SR_B)`.
 
-### 8.4 Files written by `save()` / `save_orthoresponse()`
+### 8.4 Files written by `save()` / `save_altiro()`
 
 ```text
 results/
@@ -454,17 +456,17 @@ them off:
 res.save("results", condition_labels=("Ctrl", "NaCl"),
          model_labels={"primed": "Pre-adapted"}, formats=("png",))
 res.save("results", plots=False)                     # tables only
-orr.save_plots(classification, "figures")            # figures for any classification
+alt.save_plots(classification, "figures")            # figures for any classification
 ```
 ```r
-save_orthoresponse(res, "results", condition_labels = c("Ctrl", "NaCl"),
-                   model_labels = c(primed = "Pre-adapted"), formats = "png")
-save_orthoresponse(res, "results", plots = FALSE)
+save_altiro(res, "results", condition_labels = c("Ctrl", "NaCl"),
+            model_labels = c(primed = "Pre-adapted"), formats = "png")
+save_altiro(res, "results", plots = FALSE)
 save_plots(classification, "figures")
 ```
 
-Command line: figures are written by `orthoresponse run` and
-`orthoresponse classify`; use `--condition-labels Ctrl NaCl`,
+Command line: figures are written by `altiro run` and
+`altiro classify`; use `--condition-labels Ctrl NaCl`,
 `--plot-formats png` or `--no-plots`.
 
 ---
@@ -505,21 +507,21 @@ pipeline, the names are used in the `description`, `primed_group` and
 figures.
 
 ```python
-res = orr.run_orthoresponse(ex.counts, ex.samples, **ex.params,
-                            group_names=("Sensitive", "Tolerant"))
-print(res)   # orthoresponse result: A = Sensitive | B = Tolerant
+res = alt.run_altiro(ex.counts, ex.samples, **ex.params,
+                     group_names=("Sensitive", "Tolerant"))
+print(res)   # altiro result: A = Sensitive | B = Tolerant
 ```
 ```r
-res <- orthoresponse(ex$counts, ex$samples, group_col = "line", condition_col = "treatment",
-                     group_a = "PL12", group_b = "IL22", control = "Control", stress = "Salt",
-                     group_names = c("Sensitive", "Tolerant"))
+res <- altiro(ex$counts, ex$samples, group_col = "line", condition_col = "treatment",
+              group_a = "PL12", group_b = "IL22", control = "Control", stress = "Salt",
+              group_names = c("Sensitive", "Tolerant"))
 ```
 ```bash
-orthoresponse run ... --group-a PL12 --group-b IL22 --group-names Sensitive Tolerant
+altiro run ... --group-a PL12 --group-b IL22 --group-names Sensitive Tolerant
 ```
 
 `classify_responses(..., group_names=)` does the same for precomputed
-contrasts. In `save()` / `save_orthoresponse()`, `save_plots()` and
+contrasts. In `save()` / `save_altiro()`, `save_plots()` and
 `plot_model_patterns()`, `group_names` changes **only the figure legend**.
 
 ### 9.3 Renaming values in the sample table
@@ -530,8 +532,8 @@ new values in `group_a`, `group_b`, `control` and `stress`:
 ```python
 samples["line"] = samples["line"].replace({"PL12": "Sensitive", "IL22": "Tolerant"})
 samples["treatment"] = samples["treatment"].replace({"Control": "Ctrl", "Salt": "NaCl"})
-res = orr.run_orthoresponse(counts, samples, group_col="line", condition_col="treatment",
-                            group_a="Sensitive", group_b="Tolerant", control="Ctrl", stress="NaCl")
+res = alt.run_altiro(counts, samples, group_col="line", condition_col="treatment",
+                     group_a="Sensitive", group_b="Tolerant", control="Ctrl", stress="NaCl")
 ```
 ```r
 samples$line[samples$line == "PL12"] <- "Sensitive"
@@ -550,7 +552,7 @@ second condition can be any treatment, drug, time point or environment.
 res.save("results", condition_labels=("Ctrl", "NaCl"))
 ```
 ```r
-save_orthoresponse(res, "results", condition_labels = c("Veh", "BQ"))
+save_altiro(res, "results", condition_labels = c("Veh", "BQ"))
 ```
 Command line: `--condition-labels C D`.
 
@@ -564,8 +566,8 @@ their defaults. The legacy key `stress_ready` is accepted for `primed`.
 res.save("results", model_labels={"primed": "Pre-adapted", "no_response": "Unchanged"})
 ```
 ```r
-save_orthoresponse(res, "results",
-                   model_labels = c(primed = "Pre-adapted", no_response = "Unchanged"))
+save_altiro(res, "results",
+            model_labels = c(primed = "Pre-adapted", no_response = "Unchanged"))
 ```
 
 **Tables.** `label` and `model` use fixed identifiers (`primed_3`,
@@ -599,14 +601,14 @@ Resolution: `dpi` (Python) or `res` (R); size in R: `width`, `height` (inches).
 res.save("results", title="Rice leaves, 80 mM NaCl", formats=("pdf", "svg"), dpi=300)
 ```
 ```r
-save_orthoresponse(res, "results", title = "Rice leaves, 80 mM NaCl",
-                   formats = "pdf", width = 11, height = 10)
+save_altiro(res, "results", title = "Rice leaves, 80 mM NaCl",
+            formats = "pdf", width = 11, height = 10)
 ```
 
 The figure above was drawn with:
 
 ```python
-from orthoresponse.plotting import plot_model_patterns
+from altiro.plotting import plot_model_patterns
 fig = plot_model_patterns(res.classification,
         group_names=("PL12 (sensitive)", "IL22 (tolerant)"),
         condition_labels=("Ctrl", "NaCl"),
@@ -621,7 +623,7 @@ fig = plot_model_patterns(res.classification,
 limma output:
 
 ```python
-tabs = orr.read_contrasts(paths, id_col="gene", lfc_col="logFC", padj_col="FDR")
+tabs = alt.read_contrasts(paths, id_col="gene", lfc_col="logFC", padj_col="FDR")
 ```
 
 ### 9.8 Quick reference
@@ -631,7 +633,7 @@ tabs = orr.read_contrasts(paths, id_col="gene", lfc_col="logFC", padj_col="FDR")
 | roles A and B (data) | `group_a`, `group_b` | `--group-a`, `--group-b` |
 | conditions (data) | `control`, `stress` | `--control`, `--stress` |
 | sample-table columns (data) | `group_col`, `condition_col` | `--group-col`, `--condition-col` |
-| group names in tables, text and figures | `group_names` in `run_orthoresponse()` / `orthoresponse()`, `classify_responses()` | `--group-names` |
+| group names in tables, text and figures | `group_names` in `run_altiro()` / `altiro()`, `classify_responses()` | `--group-names` |
 | group names in the legend only | `group_names` in `save()`, `save_plots()`, `plot_model_patterns()` | - |
 | condition ticks (C, S) | `condition_labels` | `--condition-labels` |
 | figure row labels | `model_labels` | - |
@@ -657,7 +659,7 @@ tabs = orr.read_contrasts(paths, id_col="gene", lfc_col="logFC", padj_col="FDR")
    ```
 
    ```python
-   orth = orr.reciprocal_best_hits("A_vs_B.tsv", "B_vs_A.tsv", strip_pattern=r"\.\d+$")
+   orth = alt.reciprocal_best_hits("A_vs_B.tsv", "B_vs_A.tsv", strip_pattern=r"\.\d+$")
    ```
    ```r
    orth <- reciprocal_best_hits("A_vs_B.tsv", "B_vs_A.tsv", strip_pattern = "\\.\\d+$")
@@ -671,7 +673,7 @@ tabs = orr.read_contrasts(paths, id_col="gene", lfc_col="logFC", padj_col="FDR")
 3. **Merge the two count matrices:**
 
    ```python
-   counts = orr.merge_ortholog_counts(counts_a, counts_b, orth)
+   counts = alt.merge_ortholog_counts(counts_a, counts_b, orth)
    ```
 
    Rows become ortholog ids; columns are the samples of A followed by B
@@ -832,9 +834,9 @@ paths = {
     "b_stress_vs_a_control": "Spenn.drought_Sly.control.csv",
     "a_stress_vs_b_control": "Sly.drought_Spenn.control.csv",
 }
-tabs = orr.read_contrasts(paths, id_col="Row.names")
-cls = orr.classify_responses(tabs, group_names=("S. lycopersicum", "S. pennellii"))
-orr.summarize_classification(cls)
+tabs = alt.read_contrasts(paths, id_col="Row.names")
+cls = alt.classify_responses(tabs, group_names=("S. lycopersicum", "S. pennellii"))
+alt.summarize_classification(cls)
 ```
 
 The Python test suite contains a verbatim copy of the published notebook logic
@@ -893,7 +895,7 @@ To refit from counts with the published settings use
 
 | Python | R | purpose |
 |---|---|---|
-| `run_orthoresponse()` | `orthoresponse()` | counts -> contrasts -> classification |
+| `run_altiro()` | `altiro()` | counts -> contrasts -> classification |
 | `run_contrasts()` | `run_contrasts()` | fit (Py)DESeq2 and extract the five contrasts |
 | `build_design()` | `build_design()` | map samples to the four cells |
 | `classify_responses()` | `classify_responses()` | decision tree |
@@ -909,13 +911,13 @@ To refit from counts with the published settings use
 | `plotting.plot_model_patterns()` | `plot_model_patterns()` | the 15 patterns with counts; custom `condition_labels`, `model_labels`, `group_names`, `title` |
 | `plotting.plot_summary()` | `plot_summary()` | bar chart of models |
 | `plotting.plot_feature()` | - | normalized counts of one feature |
-| `OrthoResponseResult.save()` | `save_orthoresponse()` | write all outputs, including figures |
+| `AltiroResult.save()` | `save_altiro()` | write all outputs, including figures |
 | `save_plots()` | `save_plots()` | write `model_patterns` and `model_summary` figures |
 | `load_example()`, `list_examples()` | same | bundled example data (`rice_salt`, `ovarian_brequinar`) |
 | `example_files()`, `export_example()` | same | paths / copies of the example files |
 | `CONTRAST_KEYS` | `contrast_keys()` | the five contrast names |
 
-Every function is documented in place: `help(orr.classify_responses)` in
+Every function is documented in place: `help(alt.classify_responses)` in
 Python, `?classify_responses` in R.
 
 ---
@@ -930,7 +932,7 @@ Python, `?classify_responses` in R.
 | `Samples missing from the count matrix` | sample table row names do not match count columns |
 | `Contrast tables cover different features` | the five tables were filtered differently; only shared features are used |
 | `equivalence_margin requires an 'lfcSE' column` | keep the standard-error column when exporting contrasts |
-| `run_contrasts() needs PyDESeq2` | `pip install "orthoresponse[deseq]"` |
+| `run_contrasts() needs PyDESeq2` | `pip install "altiro[deseq]"` |
 | `The dispersion trend curve fitting did not converge` (PyDESeq2) | informative warning; PyDESeq2 falls back to a mean dispersion trend |
 
 ---

@@ -29,7 +29,7 @@ export_example(outdir = ".", name = "rice_salt")
 
 \code{load_example()}: a list with \code{counts} (integer matrix, genes x
 samples), \code{samples} (data frame), \code{params} (the matching arguments for
-\code{\link[=orthoresponse]{orthoresponse()}}) and \code{description}.
+\code{\link[=altiro]{altiro()}}) and \code{description}.
 
 \code{export_example()}: invisibly, the paths of the copied files.
 }
@@ -56,7 +56,7 @@ ex <- load_example("rice_salt")
 dim(ex$counts)
 ex$samples
 \dontrun{
-res <- do.call(orthoresponse, c(list(ex$counts, ex$samples), ex$params))
+res <- do.call(altiro, c(list(ex$counts, ex$samples), ex$params))
 res
 }
 }

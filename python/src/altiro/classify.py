@@ -322,7 +322,7 @@ def classify_responses(
         Either a mapping ``{key: DataFrame}`` with the five keys in
         :data:`CONTRAST_KEYS` (each DataFrame indexed by feature id with at
         least ``log2FoldChange`` and ``padj``; ``lfcSE`` is needed for
-        equivalence tests), a :class:`~orthoresponse.contrasts.ContrastSet`, or
+        equivalence tests), a :class:`~altiro.contrasts.ContrastSet`, or
         one wide DataFrame whose columns are ``<key>_log2FoldChange``,
         ``<key>_padj`` ...
     preset:

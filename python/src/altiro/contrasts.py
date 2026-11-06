@@ -144,7 +144,7 @@ def run_contrasts(
         from pydeseq2.ds import DeseqStats
     except ImportError as err:  # pragma: no cover - exercised only without the extra
         raise ImportError(
-            "run_contrasts() needs PyDESeq2. Install it with: pip install 'orthoresponse[deseq]'"
+            "run_contrasts() needs PyDESeq2. Install it with: pip install 'altiro[deseq]'"
         ) from err
 
     design = build_design(samples, group_col, condition_col, group_a, group_b, control, stress)
@@ -207,7 +207,7 @@ def read_contrasts(
     Parameters
     ----------
     paths:
-        Mapping from contrast key (see :data:`~orthoresponse.CONTRAST_KEYS`) to a
+        Mapping from contrast key (see :data:`~altiro.CONTRAST_KEYS`) to a
         file path. For the files written by the original publication script use::
 
             {"a_response": "Sly.drought_Sly.control.csv",

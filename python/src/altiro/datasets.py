@@ -68,8 +68,8 @@ _EXAMPLES = {
 class ExampleData:
     """An example data set: raw counts, sample table and the matching arguments.
 
-    ``params`` holds the arguments for :func:`~orthoresponse.run_orthoresponse`,
-    so the whole example runs with ``run_orthoresponse(ex.counts, ex.samples, **ex.params)``.
+    ``params`` holds the arguments for :func:`~altiro.run_altiro`,
+    so the whole example runs with ``run_altiro(ex.counts, ex.samples, **ex.params)``.
     """
 
     name: str
@@ -97,7 +97,7 @@ def _get(name: str) -> dict:
 def example_files(name: str = "rice_salt") -> Dict[str, Path]:
     """Paths of the bundled files (``counts`` and ``samples``) of an example."""
     info = _get(name)
-    base = resources.files("orthoresponse") / "data"
+    base = resources.files("altiro") / "data"
     return {k: Path(str(base / info[k])) for k in ("counts", "samples")}
 
 
@@ -106,9 +106,9 @@ def load_example(name: str = "rice_salt") -> ExampleData:
 
     Examples
     --------
-    >>> import orthoresponse as orr
-    >>> ex = orr.load_example("rice_salt")
-    >>> res = orr.run_orthoresponse(ex.counts, ex.samples, **ex.params)
+    >>> import altiro as alt
+    >>> ex = alt.load_example("rice_salt")
+    >>> res = alt.run_altiro(ex.counts, ex.samples, **ex.params)
     >>> print(res.summary)
     """
     info = _get(name)

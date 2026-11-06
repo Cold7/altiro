@@ -3,9 +3,9 @@ requires = ["setuptools>=64"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "orthoresponse"
-version = "0.5.1"
-description = "Classify expression response models (primed, shared, unique, opposite, no response) of orthologs or genes in 2 x 2 designs."
+name = "altiro"
+version = "0.6.0"
+description = "ALTIRO (Analysis of Latent Transcriptional Induction and Response Outcomes). Classify expression response models (primed, shared, unique, opposite, no response) of orthologs or genes in 2 x 2 designs."
 readme = "README.md"
 license = { text = "MIT" }
 authors = [{ name = "J. Sebastián Contreras-Riquelme", email = "contrerasriquelme.sebastian@gmail.com" }]
@@ -28,18 +28,18 @@ all = ["pydeseq2>=0.4", "matplotlib>=3.5", "openpyxl>=3.0"]
 test = ["pytest>=7"]
 
 [project.scripts]
-orthoresponse = "orthoresponse.cli:main"
+altiro = "altiro.cli:main"
 
 [project.urls]
-Homepage = "https://github.com/Cold7/orthoresponse"
-Documentation = "https://github.com/Cold7/orthoresponse/blob/main/docs/manual.md"
+Homepage = "https://github.com/Cold7/altiro"
+Documentation = "https://github.com/Cold7/altiro/blob/main/docs/manual.md"
 "Original publication" = "https://doi.org/10.1371/journal.pone.0324724"
 
 [tool.setuptools.packages.find]
 where = ["src"]
 
 [tool.setuptools.package-data]
-orthoresponse = ["data/*.tsv", "data/*.tsv.gz"]
+altiro = ["data/*.tsv", "data/*.tsv.gz"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

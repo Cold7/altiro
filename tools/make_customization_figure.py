@@ -7,13 +7,13 @@ import warnings; warnings.filterwarnings("ignore")
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
-import orthoresponse as orr
-from orthoresponse.plotting import plot_model_patterns
+import altiro as alt
+from altiro.plotting import plot_model_patterns
 
 plt.rcParams.update({"font.family": "Inter", "pdf.fonttype": 42})
 D = "examples/rice_salt_GSE167342/results_r/contrasts"
-tabs = orr.read_contrasts({k: f"{D}/contrast_{k}.tsv" for k in orr.CONTRAST_KEYS})
-cls = orr.classify_responses(tabs, group_names=("PL12", "IL22"))
+tabs = alt.read_contrasts({k: f"{D}/contrast_{k}.tsv" for k in alt.CONTRAST_KEYS})
+cls = alt.classify_responses(tabs, group_names=("PL12", "IL22"))
 
 fig = plot_model_patterns(cls, group_names=("PL12 (sensitive)", "IL22 (tolerant)"),
                           condition_labels=("Ctrl", "NaCl"),

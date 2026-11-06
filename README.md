@@ -1,4 +1,7 @@
-# orthoresponse
+# ALTIRO
+
+**A**nalysis of **L**atent **T**ranscriptional **I**nduction and **R**esponse **O**utcomes
+(package name `altiro`, formerly `orthoresponse`).
 
 Classify genes or ortholog pairs into **expression response models** in a
 2 x 2 design: two groups (species, genotypes, cultivars, cell lines) measured
@@ -32,7 +35,7 @@ function names; both give identical classifications for identical inputs.
 **Python** (>= 3.9)
 
 ```bash
-pip install "orthoresponse[all] @ git+https://github.com/Cold7/orthoresponse.git#subdirectory=python"
+pip install "altiro[all] @ git+https://github.com/Cold7/altiro.git#subdirectory=python"
 ```
 
 **R** (>= 4.1)
@@ -40,7 +43,7 @@ pip install "orthoresponse[all] @ git+https://github.com/Cold7/orthoresponse.git
 ```r
 install.packages(c("BiocManager", "remotes"))
 BiocManager::install("DESeq2")
-remotes::install_github("Cold7/orthoresponse", subdir = "r-package", build_vignettes = TRUE)
+remotes::install_github("Cold7/altiro", subdir = "r-package", build_vignettes = TRUE)
 ```
 
 ## Example data
@@ -59,10 +62,10 @@ They are bundled inside the packages, not in `examples/`:
 
 | file | in this repository (Python copy; the R copy is identical) | after installing |
 |---|---|---|
-| rice counts | `python/src/orthoresponse/data/rice_GSE167342_counts.tsv.gz` | Python: `orr.example_files("rice_salt")["counts"]`; R: `example_files("rice_salt")[["counts"]]` |
-| rice samples | `python/src/orthoresponse/data/rice_GSE167342_samples.tsv` | Python: `orr.example_files("rice_salt")["samples"]`; R: `example_files("rice_salt")[["samples"]]` |
-| ovarian counts | `python/src/orthoresponse/data/ovarian_GSE283381_counts.tsv.gz` | Python: `orr.example_files("ovarian_brequinar")["counts"]`; R: `example_files("ovarian_brequinar")[["counts"]]` |
-| ovarian samples | `python/src/orthoresponse/data/ovarian_GSE283381_samples.tsv` | Python: `orr.example_files("ovarian_brequinar")["samples"]`; R: `example_files("ovarian_brequinar")[["samples"]]` |
+| rice counts | `python/src/altiro/data/rice_GSE167342_counts.tsv.gz` | Python: `alt.example_files("rice_salt")["counts"]`; R: `example_files("rice_salt")[["counts"]]` |
+| rice samples | `python/src/altiro/data/rice_GSE167342_samples.tsv` | Python: `alt.example_files("rice_salt")["samples"]`; R: `example_files("rice_salt")[["samples"]]` |
+| ovarian counts | `python/src/altiro/data/ovarian_GSE283381_counts.tsv.gz` | Python: `alt.example_files("ovarian_brequinar")["counts"]`; R: `example_files("ovarian_brequinar")[["counts"]]` |
+| ovarian samples | `python/src/altiro/data/ovarian_GSE283381_samples.tsv` | Python: `alt.example_files("ovarian_brequinar")["samples"]`; R: `example_files("ovarian_brequinar")[["samples"]]` |
 
 The R copies are in `r-package/inst/extdata/` with the same file names. Count
 files are tab-separated and gzip-compressed (genes in rows, samples in
@@ -83,16 +86,16 @@ S70     IL22  Salt       GSM5102560  Salt-IL22-1
 **Option 1: from the installed package** (no paths needed; use `"ovarian_brequinar"` for the second data set)
 
 ```python
-import orthoresponse as orr
-ex = orr.load_example("rice_salt")              # ex.counts, ex.samples, ex.params
-res = orr.run_orthoresponse(ex.counts, ex.samples, **ex.params)
+import altiro as alt
+ex = alt.load_example("rice_salt")              # ex.counts, ex.samples, ex.params
+res = alt.run_altiro(ex.counts, ex.samples, **ex.params)
 print(res)                                      # summary + asymmetry test
 ```
 
 ```r
-library(orthoresponse)
+library(altiro)
 ex <- load_example("rice_salt")                  # ex$counts, ex$samples, ex$params
-res <- do.call(orthoresponse, c(list(ex$counts, ex$samples), ex$params))
+res <- do.call(altiro, c(list(ex$counts, ex$samples), ex$params))
 res
 ```
 
@@ -100,23 +103,23 @@ res
 
 ```python
 import pandas as pd
-import orthoresponse as orr
+import altiro as alt
 
-counts  = pd.read_csv("python/src/orthoresponse/data/rice_GSE167342_counts.tsv.gz", sep="\t", index_col=0)
-samples = pd.read_csv("python/src/orthoresponse/data/rice_GSE167342_samples.tsv", sep="\t", index_col=0)
+counts  = pd.read_csv("python/src/altiro/data/rice_GSE167342_counts.tsv.gz", sep="\t", index_col=0)
+samples = pd.read_csv("python/src/altiro/data/rice_GSE167342_samples.tsv", sep="\t", index_col=0)
 
-res = orr.run_orthoresponse(counts, samples, group_col="line", condition_col="treatment",
-                            group_a="PL12", group_b="IL22", control="Control", stress="Salt")
+res = alt.run_altiro(counts, samples, group_col="line", condition_col="treatment",
+                     group_a="PL12", group_b="IL22", control="Control", stress="Salt")
 ```
 
 ```r
-library(orthoresponse)
+library(altiro)
 counts  <- as.matrix(read.delim("r-package/inst/extdata/rice_GSE167342_counts.tsv.gz",
                                 row.names = 1, check.names = FALSE))
 samples <- read.delim("r-package/inst/extdata/rice_GSE167342_samples.tsv", row.names = 1)
 
-res <- orthoresponse(counts, samples, group_col = "line", condition_col = "treatment",
-                     group_a = "PL12", group_b = "IL22", control = "Control", stress = "Salt")
+res <- altiro(counts, samples, group_col = "line", condition_col = "treatment",
+              group_a = "PL12", group_b = "IL22", control = "Control", stress = "Salt")
 ```
 
 For the ovarian data set, read `ovarian_GSE283381_counts.tsv.gz` and
@@ -124,8 +127,8 @@ For the ovarian data set, read `ovarian_GSE283381_counts.tsv.gz` and
 `group_b="CisR"`, `control="Vehicle"`, `stress="Brequinar"`.
 
 **Option 3: copy them to your own folder** and use them as a template for your data:
-`orthoresponse example --out my_folder` (command line; add `--name ovarian_brequinar`
-for the second set), `orr.export_example("my_folder")` (Python) or
+`altiro example --out my_folder` (command line; add `--name ovarian_brequinar`
+for the second set), `alt.export_example("my_folder")` (Python) or
 `export_example("my_folder")` (R). This writes `my_folder/counts.tsv.gz` and
 `my_folder/samples.tsv`.
 
@@ -136,29 +139,29 @@ table must be tab-separated.
 ## Quick start
 
 ```python
-import pandas as pd, orthoresponse as orr
+import pandas as pd, altiro as alt
 
 counts  = pd.read_csv("counts.tsv",  sep="\t", index_col=0)   # raw counts, genes x samples
 samples = pd.read_csv("samples.tsv", sep="\t", index_col=0)   # columns: line, treatment
 
-res = orr.run_orthoresponse(counts, samples, group_col="line", condition_col="treatment",
-                            group_a="sensitive", group_b="tolerant",
-                            control="control", stress="drought")
+res = alt.run_altiro(counts, samples, group_col="line", condition_col="treatment",
+                     group_a="sensitive", group_b="tolerant",
+                     control="control", stress="drought")
 print(res)           # summary table + asymmetry test (same output as R)
 res.save("results")  # tables + figures (model_patterns, model_summary; PNG and PDF)
 ```
 
 ```r
-library(orthoresponse)
-res <- orthoresponse(counts, samples, group_col = "line", condition_col = "treatment",
-                     group_a = "sensitive", group_b = "tolerant",
-                     control = "control", stress = "drought")
+library(altiro)
+res <- altiro(counts, samples, group_col = "line", condition_col = "treatment",
+              group_a = "sensitive", group_b = "tolerant",
+              control = "control", stress = "drought")
 res
-save_orthoresponse(res, "results")   # tables + figures
+save_altiro(res, "results")   # tables + figures
 ```
 
 ```bash
-orthoresponse run --counts counts.tsv --samples samples.tsv --group-col line \
+altiro run --counts counts.tsv --samples samples.tsv --group-col line \
   --condition-col treatment --group-a sensitive --group-b tolerant \
   --control control --stress drought --out results
 ```
@@ -169,12 +172,12 @@ Already have differential-expression results? Pass the five contrasts to
 
 ## Documentation
 
-* **[User manual (PDF)](docs/orthoresponse_manual.pdf)**: illustrated manual with diagrams,
+* **[User manual (PDF)](docs/altiro_manual.pdf)**: illustrated manual with diagrams,
   figures and worked examples (LaTeX source in `docs/latex/`, build with
-  `latexmk -xelatex orthoresponse_manual.tex`).
+  `latexmk -xelatex altiro_manual.tex`).
 * **[User manual (Markdown)](docs/manual.md)**: concepts, input formats, decision tree,
   options, outputs, cross-species workflow, worked examples, caveats.
-* R vignette: `vignette("orthoresponse")`.
+* R vignette: `vignette("altiro")`.
 * Worked examples with public, already-counted data (no alignment needed):
   * [`examples/rice_salt_GSE167342`](examples/rice_salt_GSE167342): rice,
     salt-sensitive PL12 vs salt-tolerant *Saltol* introgression line IL22.
@@ -193,7 +196,7 @@ tools/         maintenance scripts (shared test fixture)
 
 ## Citation
 
-If you use orthoresponse, please cite it using the metadata in
+If you use altiro, please cite it using the metadata in
 [`CITATION.cff`](CITATION.cff) (GitHub's *Cite this repository* button).
 
 ## License

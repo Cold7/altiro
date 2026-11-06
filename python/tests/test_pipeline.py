@@ -4,8 +4,8 @@ import pytest
 
 pytest.importorskip("pydeseq2")
 
-from orthoresponse import build_design, run_orthoresponse  # noqa: E402
-from orthoresponse.cli import main as cli_main  # noqa: E402
+from altiro import build_design, run_altiro  # noqa: E402
+from altiro.cli import main as cli_main  # noqa: E402
 
 
 def _simulate(seed=3):
@@ -38,12 +38,12 @@ def test_design_mapping():
 
 def test_pipeline_recovers_simulated_models(tmp_path):
     counts, meta = _simulate()
-    res = run_orthoresponse(counts, meta, group_col="line", condition_col="treatment", group_a="sens",
-                            group_b="tol", control="ctrl", stress="salt")
+    res = run_altiro(counts, meta, group_col="line", condition_col="treatment", group_a="sens",
+                     group_b="tol", control="ctrl", stress="salt")
     lab = res.classification["label"]
-    renamed = run_orthoresponse(counts.iloc[:300], meta, group_col="line", condition_col="treatment", group_a="sens",
-                                group_b="tol", control="ctrl", stress="salt", group_names=("Sensitive", "Tolerant"))
-    assert str(renamed).startswith("orthoresponse result: A = Sensitive | B = Tolerant")
+    renamed = run_altiro(counts.iloc[:300], meta, group_col="line", condition_col="treatment", group_a="sens",
+                         group_b="tol", control="ctrl", stress="salt", group_names=("Sensitive", "Tolerant"))
+    assert str(renamed).startswith("altiro result: A = Sensitive | B = Tolerant")
     assert set(renamed.classification["primed_group"]) <= {"Sensitive", "Tolerant", ""}
     assert list(renamed.asymmetry["responding_group"]) == ["Sensitive", "Tolerant"]
     assert (lab.iloc[:150] == "primed_3").mean() > 0.9
@@ -51,7 +51,7 @@ def test_pipeline_recovers_simulated_models(tmp_path):
     assert (lab.iloc[300:450] == "shared_2").mean() > 0.9
     assert (lab.iloc[450:600] == "no_response_1").mean() > 0.9
     text = str(res)
-    assert text.startswith("orthoresponse result: A = sens | B = tol")
+    assert text.startswith("altiro result: A = sens | B = tol")
     assert "Single-group responses ending primed: sens-only" in text and "(Fisher p = " in text
     assert repr(res) == text
     out = res.save(tmp_path / "res", condition_labels=("Ctrl", "Salt"))

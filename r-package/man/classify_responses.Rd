@@ -53,7 +53,7 @@ the result is identical to the published script, where A =
 \emph{S. lycopersicum} and B = \emph{S. pennellii}.
 }
 \examples{
-f <- function(k) system.file("extdata", paste0("contrast_", k, ".tsv"), package = "orthoresponse")
+f <- function(k) system.file("extdata", paste0("contrast_", k, ".tsv"), package = "altiro")
 paths <- setNames(lapply(names(contrast_keys()), f), names(contrast_keys()))
 tabs <- read_contrasts(paths)
 res <- classify_responses(tabs, group_names = c("sensitive", "tolerant"))

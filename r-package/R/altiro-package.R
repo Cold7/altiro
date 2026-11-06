@@ -1,4 +1,4 @@
-#' orthoresponse: Expression Response Models of Orthologs in 2 x 2 Designs
+#' altiro: Analysis of Latent Transcriptional Induction and Response Outcomes (ALTIRO)
 #'
 #' Classifies orthologs (cross-species) or genes (within species) into
 #' primed (called stress-ready in the original publication), shared, unique,
@@ -10,7 +10,7 @@
 #' statistics, require a basal difference, or test equivalence explicitly.
 #'
 #' Main functions:
-#' * [orthoresponse()] - counts to classification in one call.
+#' * [altiro()] - counts to classification in one call.
 #' * [run_contrasts()] - DESeq2 fit and the five contrasts.
 #' * [classify_responses()] - the decision tree.
 #' * [summarize_classification()], [primed_asymmetry()] - summaries.

@@ -59,20 +59,20 @@ list_examples <- function() {
 #' @export
 example_files <- function(name = "rice_salt") {
   info <- .get_example(name)
-  c(counts = system.file("extdata", info$counts, package = "orthoresponse", mustWork = TRUE),
-    samples = system.file("extdata", info$samples, package = "orthoresponse", mustWork = TRUE))
+  c(counts = system.file("extdata", info$counts, package = "altiro", mustWork = TRUE),
+    samples = system.file("extdata", info$samples, package = "altiro", mustWork = TRUE))
 }
 
 #' @rdname list_examples
 #' @return `load_example()`: a list with `counts` (integer matrix, genes x
 #'   samples), `samples` (data frame), `params` (the matching arguments for
-#'   [orthoresponse()]) and `description`.
+#'   [altiro()]) and `description`.
 #' @examples
 #' ex <- load_example("rice_salt")
 #' dim(ex$counts)
 #' ex$samples
 #' \dontrun{
-#' res <- do.call(orthoresponse, c(list(ex$counts, ex$samples), ex$params))
+#' res <- do.call(altiro, c(list(ex$counts, ex$samples), ex$params))
 #' res
 #' }
 #' @export

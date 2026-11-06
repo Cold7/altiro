@@ -116,7 +116,7 @@ model_definitions <- function(group_names = c("A", "B"), include_extra = FALSE) 
 #'   different nor equivalent are labelled `unresolved`. Needs `lfcSE`.
 #' @param sign_digits Decimals used to round log2 fold changes before taking
 #'   their sign (the published script used 2).
-#' @return A list of class `orthoresponse_options`.
+#' @return A list of class `altiro_options`.
 #' @examples
 #' classification_options("strict")
 #' classification_options("paper", equivalence_margin = 0.5)
@@ -142,13 +142,13 @@ classification_options <- function(preset = c("paper", "strict"), alpha = NULL, 
   if (!o$na_action %in% c("not_de", "unclassified")) stop("na_action must be 'not_de' or 'unclassified'")
   if (!is.null(o$equivalence_margin) && o$equivalence_margin <= 0) stop("equivalence_margin must be > 0")
   o$preset <- preset
-  class(o) <- "orthoresponse_options"
+  class(o) <- "altiro_options"
   o
 }
 
 #' @export
-print.orthoresponse_options <- function(x, ...) {
-  cat("orthoresponse classification options (preset:", x$preset, ")\n")
+print.altiro_options <- function(x, ...) {
+  cat("altiro classification options (preset:", x$preset, ")\n")
   cat("  alpha                    :", x$alpha, "\n")
   cat("  min_abs_lfc              :", x$min_abs_lfc, "\n")
   cat("  na_action                :", x$na_action, "\n")
@@ -244,7 +244,7 @@ equivalence_test <- function(log2fc, lfc_se, margin) {
 #'   `responding_group`, `description`, `flags` and, optionally, the
 #'   statistics of each contrast.
 #' @examples
-#' f <- function(k) system.file("extdata", paste0("contrast_", k, ".tsv"), package = "orthoresponse")
+#' f <- function(k) system.file("extdata", paste0("contrast_", k, ".tsv"), package = "altiro")
 #' paths <- setNames(lapply(names(contrast_keys()), f), names(contrast_keys()))
 #' tabs <- read_contrasts(paths)
 #' res <- classify_responses(tabs, group_names = c("sensitive", "tolerant"))

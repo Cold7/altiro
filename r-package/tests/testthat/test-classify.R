@@ -1,13 +1,13 @@
 fixture_tables <- function() {
   keys <- names(contrast_keys())
   paths <- setNames(lapply(keys, function(k) {
-    system.file("extdata", paste0("contrast_", k, ".tsv"), package = "orthoresponse")
+    system.file("extdata", paste0("contrast_", k, ".tsv"), package = "altiro")
   }), keys)
   read_contrasts(paths)
 }
 
 expected_labels <- function() {
-  p <- system.file("extdata", "expected_labels.tsv", package = "orthoresponse")
+  p <- system.file("extdata", "expected_labels.tsv", package = "altiro")
   e <- utils::read.delim(p, check.names = FALSE, stringsAsFactors = FALSE)
   rownames(e) <- e[[1]]
   e

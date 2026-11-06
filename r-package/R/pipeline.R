@@ -10,17 +10,17 @@
 #'   the sample table).
 #' @param ... Classification options passed to [classify_responses()], e.g.
 #'   `equivalence_margin = 0.5`.
-#' @return An object of class `orthoresponse` with elements `contrasts`,
+#' @return An object of class `altiro` with elements `contrasts`,
 #'   `classification`, `summary` and `asymmetry`.
 #' @examples
 #' \dontrun{
-#' res <- orthoresponse(counts, samples, group_col = "line", condition_col = "treatment",
+#' res <- altiro(counts, samples, group_col = "line", condition_col = "treatment",
 #'                      group_a = "PL12", group_b = "IL22", control = "Control", stress = "Salt")
 #' res
-#' save_orthoresponse(res, "results")
+#' save_altiro(res, "results")
 #' }
 #' @export
-orthoresponse <- function(counts, samples, group_col, condition_col, group_a, group_b, control, stress,
+altiro <- function(counts, samples, group_col, condition_col, group_a, group_b, control, stress,
                           preset = c("paper", "strict"), min_total_count = 10, alpha = 0.05,
                           filter_alpha = NULL, round_counts = FALSE, quiet = TRUE, group_names = NULL, ...) {
   preset <- match.arg(preset)
@@ -34,12 +34,12 @@ orthoresponse <- function(counts, samples, group_col, condition_col, group_a, gr
   }
   cls <- classify_responses(cs, preset = preset, group_names = cs$group_names, alpha = alpha, ...)
   structure(list(contrasts = cs, classification = cls, summary = summarize_classification(cls),
-                 asymmetry = primed_asymmetry(cls)), class = "orthoresponse")
+                 asymmetry = primed_asymmetry(cls)), class = "altiro")
 }
 
 #' @export
-print.orthoresponse <- function(x, ...) {
-  cat("orthoresponse result: A =", x$contrasts$group_names[1], "| B =", x$contrasts$group_names[2], "\n")
+print.altiro <- function(x, ...) {
+  cat("altiro result: A =", x$contrasts$group_names[1], "| B =", x$contrasts$group_names[2], "\n")
   cat(nrow(x$classification), "features classified\n\n")
   s <- x$summary
   s$pct_of_responsive <- round(s$pct_of_responsive, 1)
@@ -52,14 +52,14 @@ print.orthoresponse <- function(x, ...) {
   invisible(x)
 }
 
-#' Save an orthoresponse result to disk
+#' Save an altiro result to disk
 #'
 #' Writes `classification.tsv`, `summary.tsv`, `primed_asymmetry.tsv`,
 #' `normalized_counts.tsv`, the five contrast tables and, with `plots = TRUE`
 #' (default), the figures `model_patterns.<fmt>` (the 15 patterns with counts)
 #' and `model_summary.<fmt>` (bar chart).
 #'
-#' @param x Output of [orthoresponse()].
+#' @param x Output of [altiro()].
 #' @param outdir Output directory.
 #' @param plots Save the figures (default `TRUE`).
 #' @param ... Passed to [save_plots()]: `condition_labels`, `model_labels`,
@@ -67,10 +67,10 @@ print.orthoresponse <- function(x, ...) {
 #' @return Invisibly, `outdir`.
 #' @examples
 #' \dontrun{
-#' save_orthoresponse(res, "results", condition_labels = c("Ctrl", "NaCl"))
+#' save_altiro(res, "results", condition_labels = c("Ctrl", "NaCl"))
 #' }
 #' @export
-save_orthoresponse <- function(x, outdir, plots = TRUE, ...) {
+save_altiro <- function(x, outdir, plots = TRUE, ...) {
   dir.create(outdir, showWarnings = FALSE, recursive = TRUE)
   w <- function(d, f) utils::write.table(d, file.path(outdir, f), sep = "\t", quote = FALSE, row.names = FALSE)
   w(x$classification, "classification.tsv")

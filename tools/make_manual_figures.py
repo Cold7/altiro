@@ -7,8 +7,8 @@ import warnings; warnings.filterwarnings("ignore")
 import numpy as np, pandas as pd, matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
-import orthoresponse as orr
-from orthoresponse.plotting import plot_model_patterns, plot_summary, COLOR_A, COLOR_B
+import altiro as alt
+from altiro.plotting import plot_model_patterns, plot_summary, COLOR_A, COLOR_B
 
 plt.rcParams.update({"font.family": "Inter", "pdf.fonttype": 42})
 OUT = "docs/latex/figures"
@@ -19,9 +19,9 @@ plot_model_patterns(group_names=("Group A (reference)", "Group B (comparison)"))
 
 cls_all, norm_all = {}, {}
 for key, (d, names, cond, exname) in EX.items():
-    tabs = orr.read_contrasts({k: f"{d}/results_r/contrasts/contrast_{k}.tsv" for k in orr.CONTRAST_KEYS})
-    cls = orr.classify_responses(tabs, group_names=names)
-    strict = orr.classify_responses(tabs, preset="strict", group_names=names)
+    tabs = alt.read_contrasts({k: f"{d}/results_r/contrasts/contrast_{k}.tsv" for k in alt.CONTRAST_KEYS})
+    cls = alt.classify_responses(tabs, group_names=names)
+    strict = alt.classify_responses(tabs, preset="strict", group_names=names)
     cls_all[key] = (cls, strict)
     plot_model_patterns(cls, condition_labels=cond).savefig(f"{OUT}/{key}_patterns.pdf", bbox_inches="tight")
     f = plot_summary(cls); f.set_size_inches(5.2, 4.6); f.tight_layout(); f.savefig(f"{OUT}/{key}_summary.pdf", bbox_inches="tight")
@@ -32,8 +32,8 @@ for key, (d, names, cond, exname) in EX.items():
 # real genes, one per model (ovarian, strict preset for primed)
 def gene_panel(key, picks, fname):
     d, names, cond, exname = EX[key]
-    ex = orr.load_example(exname)
-    design = orr.build_design(ex.samples, **{k: ex.params[k] for k in ("group_col","condition_col","group_a","group_b","control","stress")})
+    ex = alt.load_example(exname)
+    design = alt.build_design(ex.samples, **{k: ex.params[k] for k in ("group_col","condition_col","group_a","group_b","control","stress")})
     norm = norm_all[key]
     fig, axes = plt.subplots(1, len(picks), figsize=(2.55 * len(picks), 2.7), sharey=False)
     cells = ["A_control", "A_stress", "B_control", "B_stress"]
@@ -88,7 +88,7 @@ fig.tight_layout(); fig.savefig(f"{OUT}/paper_vs_strict.pdf", bbox_inches="tight
 fig, axes = plt.subplots(1, 2, figsize=(8.6, 2.8))
 for ax, key, title in zip(axes, ["rice", "ovarian"], ["Rice (GSE167342)", "Ovarian cells (GSE283381)"]):
     c, s = cls_all[key]
-    a_p, a_s = orr.primed_asymmetry(c), orr.primed_asymmetry(s)
+    a_p, a_s = alt.primed_asymmetry(c), alt.primed_asymmetry(s)
     x = np.arange(2)
     ax.bar(x - 0.2, 100 * a_p.fraction_primed, 0.4, color="#9aa7c7", label="paper")
     ax.bar(x + 0.2, 100 * a_s.fraction_primed, 0.4, color="#2f4b8a", label="strict")
@@ -101,4 +101,4 @@ fig.tight_layout(); fig.savefig(f"{OUT}/asymmetry.pdf", bbox_inches="tight"); pl
 
 for key in EX:
     c, s = cls_all[key]
-    print(key, len(c), orr.summarize_classification(c).set_index("label")["n"].to_dict())
+    print(key, len(c), alt.summarize_classification(c).set_index("label")["n"].to_dict())

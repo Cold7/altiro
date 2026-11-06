@@ -27,27 +27,27 @@ test_that("design cells are built correctly", {
 test_that("the pipeline recovers simulated models", {
   skip_if_not_installed("DESeq2")
   s <- simulate_counts()
-  res <- suppressWarnings(orthoresponse(s$counts, s$meta, group_col = "line", condition_col = "treatment",
-                                        group_a = "sens", group_b = "tol", control = "ctrl", stress = "salt"))
+  res <- suppressWarnings(altiro(s$counts, s$meta, group_col = "line", condition_col = "treatment",
+                                 group_a = "sens", group_b = "tol", control = "ctrl", stress = "salt"))
   lab <- res$classification[paste0("gene", 1:600), "label"]
   expect_gt(mean(lab[1:150] == "primed_3"), 0.9)
   expect_gt(mean(lab[151:300] == "unique_1"), 0.9)
   expect_gt(mean(lab[301:450] == "shared_2"), 0.9)
   expect_gt(mean(lab[451:600] == "no_response_1"), 0.85)
   out <- tempfile()
-  save_orthoresponse(res, out, condition_labels = c("Ctrl", "Salt"))
+  save_altiro(res, out, condition_labels = c("Ctrl", "Salt"))
   expect_true(file.exists(file.path(out, "classification.tsv")))
   expect_true(file.exists(file.path(out, "contrasts", "contrast_basal.tsv")))
   for (f in c("model_patterns.png", "model_patterns.pdf", "model_summary.png", "model_summary.pdf")) {
     expect_gt(file.size(file.path(out, f)), 1000)
   }
-  renamed <- suppressWarnings(orthoresponse(s$counts[1:300, ], s$meta, group_col = "line", condition_col = "treatment",
-                                            group_a = "sens", group_b = "tol", control = "ctrl", stress = "salt",
-                                            group_names = c("Sensitive", "Tolerant")))
+  renamed <- suppressWarnings(altiro(s$counts[1:300, ], s$meta, group_col = "line", condition_col = "treatment",
+                                     group_a = "sens", group_b = "tol", control = "ctrl", stress = "salt",
+                                     group_names = c("Sensitive", "Tolerant")))
   expect_true(all(renamed$classification$primed_group %in% c("Sensitive", "Tolerant", "")))
   expect_equal(renamed$asymmetry$responding_group, c("Sensitive", "Tolerant"))
   expect_output(print(renamed), "A = Sensitive \\| B = Tolerant")
   out2 <- tempfile()
-  save_orthoresponse(res, out2, plots = FALSE)
+  save_altiro(res, out2, plots = FALSE)
   expect_false(file.exists(file.path(out2, "model_patterns.png")))
 })

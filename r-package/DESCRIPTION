@@ -1,11 +1,11 @@
-Package: orthoresponse
+Package: altiro
 Type: Package
-Title: Expression Response Models of Orthologs in Two-by-Two Designs
-Version: 0.5.1
+Title: Analysis of Latent Transcriptional Induction and Response Outcomes
+Version: 0.6.0
 Authors@R:
     person(given = "J. Sebastián", family = "Contreras-Riquelme",
            email = "contrerasriquelme.sebastian@gmail.com", role = c("aut", "cre", "cph"))
-Description: Classifies orthologs (between species) or genes (within a species)
+Description: ALTIRO classifies orthologs (between species) or genes (within a species)
     into primed, shared, unique, opposite and no-response expression models
     from five differential-expression contrasts between two groups (species,
     genotypes or cell lines) measured under control and stress conditions. The
@@ -31,8 +31,8 @@ Suggests:
     testthat (>= 3.0.0)
 VignetteBuilder: knitr
 biocViews: RNASeq, DifferentialExpression, Transcriptomics, ComparativeGenomics
-URL: https://github.com/Cold7/orthoresponse
-BugReports: https://github.com/Cold7/orthoresponse/issues
+URL: https://github.com/Cold7/altiro
+BugReports: https://github.com/Cold7/altiro/issues
 Roxygen: list(markdown = TRUE)
 Config/testthat/edition: 3
 Config/roxygen2/version: 8.1.1

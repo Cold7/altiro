@@ -1,15 +1,15 @@
 ---
-title: "Getting started with orthoresponse"
+title: "Getting started with altiro"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Getting started with orthoresponse}
+  %\VignetteIndexEntry{Getting started with altiro}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
 
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>", fig.width = 7, fig.height = 6.5)
-library(orthoresponse)
+library(altiro)
 ```
 
 ## The question
@@ -37,7 +37,7 @@ model_definitions(c("sensitive", "tolerant"))[, c("label", "primed_group", "desc
 
 ## From counts in one call
 
-`orthoresponse()` fits DESeq2 once with a four-level factor, extracts the five
+`altiro()` fits DESeq2 once with a four-level factor, extracts the five
 contrasts and classifies every feature. Here we simulate a small data set with
 known answers.
 
@@ -59,16 +59,16 @@ samples <- data.frame(line = rep(c("sens", "tol"), each = 6),
 ```
 
 ```{r run, message = FALSE, warning = FALSE}
-res <- orthoresponse(counts, samples,
-                     group_col = "line", condition_col = "treatment",
-                     group_a = "sens", group_b = "tol",
-                     control = "ctrl", stress = "salt")
+res <- altiro(counts, samples,
+              group_col = "line", condition_col = "treatment",
+              group_a = "sens", group_b = "tol",
+              control = "ctrl", stress = "salt")
 res
 ```
 
 `res$classification` has one row per feature with the label, a readable
 description, flags, and the log2 fold change and adjusted p-value of each
-contrast. `save_orthoresponse(res, "results")` writes everything to disk.
+contrast. `save_altiro(res, "results")` writes everything to disk.
 
 ```{r peek}
 head(res$classification[, c("label", "primed_group", "description", "flags")], 3)
@@ -111,7 +111,7 @@ The package ships a small example set of contrast tables:
 ```{r fixture}
 keys <- names(contrast_keys())
 paths <- setNames(lapply(keys, function(k)
-  system.file("extdata", paste0("contrast_", k, ".tsv"), package = "orthoresponse")), keys)
+  system.file("extdata", paste0("contrast_", k, ".tsv"), package = "altiro")), keys)
 tabs <- read_contrasts(paths)
 cls <- classify_responses(tabs)
 summarize_classification(cls)
@@ -165,9 +165,9 @@ hits and merge the two count matrices:
 # blastp -query B.faa -db A -outfmt 6 -evalue 1e-5 -max_target_seqs 5 > B_vs_A.tsv
 orth <- reciprocal_best_hits("A_vs_B.tsv", "B_vs_A.tsv", strip_pattern = "\\.\\d+$")
 counts <- merge_ortholog_counts(counts_a, counts_b, orth)
-res <- orthoresponse(counts, samples, group_col = "species", condition_col = "treatment",
-                     group_a = "S_lycopersicum", group_b = "S_pennellii",
-                     control = "control", stress = "drought")
+res <- altiro(counts, samples, group_col = "species", condition_col = "treatment",
+              group_a = "S_lycopersicum", group_b = "S_pennellii",
+              control = "control", stress = "drought")
 ```
 
 Each species should be quantified against its own reference. Expression is then

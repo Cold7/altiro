@@ -19,7 +19,7 @@ sys.path.insert(0, str(ROOT / "python" / "tests"))
 import pandas as pd  # noqa: E402
 
 from conftest import random_contrasts  # noqa: E402
-from orthoresponse import CONTRAST_KEYS, classify_responses  # noqa: E402
+from altiro import CONTRAST_KEYS, classify_responses  # noqa: E402
 
 PY = ROOT / "python" / "tests" / "data"
 R = ROOT / "r-package" / "inst" / "extdata"
@@ -32,7 +32,7 @@ def main():
     for key in CONTRAST_KEYS:
         tables[key].to_csv(PY / f"contrast_{key}.tsv", sep="\t", float_format="%.10g")
     # re-read so that the labels refer to exactly the written values
-    from orthoresponse import read_contrasts
+    from altiro import read_contrasts
 
     t = read_contrasts({k: PY / f"contrast_{k}.tsv" for k in CONTRAST_KEYS})
     exp = pd.DataFrame({

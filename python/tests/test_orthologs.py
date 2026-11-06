@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from orthoresponse import best_hits, merge_ortholog_counts, reciprocal_best_hits
+from altiro import best_hits, merge_ortholog_counts, reciprocal_best_hits
 
 
 def _blast(rows):

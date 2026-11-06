@@ -1,4 +1,4 @@
-"""Plots for expression models (requires matplotlib: ``pip install 'orthoresponse[plot]'``)."""
+"""Plots for expression models (requires matplotlib: ``pip install 'altiro[plot]'``)."""
 
 from __future__ import annotations
 
@@ -105,7 +105,7 @@ def plot_model_patterns(
     Parameters
     ----------
     classification:
-        Optional output of :func:`~orthoresponse.classify_responses`; adds the
+        Optional output of :func:`~altiro.classify_responses`; adds the
         number and percentage of features under each panel.
     group_names:
         Legend labels for groups A and B (default: taken from ``classification``).

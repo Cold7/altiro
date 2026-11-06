@@ -3,8 +3,8 @@ import pytest
 matplotlib = pytest.importorskip("matplotlib")
 matplotlib.use("Agg")
 
-from orthoresponse import classify_responses  # noqa: E402
-from orthoresponse.plotting import plot_model_patterns  # noqa: E402
+from altiro import classify_responses  # noqa: E402
+from altiro.plotting import plot_model_patterns  # noqa: E402
 
 
 def _ticks(fig):
@@ -55,7 +55,7 @@ def test_custom_model_labels():
 
 
 def test_save_plots(contrasts, tmp_path):
-    from orthoresponse import save_plots
+    from altiro import save_plots
     cls = classify_responses(contrasts, group_names=("Sly", "Spenn"))
     paths = save_plots(cls, tmp_path, condition_labels=("C", "D"), formats=("png",))
     assert sorted(p.name for p in paths) == ["model_patterns.png", "model_summary.png"]

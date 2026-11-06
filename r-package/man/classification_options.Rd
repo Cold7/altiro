@@ -42,7 +42,7 @@ different nor equivalent are labelled \code{unresolved}. Needs \code{lfcSE}.}
 their sign (the published script used 2).}
 }
 \value{
-A list of class \code{orthoresponse_options}.
+A list of class \code{altiro_options}.
 }
 \description{
 Classification options and presets

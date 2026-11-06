@@ -12,12 +12,12 @@ import pandas as pd
 from .classify import classify_responses, primed_asymmetry, summarize_classification
 from .contrasts import ContrastSet, run_contrasts, write_contrasts
 
-__all__ = ["OrthoResponseResult", "format_asymmetry", "run_orthoresponse", "save_plots"]
+__all__ = ["AltiroResult", "format_asymmetry", "run_altiro", "save_plots"]
 
 
 @dataclass
-class OrthoResponseResult:
-    """Result of :func:`run_orthoresponse`."""
+class AltiroResult:
+    """Result of :func:`run_altiro`."""
 
     contrasts: ContrastSet
     classification: pd.DataFrame
@@ -30,7 +30,7 @@ class OrthoResponseResult:
         summ = self.summary.copy()
         for col in ("pct_of_responsive", "pct_of_all"):
             summ[col] = summ[col].round(1)
-        lines = [f"orthoresponse result: A = {a} | B = {b}",
+        lines = [f"altiro result: A = {a} | B = {b}",
                  f"{len(self.classification)} features classified", "",
                  summ.to_string(index=False, na_rep="NA"), "",
                  format_asymmetry(self.asymmetry)]
@@ -57,7 +57,7 @@ class OrthoResponseResult:
         ``plots=True`` (default) also ``model_patterns.<fmt>`` (the 15 patterns
         with counts) and ``model_summary.<fmt>`` (bar chart) for each format in
         ``formats``. ``condition_labels``, ``model_labels``, ``group_names`` and
-        ``title`` are passed to :func:`~orthoresponse.plotting.plot_model_patterns`.
+        ``title`` are passed to :func:`~altiro.plotting.plot_model_patterns`.
         Plots are skipped with a warning if matplotlib is not installed.
         """
         outdir = Path(outdir)
@@ -75,7 +75,7 @@ class OrthoResponseResult:
 
 
 def format_asymmetry(asymmetry: pd.DataFrame) -> str:
-    """One-line description of :func:`~orthoresponse.primed_asymmetry` (same wording as the R package)."""
+    """One-line description of :func:`~altiro.primed_asymmetry` (same wording as the R package)."""
     a = asymmetry
     return ("Single-group responses ending primed: "
             f"{a['responding_group'].iloc[0]}-only {100 * a['fraction_primed'].iloc[0]:.1f}%, "
@@ -103,7 +103,7 @@ def save_plots(
         import matplotlib.pyplot as plt
     except ImportError:
         warnings.warn("matplotlib is not installed; plots were not saved. "
-                      "Install it with: pip install 'orthoresponse[plot]'", stacklevel=2)
+                      "Install it with: pip install 'altiro[plot]'", stacklevel=2)
         return []
     from .plotting import plot_model_patterns, plot_summary
 
@@ -125,7 +125,7 @@ def save_plots(
     return written
 
 
-def run_orthoresponse(
+def run_altiro(
     counts: pd.DataFrame,
     samples: pd.DataFrame,
     *,
@@ -143,11 +143,11 @@ def run_orthoresponse(
     n_cpus: Optional[int] = None,
     group_names: Optional[Sequence[str]] = None,
     **classification_overrides,
-) -> OrthoResponseResult:
+) -> AltiroResult:
     """Run PyDESeq2 and classify every feature in one call.
 
-    All arguments are forwarded to :func:`~orthoresponse.run_contrasts` and
-    :func:`~orthoresponse.classify_responses`. ``alpha`` is used both for the
+    All arguments are forwarded to :func:`~altiro.run_contrasts` and
+    :func:`~altiro.classify_responses`. ``alpha`` is used both for the
     independent filtering (unless ``filter_alpha`` is set) and as the
     classification threshold. ``group_names`` sets the display names of groups
     A and B in descriptions, summaries and figures (default: ``group_a`` and
@@ -155,7 +155,7 @@ def run_orthoresponse(
 
     Examples
     --------
-    >>> res = run_orthoresponse(counts, samples, group_col="line", condition_col="treatment",
+    >>> res = run_altiro(counts, samples, group_col="line", condition_col="treatment",
     ...                         group_a="PL12", group_b="IL22", control="Control", stress="Salt")
     >>> res.summary
     """
@@ -169,5 +169,5 @@ def run_orthoresponse(
         raise ValueError("group_names must have exactly two elements: (A, B)")
     cs.group_names = names
     cls = classify_responses(cs, preset=preset, group_names=names, alpha=alpha, **classification_overrides)
-    return OrthoResponseResult(contrasts=cs, classification=cls, summary=summarize_classification(cls),
+    return AltiroResult(contrasts=cs, classification=cls, summary=summarize_classification(cls),
                                asymmetry=primed_asymmetry(cls))

@@ -1,24 +1,24 @@
 """Rice salt stress: salt-sensitive PL12 (group A) vs salt-tolerant Saltol introgression line IL22 (group B).
 
 Data: GEO GSE167342 (leaves, control vs 24 h 80 mM NaCl, 3 replicates), bundled with the package.
-Requires: pip install "orthoresponse[all]"
+Requires: pip install "altiro[all]"
 Run from this folder:  python run_python.py
 """
 
 from pathlib import Path
 
-import orthoresponse as orr
+import altiro as alt
 
 HERE = Path(__file__).parent
 
 
 def main():
-    ex = orr.load_example("rice_salt")        # counts: 36,844 genes x 12 samples (S40 ... S72)
+    ex = alt.load_example("rice_salt")        # counts: 36,844 genes x 12 samples (S40 ... S72)
     print(ex.samples[["line", "treatment"]])
 
     # ex.params = group_col="line", condition_col="treatment", group_a="PL12", group_b="IL22",
     #             control="Control", stress="Salt"
-    res = orr.run_orthoresponse(ex.counts, ex.samples, **ex.params)
+    res = alt.run_altiro(ex.counts, ex.samples, **ex.params)
     # tables + figures (model_patterns.png/pdf, model_summary.png/pdf)
     out = res.save(HERE / "results_python", condition_labels=("Ctrl", "NaCl"))
 
@@ -27,7 +27,7 @@ def main():
     print(res.asymmetry.to_string(index=False))
 
     # Same data, stricter rules: NA -> unclassified, basal difference required
-    strict = orr.classify_responses(res.contrasts, preset="strict", group_names=("PL12", "IL22"))
+    strict = alt.classify_responses(res.contrasts, preset="strict", group_names=("PL12", "IL22"))
     print("\nPrimed genes, paper vs strict preset:",
           int((res.classification.model == "primed").sum()), "->",
           int((strict.model == "primed").sum()))

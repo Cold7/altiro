@@ -3,18 +3,18 @@
 # Data: GEO GSE283381 (raw HTSeq counts deposited by the authors, 3 replicates), bundled with the package.
 # Run from this folder:  Rscript run_r.R
 
-library(orthoresponse)
+library(altiro)
 
 ex <- load_example("ovarian_brequinar")   # counts: 59,453 genes x 12 samples
 ex$samples[, c("line", "treatment")]
 
-res <- orthoresponse(ex$counts, ex$samples,
-                     group_col = "line", condition_col = "treatment",
-                     group_a = "CisS", group_b = "CisR",        # A = sensitive, B = resistant
-                     control = "Vehicle", stress = "Brequinar")
+res <- altiro(ex$counts, ex$samples,
+              group_col = "line", condition_col = "treatment",
+              group_a = "CisS", group_b = "CisR",        # A = sensitive, B = resistant
+              control = "Vehicle", stress = "Brequinar")
 res
 # tables + figures (model_patterns.png/pdf, model_summary.png/pdf)
-save_orthoresponse(res, "results_r", condition_labels = c("Veh", "BQ"))
+save_altiro(res, "results_r", condition_labels = c("Veh", "BQ"))
 
 strict <- classify_responses(res$contrasts, preset = "strict", group_names = c("CisS", "CisR"))
 cat("\nPrimed genes, paper vs strict preset:",

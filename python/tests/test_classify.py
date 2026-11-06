@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from orthoresponse import (
+from altiro import (
     CONTRAST_KEYS,
     adjust_bh,
     classification_options,
@@ -156,7 +156,7 @@ def test_shared_fixture_matches_expected():
 
 
 def test_format_asymmetry_matches_r_wording():
-    from orthoresponse import format_asymmetry
+    from altiro import format_asymmetry
     t = pd.DataFrame({"responding_group": ["PL12", "IL22"], "fraction_primed": [0.7396, 0.6712],
                       "fisher_pvalue": [1.2241e-05, 1.2241e-05]})
     assert format_asymmetry(t) == ("Single-group responses ending primed: PL12-only 74.0%, "

@@ -11,7 +11,7 @@ so nothing needs to be downloaded.
 | `ovarian_brequinar_GSE283381` | *Homo sapiens* | OVCAR5 cisplatin-sensitive vs cisplatin-resistant | vehicle vs brequinar (DHODH inhibitor) | 3 | GEO GSE283381, `GSE283381_RAW.tar` (raw HTSeq counts); `load_example("ovarian_brequinar")` |
 
 ```bash
-pip install "orthoresponse[all] @ git+https://github.com/Cold7/orthoresponse.git#subdirectory=python"
+pip install "altiro[all] @ git+https://github.com/Cold7/altiro.git#subdirectory=python"
 cd rice_salt_GSE167342 && python run_python.py
 ```
 
