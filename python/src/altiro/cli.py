@@ -22,7 +22,8 @@ def _read_table(path: str, index_col=0) -> pd.DataFrame:
 
 def _add_classification_args(p: argparse.ArgumentParser) -> None:
     g = p.add_argument_group("classification")
-    g.add_argument("--preset", default="paper", choices=["paper", "strict"])
+    g.add_argument("--preset", default="lenient", choices=["lenient", "strict", "paper"],
+                   help="lenient (default, published rules) or strict; 'paper' is the former name of lenient")
     g.add_argument("--alpha", type=float, default=0.05)
     g.add_argument("--min-abs-lfc", type=float, default=None)
     g.add_argument("--na-action", choices=["not_de", "unclassified"], default=None)

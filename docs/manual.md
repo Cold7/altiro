@@ -2,7 +2,7 @@
 
 *Analysis of Latent Transcriptional Induction and Response Outcomes* (package `altiro`, formerly `orthoresponse`)
 
-Version 0.6.3 · Python and R
+Version 0.6.4 · Python and R
 
 `altiro` classifies genes (within one species) or ortholog pairs (between
 two species) into **expression response models** in a 2 x 2 design: two
@@ -401,14 +401,14 @@ The `flags` column records why a call may deserve attention:
   "not significant". Missing values come from DESeq2's independent filtering
   (low counts) and Cook's outlier detection.
 * `basal_difference_not_significant`: the feature would be primed under
-  the paper rules but was demoted to unique because no significant basal
+  the lenient rules but was demoted to unique because no significant basal
   difference supports it (only with `require_basal_difference`).
 
 ---
 
 ## 7. Presets and options
 
-| option | `paper` (default) | `strict` | meaning |
+| option | `lenient` (default) | `strict` | meaning |
 |---|---|---|---|
 | `alpha` | 0.05 | 0.05 | adjusted p-value threshold |
 | `min_abs_lfc` | 0 | 0 | minimum absolute log2FC for "significant" |
@@ -449,7 +449,7 @@ In `run_altiro()` / `altiro()` the same value is also used by DESeq2 for
 independent filtering unless `filter_alpha` is given. Because classification
 only reads the contrast tables, other thresholds can be tried on saved
 contrasts without refitting. A stricter `alpha` reduces the number of
-responsive genes, but under the `paper` preset it raises the share of primed
+responsive genes, but under the `lenient` preset it raises the share of primed
 calls among them, because a crossed difference must also pass the stricter
 threshold to make a response unique (rice example: 2,595 primed genes, 64% of
 responsive, with `alpha = 0.01`, against 4,225, 62%, with 0.05). Report the
@@ -457,7 +457,7 @@ value used.
 
 ### 7.1 Missing adjusted p-values (`na_action`)
 
-Under the paper rules a missing value counts as "not different". In the
+Under the lenient rules a missing value counts as "not different". In the
 contrasts that test whether two levels are *equal*, this pushes features
 towards the primed class. With `na_action="unclassified"` such features get the
 label `unclassified` instead. Most of them are low-count genes removed by the
@@ -466,7 +466,7 @@ independent filtering of one contrast.
 ### 7.2 Basal difference (`require_basal_difference`)
 
 If A is induced up to B's control level (primed 3), B's control level must
-be higher than A's control level. The paper rules never check this: they only
+be higher than A's control level. The lenient rules never check this: they only
 check that A-stress is *not significantly different* from B-control. When the
 two groups have the same basal level, a gene that responds in A alone (a unique
 response) can pass that check simply because the induction is modest. With
@@ -489,7 +489,7 @@ equivalent within 0.5 log2 units, which is itself informative.
 
 ### 7.4 Which preset should I use?
 
-* To reproduce or compare with the original publication: `paper`.
+* To reproduce or compare with the original publication: `lenient`.
 * To claim that a group is pre-adapted, or when the two groups are
   near-isogenic (e.g. an introgression line and its recurrent parent): `strict`,
   ideally with an equivalence margin, and report both.
@@ -838,7 +838,7 @@ python run_python.py     # or: Rscript run_r.R   (uses the bundled data, no down
 
 Results (25,045 genes after filtering):
 
-| model | paper | strict |
+| model | lenient | strict |
 |---|---|---|
 | primed 1 / 2 / 3 / 4 | 281 / 407 / 1,744 / 1,793 | 35 / 72 / 297 / 189 |
 | shared 1 / 2 | 563 / 335 | 563 / 335 |
@@ -855,11 +855,11 @@ Lessons from this data set:
   single-line responses), consistent with IL22 experiencing less stress.
 * IL22 and PL12 are nearly isogenic, so basal differences are rare (only 370
   non-responsive genes differ between the lines).
-  Under the paper rules, 62 % of responsive genes are called primed,
+  Under the lenient rules, 62 % of responsive genes are called primed,
   mostly because a gene that responds in one line is "not significantly
   different" from the unchanged basal level of the other. Requiring a basal
   difference (`strict`) keeps 593 of 4,225.
-* The paper-rule asymmetry (74.0 % of PL12-only responses end at IL22's level vs
+* The asymmetry under the lenient preset (74.0 % of PL12-only responses end at IL22's level vs
   67.1 % in the other direction, p = 1.2e-5) disappears under `strict`
   (10.4 % vs 10.6 %, p = 0.82).
 * With an equivalence margin of 0.5 log2 units and 3 replicates, only one gene
@@ -895,7 +895,7 @@ python run_python.py     # or: Rscript run_r.R   (uses the bundled data, no down
 
 Results (24,546 genes after filtering):
 
-| model | paper | strict |
+| model | lenient | strict |
 |---|---|---|
 | primed 1 / 2 / 3 / 4 | 476 / 487 / 617 / 435 | 162 / 179 / 159 / 146 |
 | shared 1 / 2 | 4,096 / 3,585 | 4,096 / 3,585 |
@@ -909,7 +909,7 @@ Results (24,546 genes after filtering):
 * Unlike the near-isogenic rice lines, the two cell lines differ at basal level
   for many genes, so the strict preset keeps about a third of the primed
   calls (646 of 2,015) rather than one in seven.
-* Neither line is globally more primed: under the paper rules 35.6 % of
+* Neither line is globally more primed: under the lenient rules 35.6 % of
   CisS-only and 31.8 % of CisR-only responses end at the other line's level
   (p = 0.002); under `strict` the fractions are 10.8 % and 11.4 % (p = 0.43).
 * Primed 3 genes (induced by brequinar in CisS and constitutively high in
@@ -954,7 +954,7 @@ alt.summarize_classification(cls)
 ```
 
 The Python test suite contains a verbatim copy of the published notebook logic
-(`python/tests/reference_notebook.py`) and checks that `preset="paper"` gives
+(`python/tests/reference_notebook.py`) and checks that `preset="lenient"` gives
 the same label for every feature on randomly generated tables that cover every
 branch, including missing values and zero fold changes.
 
@@ -983,13 +983,13 @@ To refit from counts with the published settings use
 
 ## 14. Interpretation and statistical caveats
 
-* **Absence of evidence.** Under the paper rules, "same level" means "not
+* **Absence of evidence.** Under the lenient rules, "same level" means "not
   significantly different". Low power (few replicates, low counts) therefore
   inflates primed calls. Report the `strict` preset alongside, or use an
   equivalence margin.
 * **False positives flow into the primed class.** A false-positive response in one
   group, for a gene whose basal level does not differ between groups, is
-  classified as primed under the paper rules. `require_basal_difference`
+  classified as primed under the lenient rules. `require_basal_difference`
   blocks this route.
 * **Unique vs shared.** "Significant in A and not in B" does not prove that the
   responses differ. If the difference of responses itself is your question,

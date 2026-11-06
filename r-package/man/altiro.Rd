@@ -13,7 +13,7 @@ altiro(
   group_b,
   control,
   stress,
-  preset = c("paper", "strict"),
+  preset = c("lenient", "strict", "paper"),
   min_total_count = 10,
   alpha = 0.05,
   filter_alpha = NULL,
@@ -36,7 +36,7 @@ sensitive species or line), B the comparison (e.g. the tolerant one).}
 
 \item{control, stress}{Levels of \code{condition_col}.}
 
-\item{preset}{\code{"paper"} (default) or \code{"strict"}.}
+\item{preset}{\code{"lenient"} (default) or \code{"strict"}.}
 
 \item{min_total_count}{Features with a total count \code{<=} this value are
 removed before fitting (the published script used \code{rowSums > 10}).}

@@ -5,7 +5,7 @@
 \title{Classification options and presets}
 \usage{
 classification_options(
-  preset = c("paper", "strict"),
+  preset = c("lenient", "strict", "paper"),
   alpha = NULL,
   min_abs_lfc = NULL,
   na_action = NULL,
@@ -15,7 +15,7 @@ classification_options(
 )
 }
 \arguments{
-\item{preset}{\code{"paper"} (default) reproduces exactly the classification rules of
+\item{preset}{\code{"lenient"} (default) reproduces exactly the classification rules of
 Contreras-Riquelme et al. (2025). \code{"strict"} sets
 \code{na_action = "unclassified"} and \code{require_basal_difference = TRUE}.}
 
@@ -25,8 +25,8 @@ Contreras-Riquelme et al. (2025). \code{"strict"} sets
 to \code{alpha}, to call a contrast significant (default 0).}
 
 \item{na_action}{\code{"not_de"}: a missing adjusted p-value counts as not
-differentially expressed (paper behaviour). \code{"unclassified"}: features
-with a missing value in any contrast consulted by the tree are labelled
+differentially expressed (lenient behaviour, as in the published rules). \code{"unclassified"}: features
+with a missing value in any contrast consulted by the rules are labelled
 \code{unclassified}.}
 
 \item{require_basal_difference}{If \code{TRUE}, primed calls also require
@@ -49,5 +49,5 @@ Classification options and presets
 }
 \examples{
 classification_options("strict")
-classification_options("paper", equivalence_margin = 0.5)
+classification_options("lenient", equivalence_margin = 0.5)
 }

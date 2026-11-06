@@ -16,8 +16,8 @@ key                        contrast (numerator vs denominator)
 ``a_stress_vs_b_control``  A stress  vs B control
 =========================  ============================================
 
-With the default ``preset="paper"`` the rules reproduce exactly the decision
-tree published in Contreras-Riquelme et al. (2025, PLoS One 20(5): e0324724),
+With the default ``preset="lenient"`` the rules reproduce exactly the classification
+rules published in Contreras-Riquelme et al. (2025, PLoS One 20(5): e0324724),
 where A = *Solanum lycopersicum* and B = *Solanum pennellii*.
 """
 
@@ -80,7 +80,7 @@ class ClassificationOptions:
         Minimum absolute log2 fold change required, in addition to ``alpha``,
         to call a contrast significant (default 0, i.e. sign only).
     na_action:
-        ``"not_de"`` (paper behaviour): a missing adjusted p-value (independent
+        ``"not_de"`` (lenient behaviour, as in the published rules): a missing adjusted p-value (independent
         filtering, Cook's outliers) counts as *not differentially expressed*.
         ``"unclassified"``: features with a missing value in any contrast that
         the classification rules consult are labelled ``unclassified``.
@@ -119,26 +119,34 @@ class ClassificationOptions:
 
 
 _PRESETS: Dict[str, ClassificationOptions] = {
-    "paper": ClassificationOptions(),
+    "lenient": ClassificationOptions(),
     "strict": ClassificationOptions(na_action="unclassified", require_basal_difference=True),
 }
 
 
-def classification_options(preset: str = "paper", **overrides) -> ClassificationOptions:
+def classification_options(preset: str = "lenient", **overrides) -> ClassificationOptions:
     """Return the options of a preset, optionally overriding individual fields.
 
     Presets
     -------
-    ``"paper"``
-        Exact rules of the published methodology.
+    ``"lenient"`` (default)
+        Exact rules of the published methodology: equal levels are inferred
+        from the absence of a significant difference and a missing adjusted
+        p-value counts as not differentially expressed. ``"paper"`` is accepted
+        as the former name of this preset.
     ``"strict"``
         ``na_action="unclassified"`` and ``require_basal_difference=True``.
 
     Examples
     --------
-    >>> classification_options("paper", equivalence_margin=0.5).equivalence_margin
+    >>> classification_options("lenient", equivalence_margin=0.5).equivalence_margin
     0.5
     """
+    if preset == "paper":
+        import warnings
+
+        warnings.warn('preset "paper" was renamed "lenient"', FutureWarning, stacklevel=2)
+        preset = "lenient"
     if preset not in _PRESETS:
         raise ValueError(f"Unknown preset {preset!r}; choose from {sorted(_PRESETS)}")
     unknown = set(overrides) - set(ClassificationOptions.__dataclass_fields__)
@@ -307,7 +315,7 @@ def _sign(lfc: np.ndarray, digits: int) -> np.ndarray:
 
 def classify_responses(
     contrasts,
-    preset: str = "paper",
+    preset: str = "lenient",
     group_names: Sequence[str] = ("A", "B"),
     options: Optional[ClassificationOptions] = None,
     keep_statistics: bool = True,
@@ -326,7 +334,7 @@ def classify_responses(
         one wide DataFrame whose columns are ``<key>_log2FoldChange``,
         ``<key>_padj`` ...
     preset:
-        ``"paper"`` (default) or ``"strict"``; see :func:`classification_options`.
+        ``"lenient"`` (default) or ``"strict"``; see :func:`classification_options`.
     group_names:
         Display names for groups A and B (e.g. ``("S. lycopersicum", "S. pennellii")``).
     options:

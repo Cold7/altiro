@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "altiro"
-version = "0.6.3"
+version = "0.6.4"
 description = "ALTIRO (Analysis of Latent Transcriptional Induction and Response Outcomes). Classify expression response models (primed, shared, unique, opposite, no response) of orthologs or genes in 2 x 2 designs."
 readme = "README.md"
 license = { text = "MIT" }

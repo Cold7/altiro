@@ -1,7 +1,7 @@
 cff-version: 1.2.0
 message: "If you use this software, please cite it as below."
 title: "ALTIRO: Analysis of Latent Transcriptional Induction and Response Outcomes"
-version: 0.6.3
+version: 0.6.4
 date-released: 2026-11-06
 license: MIT
 repository-code: "https://github.com/Cold7/altiro"

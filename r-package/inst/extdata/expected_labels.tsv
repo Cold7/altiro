@@ -1,4 +1,4 @@
-feature	paper	strict	paper_equivalence_0.5
+feature	lenient	strict	lenient_equivalence_0.5
 ortholog_0	opposite_1	opposite_1	opposite_1
 ortholog_1	primed_2	unique_4	unresolved_2
 ortholog_2	unique_4	unique_4	unique_4

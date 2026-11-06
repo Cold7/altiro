@@ -6,7 +6,7 @@
 \usage{
 classify_responses(
   contrasts,
-  preset = c("paper", "strict"),
+  preset = c("lenient", "strict", "paper"),
   group_names = c("A", "B"),
   options = NULL,
   keep_statistics = TRUE,
@@ -21,7 +21,7 @@ names; columns \code{log2FoldChange}, \code{padj} and, for equivalence tests,
 \code{lfcSE}), or one wide data frame with columns \verb{<key>_log2FoldChange},
 \verb{<key>_padj}, ...}
 
-\item{preset}{\code{"paper"} or \code{"strict"}; see \code{\link[=classification_options]{classification_options()}}.}
+\item{preset}{\code{"lenient"} (default) or \code{"strict"}; see \code{\link[=classification_options]{classification_options()}}.}
 
 \item{group_names}{Display names for groups A and B.}
 
@@ -48,7 +48,7 @@ Applies the classification rules of Contreras-Riquelme et al. (2025) to the five
 contrasts of a 2 x 2 design and assigns each feature (ortholog pair or gene)
 to one model: primed (cases 1-4; called stress-ready in the original
 publication), shared (1-2), unique (1-4),
-opposite (1-2) or no response (1-3). With the default \code{preset = "paper"}
+opposite (1-2) or no response (1-3). With the default \code{preset = "lenient"}
 the result is identical to the published script, where A =
 \emph{S. lycopersicum} and B = \emph{S. pennellii}.
 }

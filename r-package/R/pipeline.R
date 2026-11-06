@@ -4,7 +4,7 @@
 #' [summarize_classification()] and [primed_asymmetry()].
 #'
 #' @inheritParams run_contrasts
-#' @param preset `"paper"` (default) or `"strict"`.
+#' @param preset `"lenient"` (default) or `"strict"`.
 #' @param group_names Display names for groups A and B in descriptions,
 #'   summaries and figures (default: `group_a` and `group_b`, i.e. the values of
 #'   the sample table).
@@ -21,7 +21,7 @@
 #' }
 #' @export
 altiro <- function(counts, samples, group_col, condition_col, group_a, group_b, control, stress,
-                          preset = c("paper", "strict"), min_total_count = 10, alpha = 0.05,
+                          preset = c("lenient", "strict", "paper"), min_total_count = 10, alpha = 0.05,
                           filter_alpha = NULL, round_counts = FALSE, quiet = TRUE, group_names = NULL, ...) {
   preset <- match.arg(preset)
   cs <- run_contrasts(counts, samples, group_col = group_col, condition_col = condition_col,

@@ -17,7 +17,7 @@ res
 save_altiro(res, "results_r", condition_labels = c("Veh", "BQ"))
 
 strict <- classify_responses(res$contrasts, preset = "strict", group_names = c("CisS", "CisR"))
-cat("\nPrimed genes, paper vs strict preset:",
+cat("\nPrimed genes, lenient vs strict preset:",
     sum(res$classification$model == "primed"), "->", sum(strict$model == "primed"), "\n")
 print(table(strict$label))
 print(primed_asymmetry(strict))

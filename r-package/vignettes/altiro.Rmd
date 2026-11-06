@@ -95,7 +95,7 @@ them to `classify_responses()`. Each table needs `log2FoldChange` and `padj`
 first column. To re-classify the files written by the script of the original
 publication:
 
-```{r paper-files, eval = FALSE}
+```{r published-files, eval = FALSE}
 paths <- list(a_response            = "Sly.drought_Sly.control.csv",
               b_response            = "Spenn.drought_Spenn.control.csv",
               basal                 = "Spenn.control_Sly.control.csv",
@@ -148,10 +148,10 @@ summarize_classification(cls)
 
 ## Presets and options
 
-The default `preset = "paper"` reproduces the published classification rules exactly.
+The default `preset = "lenient"` reproduces the published classification rules exactly.
 Its rules have known limitations, so three options can be changed:
 
-| option | paper | strict | effect |
+| option | lenient | strict | effect |
 |---|---|---|---|
 | `na_action` | `"not_de"` | `"unclassified"` | a missing `padj` is no longer read as "no difference" |
 | `require_basal_difference` | `FALSE` | `TRUE` | primed calls need a significant basal difference in the right direction |
@@ -159,14 +159,14 @@ Its rules have known limitations, so three options can be changed:
 
 ```{r presets}
 cmp <- data.frame(
-  paper = table(factor(classify_responses(tabs)$model, levels = c("primed", "unique", "unresolved", "unclassified"))),
+  lenient = table(factor(classify_responses(tabs)$model, levels = c("primed", "unique", "unresolved", "unclassified"))),
   strict = table(factor(classify_responses(tabs, preset = "strict")$model, levels = c("primed", "unique", "unresolved", "unclassified"))),
   equivalence = table(factor(classify_responses(tabs, equivalence_margin = 0.5)$model, levels = c("primed", "unique", "unresolved", "unclassified")))
 )
 cmp[, c(1, 2, 4, 6)]
 ```
 
-Why it matters: under the paper rules a gene is "primed" when the
+Why it matters: under the lenient rules a gene is "primed" when the
 responding group's stressed level is *not significantly different* from the
 other group's control level. Absence of a significant difference is not
 evidence of equality, and any false-positive response in one group whose basal

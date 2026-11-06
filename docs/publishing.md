@@ -16,10 +16,10 @@ Notes for the maintainer.
 3. Push the release tag so users can pin it:
 
    ```bash
-   git push origin v0.6.3
+   git push origin v0.6.4
    ```
 
-   Then on GitHub: *Releases -> Draft a new release -> choose v0.6.3*.
+   Then on GitHub: *Releases -> Draft a new release -> choose v0.6.4*.
 
 The workflows in `.github/workflows/` run the Python tests and `R CMD check`
 on every push.
@@ -37,7 +37,7 @@ existing repository to the new name:
    ```bash
    git remote set-url origin https://github.com/Cold7/altiro.git
    git push
-   git push origin v0.6.3
+   git push origin v0.6.4
    ```
 
 3. Uninstall the old package once: `pip uninstall orthoresponse` and, in R,
@@ -46,11 +46,11 @@ existing repository to the new name:
 ## 2. Installing a specific version
 
 ```bash
-pip install "altiro[all] @ git+https://github.com/Cold7/altiro.git@v0.6.3#subdirectory=python"
+pip install "altiro[all] @ git+https://github.com/Cold7/altiro.git@v0.6.4#subdirectory=python"
 ```
 
 ```r
-remotes::install_github("Cold7/altiro@v0.6.3", subdir = "r-package")
+remotes::install_github("Cold7/altiro@v0.6.4", subdir = "r-package")
 ```
 
 ## 3. Optional: PyPI

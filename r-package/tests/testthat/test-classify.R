@@ -16,10 +16,10 @@ expected_labels <- function() {
 test_that("labels match the shared fixture (same as the Python implementation)", {
   tabs <- fixture_tables()
   e <- expected_labels()
-  expect_identical(classify_responses(tabs)[rownames(e), "label"], e$paper)
+  expect_identical(classify_responses(tabs)[rownames(e), "label"], e$lenient)
   expect_identical(classify_responses(tabs, preset = "strict")[rownames(e), "label"], e$strict)
   expect_identical(classify_responses(tabs, equivalence_margin = 0.5)[rownames(e), "label"],
-                   e[["paper_equivalence_0.5"]])
+                   e[["lenient_equivalence_0.5"]])
 })
 
 one <- function(a, b, basal, mb, ma, ...) {
@@ -51,12 +51,12 @@ test_that("strict preset requires a basal difference", {
 
 test_that("missing values are flagged or unclassified", {
   tabs <- fixture_tables()
-  paper <- classify_responses(tabs)
+  lenient <- classify_responses(tabs)
   strict <- classify_responses(tabs, na_action = "unclassified")
-  flagged <- grepl("na_treated_as_not_de", paper$flags)
+  flagged <- grepl("na_treated_as_not_de", lenient$flags)
   expect_true(any(flagged))
   expect_true(all(strict$model[flagged] == "unclassified"))
-  expect_identical(strict$label[!flagged], paper$label[!flagged])
+  expect_identical(strict$label[!flagged], lenient$label[!flagged])
 })
 
 test_that("BH adjustment and TOST agree with closed forms", {
@@ -88,8 +88,8 @@ test_that("wide input gives the same result", {
 })
 
 test_that("options are validated", {
-  expect_error(classification_options("paper", na_action = "drop"))
-  expect_error(classification_options("paper", alpha = 2))
+  expect_error(classification_options("lenient", na_action = "drop"))
+  expect_error(classification_options("lenient", alpha = 2))
 })
 
 test_that("label_style only renames the primed model", {
@@ -102,4 +102,9 @@ test_that("label_style only renames the primed model", {
   expect_equal(summarize_classification(new)$n, summarize_classification(old)$n)
   expect_equal(primed_asymmetry(new), primed_asymmetry(old))
   expect_error(classify_responses(tabs, label_style = "ready"))
+})
+
+test_that("'paper' is a deprecated alias of the lenient preset", {
+  expect_warning(o <- classification_options("paper"), "renamed")
+  expect_identical(o$preset, "lenient")
 })

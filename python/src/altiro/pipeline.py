@@ -135,7 +135,7 @@ def run_altiro(
     group_b: str,
     control: str,
     stress: str,
-    preset: str = "paper",
+    preset: str = "lenient",
     min_total_count: float = 10,
     alpha: float = 0.05,
     filter_alpha: Optional[float] = None,

@@ -67,14 +67,14 @@ picks = [(top(strict, "primed_3"), "primed_3"),
 print("ovarian picks:", picks)
 gene_panel("ovarian", picks, "ovarian_genes.pdf")
 
-# paper vs strict, both data sets
+# lenient vs strict, both data sets
 fig, axes = plt.subplots(1, 2, figsize=(8.6, 3.0))
 for ax, key, title in zip(axes, ["rice", "ovarian"], ["Rice (GSE167342)", "Ovarian cells (GSE283381)"]):
     c, s = cls_all[key]
     labs = [f"primed_{i}" for i in range(1, 5)]
     pv = [int((c.label == l).sum()) for l in labs]; sv = [int((s.label == l).sum()) for l in labs]
     x = np.arange(4)
-    ax.bar(x - 0.2, pv, 0.4, color="#9aa7c7", label="paper preset")
+    ax.bar(x - 0.2, pv, 0.4, color="#9aa7c7", label="lenient preset")
     ax.bar(x + 0.2, sv, 0.4, color="#2f4b8a", label="strict preset")
     for xi, a, b in zip(x, pv, sv):
         ax.text(xi - 0.2, a, str(a), ha="center", va="bottom", fontsize=6.5)
@@ -82,7 +82,7 @@ for ax, key, title in zip(axes, ["rice", "ovarian"], ["Rice (GSE167342)", "Ovari
     ax.set_xticks(x); ax.set_xticklabels([f"primed {i}" for i in range(1, 5)], fontsize=8)
     ax.set_title(title, fontsize=9); ax.spines[["top", "right"]].set_visible(False); ax.tick_params(axis="y", labelsize=7)
 axes[0].set_ylabel("Primed genes", fontsize=8); axes[1].legend(fontsize=7, frameon=False)
-fig.tight_layout(); fig.savefig(f"{OUT}/paper_vs_strict.pdf", bbox_inches="tight"); plt.close(fig)
+fig.tight_layout(); fig.savefig(f"{OUT}/lenient_vs_strict.pdf", bbox_inches="tight"); plt.close(fig)
 
 # asymmetry fractions
 fig, axes = plt.subplots(1, 2, figsize=(8.6, 2.8))
@@ -90,11 +90,11 @@ for ax, key, title in zip(axes, ["rice", "ovarian"], ["Rice (GSE167342)", "Ovari
     c, s = cls_all[key]
     a_p, a_s = alt.primed_asymmetry(c), alt.primed_asymmetry(s)
     x = np.arange(2)
-    ax.bar(x - 0.2, 100 * a_p.fraction_primed, 0.4, color="#9aa7c7", label="paper")
+    ax.bar(x - 0.2, 100 * a_p.fraction_primed, 0.4, color="#9aa7c7", label="lenient")
     ax.bar(x + 0.2, 100 * a_s.fraction_primed, 0.4, color="#2f4b8a", label="strict")
     ax.set_xticks(x); ax.set_xticklabels([f"{g}-only\nresponders" for g in a_p.responding_group], fontsize=7.5)
     ax.set_ylim(0, 100); ax.set_ylabel("% ending primed", fontsize=7.5); ax.tick_params(axis="y", labelsize=7)
-    ax.set_title(f"{title}\nFisher p: paper {a_p.fisher_pvalue[0]:.1g}, strict {a_s.fisher_pvalue[0]:.2f}", fontsize=8.5)
+    ax.set_title(f"{title}\nFisher p: lenient {a_p.fisher_pvalue[0]:.1g}, strict {a_s.fisher_pvalue[0]:.2f}", fontsize=8.5)
     ax.spines[["top", "right"]].set_visible(False)
 axes[1].legend(fontsize=7, frameon=False)
 fig.tight_layout(); fig.savefig(f"{OUT}/asymmetry.pdf", bbox_inches="tight"); plt.close(fig)

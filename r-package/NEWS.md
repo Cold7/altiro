@@ -1,3 +1,10 @@
+# altiro 0.6.4
+
+* The default preset `paper` is renamed `lenient`, a name that describes what it does (equal
+  levels mean "not significantly different", missing adjusted p-values count as not DE) instead
+  of where it came from. `preset = "paper"` still works and gives a deprecation warning
+  (`FutureWarning` in Python). Labels and results are unchanged.
+
 # altiro 0.6.3
 
 * Documentation and messages call the classification "classification rules" instead of

@@ -9,7 +9,7 @@ opposite or no response -- with the classification rules of Contreras-Riquelme e
 (2025) PLoS One 20(5): e0324724.
 """
 
-__version__ = "0.6.3"
+__version__ = "0.6.4"
 
 from .classify import (  # noqa: E402
     CONTRAST_KEYS,

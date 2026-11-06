@@ -97,15 +97,15 @@ model_definitions <- function(group_names = c("A", "B"), include_extra = FALSE) 
 
 #' Classification options and presets
 #'
-#' @param preset `"paper"` (default) reproduces exactly the classification rules of
+#' @param preset `"lenient"` (default) reproduces exactly the classification rules of
 #'   Contreras-Riquelme et al. (2025). `"strict"` sets
 #'   `na_action = "unclassified"` and `require_basal_difference = TRUE`.
 #' @param alpha Adjusted p-value threshold (default 0.05).
 #' @param min_abs_lfc Minimum absolute log2 fold change required, in addition
 #'   to `alpha`, to call a contrast significant (default 0).
 #' @param na_action `"not_de"`: a missing adjusted p-value counts as not
-#'   differentially expressed (paper behaviour). `"unclassified"`: features
-#'   with a missing value in any contrast consulted by the tree are labelled
+#'   differentially expressed (lenient behaviour, as in the published rules). `"unclassified"`: features
+#'   with a missing value in any contrast consulted by the rules are labelled
 #'   `unclassified`.
 #' @param require_basal_difference If `TRUE`, primed calls also require
 #'   a significant basal difference in the direction implied by the case;
@@ -119,12 +119,16 @@ model_definitions <- function(group_names = c("A", "B"), include_extra = FALSE) 
 #' @return A list of class `altiro_options`.
 #' @examples
 #' classification_options("strict")
-#' classification_options("paper", equivalence_margin = 0.5)
+#' classification_options("lenient", equivalence_margin = 0.5)
 #' @export
-classification_options <- function(preset = c("paper", "strict"), alpha = NULL, min_abs_lfc = NULL,
+classification_options <- function(preset = c("lenient", "strict", "paper"), alpha = NULL, min_abs_lfc = NULL,
                                    na_action = NULL, require_basal_difference = NULL,
                                    equivalence_margin = NULL, sign_digits = NULL) {
   preset <- match.arg(preset)
+  if (preset == "paper") {
+    warning('preset "paper" was renamed "lenient"', call. = FALSE)
+    preset <- "lenient"
+  }
   o <- list(alpha = 0.05, min_abs_lfc = 0, na_action = "not_de", require_basal_difference = FALSE,
             equivalence_margin = NULL, sign_digits = 2L)
   if (preset == "strict") {
@@ -220,7 +224,7 @@ equivalence_test <- function(log2fc, lfc_se, margin) {
 #' contrasts of a 2 x 2 design and assigns each feature (ortholog pair or gene)
 #' to one model: primed (cases 1-4; called stress-ready in the original
 #' publication), shared (1-2), unique (1-4),
-#' opposite (1-2) or no response (1-3). With the default `preset = "paper"`
+#' opposite (1-2) or no response (1-3). With the default `preset = "lenient"`
 #' the result is identical to the published script, where A =
 #' *S. lycopersicum* and B = *S. pennellii*.
 #'
@@ -229,7 +233,7 @@ equivalence_test <- function(log2fc, lfc_se, margin) {
 #'   names; columns `log2FoldChange`, `padj` and, for equivalence tests,
 #'   `lfcSE`), or one wide data frame with columns `<key>_log2FoldChange`,
 #'   `<key>_padj`, ...
-#' @param preset `"paper"` or `"strict"`; see [classification_options()].
+#' @param preset `"lenient"` (default) or `"strict"`; see [classification_options()].
 #' @param group_names Display names for groups A and B.
 #' @param options An object from [classification_options()]; overrides
 #'   `preset` and `...`.
@@ -250,7 +254,7 @@ equivalence_test <- function(log2fc, lfc_se, margin) {
 #' res <- classify_responses(tabs, group_names = c("sensitive", "tolerant"))
 #' table(res$label)
 #' @export
-classify_responses <- function(contrasts, preset = c("paper", "strict"), group_names = c("A", "B"),
+classify_responses <- function(contrasts, preset = c("lenient", "strict", "paper"), group_names = c("A", "B"),
                                options = NULL, keep_statistics = TRUE,
                                label_style = c("primed", "stress_ready"), ...) {
   preset <- match.arg(preset)

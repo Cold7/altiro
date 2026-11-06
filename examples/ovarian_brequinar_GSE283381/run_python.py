@@ -28,7 +28,7 @@ def main():
     print(res.asymmetry.to_string(index=False))
 
     strict = alt.classify_responses(res.contrasts, preset="strict", group_names=("CisS", "CisR"))
-    print("\nPrimed genes, paper vs strict preset:",
+    print("\nPrimed genes, lenient vs strict preset:",
           int((res.classification.model == "primed").sum()), "->",
           int((strict.model == "primed").sum()))
 

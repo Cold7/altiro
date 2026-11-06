@@ -28,7 +28,7 @@ def main():
 
     # Same data, stricter rules: NA -> unclassified, basal difference required
     strict = alt.classify_responses(res.contrasts, preset="strict", group_names=("PL12", "IL22"))
-    print("\nPrimed genes, paper vs strict preset:",
+    print("\nPrimed genes, lenient vs strict preset:",
           int((res.classification.model == "primed").sum()), "->",
           int((strict.model == "primed").sum()))
 

@@ -1,7 +1,7 @@
 """Regenerate the cross-language test fixture.
 
 Writes five contrast tables and the expected labels (computed with the Python
-implementation, whose ``paper`` preset is itself validated against the
+implementation, whose ``lenient`` preset is itself validated against the
 published notebook) into ``python/tests/data`` and ``r-package/inst/extdata``.
 The R test suite checks that it reproduces the same labels.
 
@@ -36,9 +36,9 @@ def main():
 
     t = read_contrasts({k: PY / f"contrast_{k}.tsv" for k in CONTRAST_KEYS})
     exp = pd.DataFrame({
-        "paper": classify_responses(t)["label"],
+        "lenient": classify_responses(t)["label"],
         "strict": classify_responses(t, preset="strict")["label"],
-        "paper_equivalence_0.5": classify_responses(t, equivalence_margin=0.5)["label"],
+        "lenient_equivalence_0.5": classify_responses(t, equivalence_margin=0.5)["label"],
     })
     exp.to_csv(PY / "expected_labels.tsv", sep="\t")
     for f in PY.glob("*.tsv"):

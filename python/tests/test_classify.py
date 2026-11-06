@@ -30,7 +30,7 @@ def _write_paper_csvs(tables, folder):
 
 
 @pytest.mark.parametrize("seed", [0, 1, 2, 3, 4])
-def test_paper_preset_matches_published_notebook(tmp_path, seed):
+def test_lenient_preset_matches_published_notebook(tmp_path, seed):
     tables = random_contrasts(n=3000, seed=seed)
     _write_paper_csvs(tables, tmp_path)
     expected = classify_like_notebook(tmp_path)
@@ -80,19 +80,19 @@ def test_strict_requires_basal_difference():
 
 
 def test_na_handling(contrasts):
-    paper = classify_responses(contrasts)
+    lenient = classify_responses(contrasts)
     strict = classify_responses(contrasts, na_action="unclassified")
-    flagged = paper["flags"].str.contains("na_treated_as_not_de")
+    flagged = lenient["flags"].str.contains("na_treated_as_not_de")
     assert flagged.sum() > 0
     assert (strict.loc[flagged, "model"] == "unclassified").all()
-    assert (strict.loc[~flagged, "label"] == paper.loc[~flagged, "label"]).all()
+    assert (strict.loc[~flagged, "label"] == lenient.loc[~flagged, "label"]).all()
 
 
 def test_equivalence_only_moves_primed(contrasts):
-    paper = classify_responses(contrasts)
+    lenient = classify_responses(contrasts)
     eq = classify_responses(contrasts, equivalence_margin=0.5)
-    changed = paper["label"] != eq["label"]
-    assert (paper.loc[changed, "model"] == "primed").all()
+    changed = lenient["label"] != eq["label"]
+    assert (lenient.loc[changed, "model"] == "primed").all()
     assert (eq.loc[changed, "model"] == "unresolved").all()
 
 
@@ -138,9 +138,9 @@ def test_options_validation():
     with pytest.raises(ValueError):
         classification_options("nope")
     with pytest.raises(TypeError):
-        classification_options("paper", not_an_option=1)
+        classification_options("lenient", not_an_option=1)
     with pytest.raises(ValueError):
-        classification_options("paper", na_action="drop")
+        classification_options("lenient", na_action="drop")
 
 
 def test_shared_fixture_matches_expected():
@@ -148,11 +148,11 @@ def test_shared_fixture_matches_expected():
     paths = {k: DATA / f"contrast_{k}.tsv" for k in CONTRAST_KEYS}
     tables = read_contrasts(paths)
     expected = pd.read_csv(DATA / "expected_labels.tsv", sep="\t", index_col=0)
-    for preset in ("paper", "strict"):
+    for preset in ("lenient", "strict"):
         got = classify_responses(tables, preset=preset)
         assert (got.loc[expected.index, "label"] == expected[preset]).all()
     got = classify_responses(tables, equivalence_margin=0.5)
-    assert (got.loc[expected.index, "label"] == expected["paper_equivalence_0.5"]).all()
+    assert (got.loc[expected.index, "label"] == expected["lenient_equivalence_0.5"]).all()
 
 
 def test_format_asymmetry_matches_r_wording():
@@ -195,3 +195,11 @@ def test_cli_classify_with_edger_column_names(tmp_path):
     got = pd.read_csv(tmp_path / "out" / "classification.tsv", sep="\t", index_col=0)["label"]
     expected = pd.read_csv(data / "expected_labels.tsv", sep="\t", index_col=0).iloc[:, 0]
     assert (got.reindex(expected.index) == expected).all()
+
+
+def test_paper_is_an_alias_of_lenient():
+    """'paper' was the former name of the lenient preset; it still works with a warning."""
+    contrasts = random_contrasts(200, seed=3)
+    with pytest.warns(FutureWarning):
+        old = classify_responses(contrasts, preset="paper")
+    assert (old["label"] == classify_responses(contrasts, preset="lenient")["label"]).all()

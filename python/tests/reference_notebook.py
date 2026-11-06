@@ -3,7 +3,7 @@
 Only two changes were made so it can run as a function: the working directory
 is a parameter, and the positional ``Series[i]`` look-ups were replaced by
 ``.iloc[i]`` (same result; the original relied on a deprecated pandas
-behaviour). Used as the ground truth for the ``paper`` preset.
+behaviour). Used as the ground truth for the ``lenient`` preset.
 """
 
 import os

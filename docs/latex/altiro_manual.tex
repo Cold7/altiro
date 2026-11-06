@@ -161,7 +161,7 @@
     {Analysis of Latent Transcriptional Induction and Response Outcomes\\[2pt]\normalsize expression response models of genes and orthologs in two-by-two designs};
   \node[anchor=north west, text=white!80, font=\sffamily\normalsize]
     at ([xshift=2.45cm, yshift=-7.05cm]current page.north west)
-    {User manual \quad\textbullet\quad Version 0.6.3 \quad\textbullet\quad Python and R};
+    {User manual \quad\textbullet\quad Version 0.6.4 \quad\textbullet\quad Python and R};
   % pattern glyphs
   \node[anchor=north west] at ([xshift=2.3cm, yshift=-8.6cm]current page.north west) {%
     \begin{tabular}{@{}c@{\hspace{5mm}}c@{\hspace{5mm}}c@{\hspace{5mm}}c@{\hspace{5mm}}c@{}}
@@ -240,7 +240,7 @@ The original name is available with \code{label\_style="stress\_ready"}.
 \begin{itemize}
   \item \textbf{One call from counts to answers}: a single DESeq2 (R) or PyDESeq2 (Python) fit, five
         contrasts, classification, summaries and figures.
-  \item \textbf{Two presets}: \code{paper} (the published rules) and \code{strict} (handles missing
+  \item \textbf{Two presets}: \code{lenient} (the published rules, default) and \code{strict} (handles missing
         statistics and requires a basal difference for primed calls), plus an optional formal
         equivalence test.
   \item \textbf{Identical in Python and R}: same function names, options and outputs; both
@@ -350,7 +350,7 @@ tolerant group, cases 3 and 4 are the ones that support pre-adaptation of \B.
   \node[flow] (in) {\textbf{Raw counts}\\+ sample table};
   \node[flow, right=of in] (fit) {\textbf{One model}\\DESeq2 / PyDESeq2\\\code{\textasciitilde{} cell}};
   \node[flow, right=of fit] (ct) {\textbf{Five contrasts}\\log2FC, padj};
-  \node[flow, right=of ct] (tree) {\textbf{Classification rules}\\\code{paper} / \code{strict}};
+  \node[flow, right=of ct] (tree) {\textbf{Classification rules}\\\code{lenient} / \code{strict}};
   \node[flow, right=of tree, fill=navy, text=white] (out) {\textbf{Results}\\tables + figures};
   \foreach \a/\b in {in/fit, fit/ct, ct/tree, tree/out} \draw[flowarrow] (\a) -- (\b);
   \node[flow, above=0.8cm of in, fill=white, dashed] (orth) {\textbf{Two species?}\\RBH orthologs,\\merged counts};
@@ -407,12 +407,12 @@ the log2 fold change.
         [{opposite\_1/2}, fill=white, edge label={node[midway, right, font=\sffamily\scriptsize\bfseries, fill=white, inner sep=1pt, text=warnred]{no}}]]]]
 \end{forest}}
 \caption{The classification rules drawn as a flowchart. ``Same level'' (=) means \emph{not significantly different} under the
-\code{paper} preset; Section~\ref{sec:options} describes stricter alternatives.}
+\code{lenient} preset; Section~\ref{sec:options} describes stricter alternatives.}
 \label{fig:tree}
 \end{figure}
 
 \begin{caution}[Absence of evidence is not evidence of equality]
-Under the \code{paper} preset a gene is primed when the responding group's stressed level is
+Under the \code{lenient} preset a gene is primed when the responding group's stressed level is
 \emph{not significantly different} from the other group's control level. With few replicates this
 inflates the primed class. The \code{strict} preset and the equivalence test exist for this
 reason; see Sections~\ref{sec:options} and \ref{sec:interpret}.
@@ -429,7 +429,7 @@ pip install "altiro[all] @ \
 
 # a specific version
 pip install "altiro[all] @ \
-  git+https://github.com/Cold7/altiro.git@v0.6.3#subdirectory=python"
+  git+https://github.com/Cold7/altiro.git@v0.6.4#subdirectory=python"
 
 altiro --version
 \end{shcode}
@@ -720,7 +720,7 @@ statistics of each tool, not from the classifier, so report which tool was used.
 \caption{Classification options. Any option can be combined with any preset.}
 \begin{tabularx}{\linewidth}{>{\ttfamily\color{navy!85!black}}l c c Y}
 \toprule
-\textsf{\textbf{option}} & \textsf{\textbf{paper}} & \textsf{\textbf{strict}} & \textsf{\textbf{meaning}}\\
+\textsf{\textbf{option}} & \textsf{\textbf{lenient}} & \textsf{\textbf{strict}} & \textsf{\textbf{meaning}}\\
 \midrule
 alpha & 0.05 & 0.05 & adjusted p-value threshold (any value)\\
 min\_abs\_lfc & 0 & 0 & minimum \(|\log_2\mathrm{FC}|\) for a significant change\\
@@ -734,7 +734,7 @@ sign\_digits & 2 & 2 & rounding of log2FC before taking its sign\\
 
 \begin{pycode}
 alt.classify_responses(tabs, preset="strict")
-alt.classify_responses(tabs, preset="paper", equivalence_margin=0.5, alpha=0.01)
+alt.classify_responses(tabs, preset="lenient", equivalence_margin=0.5, alpha=0.01)
 \end{pycode}
 
 \subsubsection*{Significance threshold (\code{alpha})}
@@ -760,20 +760,20 @@ filtering, unless \code{filter\_alpha} is given (the original tomato script used
 \code{filter\_alpha = 0.01} with \code{alpha = 0.05}). Because the classification only reads the
 contrast tables, a different threshold can be tried with \code{classify\_responses()} on saved
 contrasts without refitting the model. A stricter \code{alpha} reduces the number of responsive
-genes, but under the \code{paper} preset it raises the share of primed calls among them, because a
+genes, but under the \code{lenient} preset it raises the share of primed calls among them, because a
 crossed difference must also pass the stricter threshold to make a response unique. On the rice
 example, \code{alpha = 0.01} gives 2,595 primed genes (64\% of responsive genes) against 4,225
 (62\%) with 0.05. Report the value used.
 
 \subsubsection*{Missing adjusted p-values}
 DESeq2 sets \code{padj} to missing for low-count genes (independent filtering) and outliers. Under
-\code{paper} a missing value counts as ``not significant'', which pushes features towards
+\code{lenient} a missing value counts as ``not significant'', which pushes features towards
 the primed class; the \code{flags} column marks them with \code{na\_treated\_as\_not\_de}. With
 \code{na\_action="unclassified"} they are labelled \code{unclassified} instead.
 
 \subsubsection*{Basal difference}
 If A is induced up to B's control level (primed 3), B's control level must be higher than A's.
-The \code{paper} rules never check this. With \code{require\_basal\_difference=True}, a primed call
+The \code{lenient} rules never check this. With \code{require\_basal\_difference=True}, a primed call
 also needs a significant \code{basal} contrast in the expected direction; otherwise the feature becomes
 the corresponding unique response and is flagged \code{basal\_difference\_not\_significant}.
 
@@ -789,7 +789,7 @@ adjusted with Benjamini--Hochberg across features. This is the construction DESe
 \code{unresolved}. Choose \(m\) before looking at the data; 0.5--1 is common.
 
 \begin{note}[Which preset?]
-Use \code{paper} to reproduce or compare with the original publication. Use \code{strict}, ideally with
+Use \code{lenient} to reproduce or compare with the original publication. Use \code{strict}, ideally with
 an equivalence margin, when you want to claim that a group is pre-adapted, and always when the two
 groups are near-isogenic. Reporting both is the most informative choice.
 \end{note}
@@ -1137,7 +1137,7 @@ python run_python.py        # or: Rscript run_r.R
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=0.9\linewidth]{figures/rice_patterns.pdf}
-\caption{Rice example, \code{paper} preset (Ctrl = control, NaCl = salt). 25\,045 genes after filtering.}
+\caption{Rice example, \code{lenient} preset (Ctrl = control, NaCl = salt). 25\,045 genes after filtering.}
 \label{fig:rice}
 \end{figure}
 
@@ -1146,7 +1146,7 @@ python run_python.py        # or: Rscript run_r.R
 \caption{Rice: number of genes per model under the two presets.}
 \begin{tabular}{l r r}
 \toprule
-\textsf{\textbf{model}} & \textsf{\textbf{paper}} & \textsf{\textbf{strict}}\\
+\textsf{\textbf{model}} & \textsf{\textbf{lenient}} & \textsf{\textbf{strict}}\\
 \midrule
 primed 1 / 2 / 3 / 4 & 281 / 407 / 1\,744 / 1\,793 & 35 / 72 / 297 / 189\\
 shared 1 / 2 & 563 / 335 & 563 / 335\\
@@ -1163,7 +1163,7 @@ unclassified & 0 & 4\,361\\
   \item The sensitive line reacts much more: 4\,782 single-line responses in PL12 against 1\,025 in IL22,
         consistent with IL22 experiencing less stress.
   \item The lines are nearly isogenic, so basal differences are rare (370 non-responsive genes). Under
-        the \code{paper} rules 62\% of the responsive genes are called primed, mostly because a gene
+        the \code{lenient} rules 62\% of the responsive genes are called primed, mostly because a gene
         that responds in one line is ``not significantly different'' from the unchanged level of the other.
         Requiring a basal difference keeps 593 of 4\,225.
   \item The apparent asymmetry (74.0\% vs 67.1\%, \(p=1.2\times10^{-5}\)) disappears under \code{strict}
@@ -1181,7 +1181,7 @@ were merged into one matrix without any transformation.
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=0.9\linewidth]{figures/ovarian_patterns.pdf}
-\caption{Ovarian example, \code{paper} preset (Veh = vehicle, BQ = brequinar). 24\,546 genes after filtering.}
+\caption{Ovarian example, \code{lenient} preset (Veh = vehicle, BQ = brequinar). 24\,546 genes after filtering.}
 \label{fig:ovarian}
 \end{figure}
 
@@ -1199,7 +1199,7 @@ the resistant cells (primed 3, \code{strict} preset).}
 \caption{Ovarian cells: number of genes per model under the two presets.}
 \begin{tabular}{l r r}
 \toprule
-\textsf{\textbf{model}} & \textsf{\textbf{paper}} & \textsf{\textbf{strict}}\\
+\textsf{\textbf{model}} & \textsf{\textbf{lenient}} & \textsf{\textbf{strict}}\\
 \midrule
 primed 1 / 2 / 3 / 4 & 476 / 487 / 617 / 435 & 162 / 179 / 159 / 146\\
 shared 1 / 2 & 4\,096 / 3\,585 & 4\,096 / 3\,585\\
@@ -1216,7 +1216,7 @@ unclassified & 0 & 2\,855\\
   \item Brequinar changes many genes in both lines: most responsive genes are shared (7\,681 of 13\,745).
   \item The two cell lines differ at basal level for many genes, so \code{strict} keeps about a third of
         the primed calls (646 of 2\,015), compared with one in seven in rice.
-  \item Neither line is globally more primed: 35.6\% vs 31.8\% under \code{paper} (\(p=0.002\)) and
+  \item Neither line is globally more primed: 35.6\% vs 31.8\% under \code{lenient} (\(p=0.002\)) and
         10.8\% vs 11.4\% under \code{strict} (\(p=0.43\)).
 \end{itemize}
 
@@ -1226,7 +1226,7 @@ unclassified & 0 & 2\,855\\
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=0.95\linewidth]{figures/paper_vs_strict.pdf}
+\includegraphics[width=0.95\linewidth]{figures/lenient_vs_strict.pdf}
 \caption{Primed genes under the two presets. The reduction is strongest when the groups have few
 basal differences (rice).}
 \label{fig:pvs}
@@ -1235,7 +1235,7 @@ basal differences (rice).}
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=0.95\linewidth]{figures/asymmetry.pdf}
-\caption{Fraction of single-group responses that end in a primed state. Under the \code{paper}
+\caption{Fraction of single-group responses that end in a primed state. Under the \code{lenient}
 rules a small asymmetry appears in both data sets; under \code{strict} it disappears.}
 \label{fig:asym}
 \end{figure}
@@ -1243,7 +1243,7 @@ rules a small asymmetry appears in both data sets; under \code{strict} it disapp
 \begin{itemize}
   \item \textbf{False positives flow into the primed class.} A false-positive response in one group, for a gene
         whose basal level does not differ between groups, is classified as primed under the
-        \code{paper} rules. \code{require\_basal\_difference} blocks this route.
+        \code{lenient} rules. \code{require\_basal\_difference} blocks this route.
   \item \textbf{Unique vs shared.} ``Significant in A and not in B'' does not prove that the responses
         differ. If the difference of responses is your question, test the interaction
         (\code{\textasciitilde{} group + group:condition}) separately.
