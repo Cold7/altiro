@@ -106,6 +106,35 @@ cls <- classify_responses(read_contrasts(paths, id_col = "Row.names"),
 summarize_classification(cls)
 ```
 
+With edgeR, fit one model with a four-level factor and keep all genes in each
+table (`n = Inf, sort.by = "none"`); edgeR names the columns `logFC` and `FDR`:
+
+```{r edger, eval = FALSE}
+library(edgeR)
+samples$cell <- factor(paste(samples$line, samples$treatment, sep = "_"))
+design <- model.matrix(~ 0 + cell, data = samples)
+colnames(design) <- levels(samples$cell)
+y <- DGEList(counts)
+y <- y[filterByExpr(y, design), , keep.lib.sizes = FALSE]
+y <- estimateDisp(normLibSizes(y), design)
+fit <- glmQLFit(y, design)
+con <- makeContrasts(a_response = PL12_Salt - PL12_Control,
+                     b_response = IL22_Salt - IL22_Control,
+                     basal = IL22_Control - PL12_Control,
+                     b_stress_vs_a_control = IL22_Salt - PL12_Control,
+                     a_stress_vs_b_control = PL12_Salt - IL22_Control,
+                     levels = design)
+tabs <- lapply(colnames(con), function(k) {
+  tt <- topTags(glmQLFTest(fit, contrast = con[, k]), n = Inf, sort.by = "none")$table
+  data.frame(log2FoldChange = tt$logFC, padj = tt$FDR, row.names = rownames(tt))
+})
+names(tabs) <- colnames(con)
+cls <- classify_responses(tabs, group_names = c("PL12", "IL22"))
+```
+
+The user manual also shows the limma-voom version, which provides the standard
+errors needed by the equivalence option.
+
 The package ships a small example set of contrast tables:
 
 ```{r fixture}

@@ -1,3 +1,10 @@
+# altiro 0.6.2
+
+* `altiro classify` (command line) gains `--lfc-col`, `--padj-col` and `--se-col`, so contrast tables
+  from edgeR (`logFC`, `FDR`) or limma (`logFC`, `adj.P.Val`) are read directly.
+* Manual: the section on precomputed contrasts now shows complete edgeR and limma-voom workflows in R,
+  the Python and command-line equivalents, and the column names of each tool.
+
 # altiro 0.6.1
 
 * Manual: new subsection on the optional length correction of `merge_ortholog_counts()`

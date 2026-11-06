@@ -174,3 +174,24 @@ def test_label_style_only_renames(contrasts):
     pd.testing.assert_frame_equal(primed_asymmetry(new), primed_asymmetry(old))
     with pytest.raises(ValueError):
         classify_responses(contrasts, label_style="ready")
+
+
+def test_cli_classify_with_edger_column_names(tmp_path):
+    """Contrast tables with edgeR-style columns (logFC, FDR) are read with --lfc-col/--padj-col."""
+    from pathlib import Path
+    import pandas as pd
+    from altiro.cli import main as cli_main
+    from altiro import CONTRAST_KEYS
+
+    data = Path(__file__).parent / "data"
+    args = ["classify"]
+    for k in CONTRAST_KEYS:
+        t = pd.read_csv(data / f"contrast_{k}.tsv", sep="\t", index_col=0)
+        t = t.rename(columns={"log2FoldChange": "logFC", "padj": "FDR"})
+        t.to_csv(tmp_path / f"{k}.csv")
+        args += [f"--{k.replace('_', '-')}", str(tmp_path / f"{k}.csv")]
+    args += ["--lfc-col", "logFC", "--padj-col", "FDR", "--out", str(tmp_path / "out"), "--no-plots"]
+    assert cli_main(args) == 0
+    got = pd.read_csv(tmp_path / "out" / "classification.tsv", sep="\t", index_col=0)["label"]
+    expected = pd.read_csv(data / "expected_labels.tsv", sep="\t", index_col=0).iloc[:, 0]
+    assert (got.reindex(expected.index) == expected).all()

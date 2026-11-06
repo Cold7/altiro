@@ -161,7 +161,7 @@
     {Analysis of Latent Transcriptional Induction and Response Outcomes\\[2pt]\normalsize expression response models of genes and orthologs in two-by-two designs};
   \node[anchor=north west, text=white!80, font=\sffamily\normalsize]
     at ([xshift=2.45cm, yshift=-7.05cm]current page.north west)
-    {User manual \quad\textbullet\quad Version 0.6.1 \quad\textbullet\quad Python and R};
+    {User manual \quad\textbullet\quad Version 0.6.2 \quad\textbullet\quad Python and R};
   % pattern glyphs
   \node[anchor=north west] at ([xshift=2.3cm, yshift=-8.6cm]current page.north west) {%
     \begin{tabular}{@{}c@{\hspace{5mm}}c@{\hspace{5mm}}c@{\hspace{5mm}}c@{\hspace{5mm}}c@{}}
@@ -429,7 +429,7 @@ pip install "altiro[all] @ \
 
 # a specific version
 pip install "altiro[all] @ \
-  git+https://github.com/Cold7/altiro.git@v0.6.1#subdirectory=python"
+  git+https://github.com/Cold7/altiro.git@v0.6.2#subdirectory=python"
 
 altiro --version
 \end{shcode}
@@ -593,10 +593,93 @@ read it with \code{sep=r"\textbackslash{}s+"}. To start from a correct template 
 
 Use at least 3 replicates per cell; with 2, treat gene-level calls as exploratory.
 
-\subsection{Precomputed contrasts}
+\subsection{Precomputed contrasts (edgeR, limma or your own DESeq2 run)}
+\label{sec:precomputed}
 
-If you already have differential-expression results, call \code{classify\_responses()} directly with five
-tables. Each needs \code{log2FoldChange} and \code{padj} (and \code{lfcSE} for the equivalence test):
+The classifier only needs, for every gene, a log2 fold change and an adjusted p-value in each of the five
+contrasts, so the differential-expression step can be done with any tool. Give
+\code{classify\_responses()} the five tables with these names (numerator versus denominator):
+
+\begin{center}
+\small
+\begin{tabular}{>{\ttfamily}l l}
+\toprule
+\textsf{\textbf{key}} & \textsf{\textbf{contrast}}\\
+\midrule
+a\_response & A stress vs A control\\
+b\_response & B stress vs B control\\
+basal & B control vs A control\\
+b\_stress\_vs\_a\_control & B stress vs A control\\
+a\_stress\_vs\_b\_control & A stress vs B control\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Three rules keep the result correct. A positive log2 fold change must mean \emph{higher in the numerator}.
+Use adjusted p-values (FDR), not nominal ones. Keep \emph{all} tested genes in every table (no
+\code{top} lists), ideally from one fitted model so the five tables contain the same genes. The column
+names used by the common tools are:
+
+\begin{center}
+\small
+\begin{tabular}{l l l l}
+\toprule
+\textsf{\textbf{tool}} & \textsf{\textbf{log2 fold change}} & \textsf{\textbf{adjusted p}} & \textsf{\textbf{standard error}}\\
+\midrule
+DESeq2 / PyDESeq2 & \code{log2FoldChange} & \code{padj} & \code{lfcSE}\\
+edgeR (\code{topTags}) & \code{logFC} & \code{FDR} & not reported\\
+limma (\code{topTable}) & \code{logFC} & \code{adj.P.Val} & \code{stdev.unscaled * sqrt(s2.post)}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The standard error is only used by the equivalence option (\code{equivalence\_margin}); without it every
+other option works.
+
+\paragraph{R, edgeR.} One quasi-likelihood fit with a four-level factor, then the five contrasts:
+
+\begin{rcode}
+library(edgeR); library(altiro)
+samples$cell <- factor(paste(samples$line, samples$treatment, sep = "_"))
+design <- model.matrix(~ 0 + cell, data = samples)
+colnames(design) <- levels(samples$cell)        # PL12_Control, PL12_Salt, ...
+y <- DGEList(counts)
+y <- y[filterByExpr(y, design), , keep.lib.sizes = FALSE]
+y <- normLibSizes(y)
+y <- estimateDisp(y, design)
+fit <- glmQLFit(y, design)
+con <- makeContrasts(
+  a_response            = PL12_Salt    - PL12_Control,
+  b_response            = IL22_Salt    - IL22_Control,
+  basal                 = IL22_Control - PL12_Control,
+  b_stress_vs_a_control = IL22_Salt    - PL12_Control,
+  a_stress_vs_b_control = PL12_Salt    - IL22_Control,
+  levels = design)
+tabs <- lapply(colnames(con), function(k) {
+  tt <- topTags(glmQLFTest(fit, contrast = con[, k]), n = Inf, sort.by = "none")$table
+  data.frame(log2FoldChange = tt$logFC, padj = tt$FDR, row.names = rownames(tt))
+})
+names(tabs) <- colnames(con)
+cls <- classify_responses(tabs, group_names = c("PL12", "IL22"))
+\end{rcode}
+
+\paragraph{R, limma-voom.} Same design and contrasts; limma also gives the standard error:
+
+\begin{rcode}
+v <- voom(y, design)
+lfit <- eBayes(contrasts.fit(lmFit(v, design), con))
+tabs <- lapply(colnames(con), function(k) {
+  tt <- topTable(lfit, coef = k, number = Inf, sort.by = "none")
+  se <- (lfit$stdev.unscaled[, k] * sqrt(lfit$s2.post))[rownames(tt)]
+  data.frame(log2FoldChange = tt$logFC, padj = tt$adj.P.Val, lfcSE = se,
+             row.names = rownames(tt))
+})
+names(tabs) <- colnames(con)
+cls <- classify_responses(tabs, group_names = c("PL12", "IL22"))
+\end{rcode}
+
+\paragraph{Python, from files.} Tables saved by any tool (one file per contrast, gene ids in the first
+column) are read with \code{read\_contrasts()}, which maps the column names:
 
 \begin{pycode}
 tabs = alt.read_contrasts({
@@ -605,12 +688,28 @@ tabs = alt.read_contrasts({
     "basal":                 "B_control_vs_A_control.csv",
     "b_stress_vs_a_control": "B_stress_vs_A_control.csv",
     "a_stress_vs_b_control": "A_stress_vs_B_control.csv",
-})
-cls = alt.classify_responses(tabs, group_names=("sensitive", "tolerant"))
+}, lfc_col="logFC", padj_col="FDR")            # edgeR; limma: padj_col="adj.P.Val"
+cls = alt.classify_responses(tabs, group_names=("PL12", "IL22"))
 \end{pycode}
 
-Column names from other tools can be mapped with \code{lfc\_col}, \code{padj\_col} and \code{se\_col}.
-The sign convention matters: a positive log2 fold change must mean \emph{higher in the numerator}.
+In R the same files are read with \code{read\_contrasts(paths, lfc\_col = "logFC", padj\_col = "FDR")}.
+
+\paragraph{Command line.} The same files can be classified from the terminal:
+
+\begin{shcode}
+altiro classify \
+  --a-response            A_stress_vs_A_control.csv \
+  --b-response            B_stress_vs_B_control.csv \
+  --basal                 B_control_vs_A_control.csv \
+  --b-stress-vs-a-control B_stress_vs_A_control.csv \
+  --a-stress-vs-b-control A_stress_vs_B_control.csv \
+  --lfc-col logFC --padj-col FDR --group-names PL12 IL22 --out results_edger
+\end{shcode}
+
+The classification, summaries, asymmetry test and figures are the same as with the built-in DESeq2
+step. On the rice example, edgeR and DESeq2 give the same model for 90\% of the genes tested by both
+(70\% among the genes that respond according to DESeq2). The differences come from the filtering and
+statistics of each tool, not from the classifier, so report which tool was used.
 
 % ================================================================== 7
 \section{Presets and options}
@@ -943,7 +1042,7 @@ fig.savefig("my_patterns.pdf")
 When you classify contrast tables made elsewhere, \code{read\_contrasts()} accepts the names of
 their columns: \code{id\_col} (feature identifier; default: the first column), \code{lfc\_col}
 (default: \code{log2FoldChange}), \code{padj\_col} (default: \code{padj}) and \code{se\_col}
-(default: \code{lfcSE}; only needed for the equivalence test). For example, for edgeR or limma output:
+(default: \code{lfcSE}; only needed for the equivalence test). For example, for edgeR output (Section~\ref{sec:precomputed} shows complete edgeR and limma workflows):
 
 \begin{pycode}
 tabs = alt.read_contrasts(paths, id_col="gene", lfc_col="logFC", padj_col="FDR")
@@ -971,7 +1070,7 @@ row labels of the figure & \code{model\_labels} & --\\
 figure title & \code{title} & --\\
 label identifiers in tables & \code{label\_style} (\code{"primed"} or \code{"stress\_ready"}) & \code{--label-style}\\
 figure files & \code{formats}; \code{dpi} (Py) or \code{width}, \code{height}, \code{res} (R); \code{plots} & \code{--plot-formats}, \code{--no-plots}\\
-contrast-table columns (data) & \code{id\_col}, \code{lfc\_col}, \code{padj\_col}, \code{se\_col} in \code{read\_contrasts()} & \code{--id-col}\\
+contrast-table columns (data) & \code{id\_col}, \code{lfc\_col}, \code{padj\_col}, \code{se\_col} in \code{read\_contrasts()} & \code{--id-col}, \code{--lfc-col}, \code{--padj-col}, \code{--se-col}\\
 \bottomrule
 \end{tabularx}
 \end{table}

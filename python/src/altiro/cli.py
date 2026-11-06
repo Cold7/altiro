@@ -92,7 +92,7 @@ def cmd_classify(a) -> None:
     from .contrasts import read_contrasts
 
     paths = {k: getattr(a, k) for k in CONTRAST_KEYS}
-    tables = read_contrasts(paths, id_col=a.id_col)
+    tables = read_contrasts(paths, id_col=a.id_col, lfc_col=a.lfc_col, padj_col=a.padj_col, se_col=a.se_col)
     names = tuple(a.group_names) if a.group_names else ("A", "B")
     cls = classify_responses(tables, preset=a.preset, group_names=names, label_style=_label_style(a),
                              **_overrides(a))
@@ -165,6 +165,9 @@ def build_parser() -> argparse.ArgumentParser:
     for k in CONTRAST_KEYS:
         c.add_argument(f"--{k.replace('_', '-')}", dest=k, required=True, help=f"table for {k}")
     c.add_argument("--id-col", default=None, help="feature id column (default: first column)")
+    c.add_argument("--lfc-col", default="log2FoldChange", help="log2 fold change column (edgeR/limma: logFC)")
+    c.add_argument("--padj-col", default="padj", help="adjusted p-value column (edgeR: FDR, limma: adj.P.Val)")
+    c.add_argument("--se-col", default="lfcSE", help="standard error column, only for --equivalence-margin")
     c.add_argument("--out", required=True)
     _add_classification_args(c)
     _add_plot_args(c)

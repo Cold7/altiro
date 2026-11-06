@@ -2,7 +2,7 @@
 
 *Analysis of Latent Transcriptional Induction and Response Outcomes* (package `altiro`, formerly `orthoresponse`)
 
-Version 0.6.1 · Python and R
+Version 0.6.2 · Python and R
 
 `altiro` classifies genes (within one species) or ortholog pairs (between
 two species) into **expression response models** in a 2 x 2 design: two
@@ -272,9 +272,75 @@ If you already ran a differential-expression analysis, call
 | `a_stress_vs_b_control` | A stress vs B control |
 
 Each table needs `log2FoldChange` and `padj` (adjusted p-value), plus `lfcSE`
-if you use the equivalence test. Other column names can be mapped with
-`read_contrasts(..., lfc_col=, padj_col=, se_col=)`. The sign convention
-matters: a positive log2 fold change means *higher in the numerator*.
+if you use the equivalence test. A positive log2 fold change must mean
+*higher in the numerator*, p-values must be adjusted (FDR), and every table
+must keep all tested genes (no top lists).
+
+| tool | log2 fold change | adjusted p | standard error |
+|---|---|---|---|
+| DESeq2 / PyDESeq2 | `log2FoldChange` | `padj` | `lfcSE` |
+| edgeR (`topTags`) | `logFC` | `FDR` | not reported |
+| limma (`topTable`) | `logFC` | `adj.P.Val` | `stdev.unscaled * sqrt(s2.post)` |
+
+**R, edgeR** (one quasi-likelihood fit, five contrasts):
+
+```r
+library(edgeR); library(altiro)
+samples$cell <- factor(paste(samples$line, samples$treatment, sep = "_"))
+design <- model.matrix(~ 0 + cell, data = samples)
+colnames(design) <- levels(samples$cell)
+y <- DGEList(counts)
+y <- y[filterByExpr(y, design), , keep.lib.sizes = FALSE]
+y <- normLibSizes(y)
+y <- estimateDisp(y, design)
+fit <- glmQLFit(y, design)
+con <- makeContrasts(
+  a_response            = PL12_Salt    - PL12_Control,
+  b_response            = IL22_Salt    - IL22_Control,
+  basal                 = IL22_Control - PL12_Control,
+  b_stress_vs_a_control = IL22_Salt    - PL12_Control,
+  a_stress_vs_b_control = PL12_Salt    - IL22_Control,
+  levels = design)
+tabs <- lapply(colnames(con), function(k) {
+  tt <- topTags(glmQLFTest(fit, contrast = con[, k]), n = Inf, sort.by = "none")$table
+  data.frame(log2FoldChange = tt$logFC, padj = tt$FDR, row.names = rownames(tt))
+})
+names(tabs) <- colnames(con)
+cls <- classify_responses(tabs, group_names = c("PL12", "IL22"))
+```
+
+**R, limma-voom** (same design and contrasts, with standard errors):
+
+```r
+v <- voom(y, design)
+lfit <- eBayes(contrasts.fit(lmFit(v, design), con))
+tabs <- lapply(colnames(con), function(k) {
+  tt <- topTable(lfit, coef = k, number = Inf, sort.by = "none")
+  se <- (lfit$stdev.unscaled[, k] * sqrt(lfit$s2.post))[rownames(tt)]
+  data.frame(log2FoldChange = tt$logFC, padj = tt$adj.P.Val, lfcSE = se, row.names = rownames(tt))
+})
+names(tabs) <- colnames(con)
+cls <- classify_responses(tabs, group_names = c("PL12", "IL22"))
+```
+
+**Python or R, from files** (one file per contrast, gene ids in the first column):
+
+```python
+tabs = alt.read_contrasts(paths, lfc_col="logFC", padj_col="FDR")   # limma: padj_col="adj.P.Val"
+cls = alt.classify_responses(tabs, group_names=("PL12", "IL22"))
+```
+
+**Command line:**
+
+```bash
+altiro classify --a-response a.csv --b-response b.csv --basal basal.csv \
+  --b-stress-vs-a-control bsac.csv --a-stress-vs-b-control asbc.csv \
+  --lfc-col logFC --padj-col FDR --group-names PL12 IL22 --out results_edger
+```
+
+On the rice example, edgeR and DESeq2 give the same model for 90% of the genes
+tested by both (70% among genes that respond according to DESeq2); the
+differences come from the filtering and statistics of each tool.
 
 You can also pass a single wide table whose columns are
 `<key>_log2FoldChange`, `<key>_padj` (and `<key>_lfcSE`).
@@ -640,7 +706,7 @@ tabs = alt.read_contrasts(paths, id_col="gene", lfc_col="logFC", padj_col="FDR")
 | figure title | `title` | - |
 | label identifiers in tables | `label_style` (`"primed"` / `"stress_ready"`) | `--label-style` |
 | figure files | `formats`; `dpi` (Py) or `width`, `height`, `res` (R); `plots` | `--plot-formats`, `--no-plots` |
-| contrast-table columns (data) | `id_col`, `lfc_col`, `padj_col`, `se_col` in `read_contrasts()` | `--id-col` |
+| contrast-table columns (data) | `id_col`, `lfc_col`, `padj_col`, `se_col` in `read_contrasts()` | `--id-col`, `--lfc-col`, `--padj-col`, `--se-col` |
 
 ---
 
