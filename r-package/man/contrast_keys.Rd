@@ -10,7 +10,7 @@ contrast_keys()
 A named character vector (keys as names, descriptions as values).
 }
 \description{
-The decision tree needs five differential-expression contrasts between the
+The classification rules need five differential-expression contrasts between the
 four cells of a 2 x 2 design (groups A and B, conditions control and stress):
 }
 \details{

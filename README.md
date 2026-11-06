@@ -20,7 +20,7 @@ under a control and a stress condition.
 *Primed* features are called *stress-ready* in the original publication;
 `label_style="stress_ready"` returns the old label names.
 
-The default rules reproduce exactly the decision tree of
+The default rules reproduce exactly the classification rules of
 Contreras-Riquelme *et al.* (2025) *PLoS One* 20(5): e0324724
 ([doi:10.1371/journal.pone.0324724](https://doi.org/10.1371/journal.pone.0324724)).
 Optional stricter rules handle missing statistics, require a basal difference
@@ -175,7 +175,7 @@ Already have differential-expression results? Pass the five contrasts to
 * **[User manual (PDF)](docs/altiro_manual.pdf)**: illustrated manual with diagrams,
   figures and worked examples (LaTeX source in `docs/latex/`, build with
   `latexmk -xelatex altiro_manual.tex`).
-* **[User manual (Markdown)](docs/manual.md)**: concepts, input formats, decision tree,
+* **[User manual (Markdown)](docs/manual.md)**: concepts, input formats, classification rules,
   options, outputs, cross-species workflow, worked examples, caveats.
 * R vignette: `vignette("altiro")`.
 * Worked examples with public, already-counted data (no alignment needed):

@@ -3,7 +3,7 @@
 The design has two *groups* (species, genotypes, cell lines, ...) called A and B,
 each measured under a *control* and a *stress* condition. Every feature (an
 ortholog pair, or a gene when both groups share a genome) is assigned to one
-expression model by a decision tree that uses five differential-expression
+expression model by a set of hierarchical classification rules that use five differential-expression
 contrasts:
 
 =========================  ============================================
@@ -83,7 +83,7 @@ class ClassificationOptions:
         ``"not_de"`` (paper behaviour): a missing adjusted p-value (independent
         filtering, Cook's outliers) counts as *not differentially expressed*.
         ``"unclassified"``: features with a missing value in any contrast that
-        the decision tree consults are labelled ``unclassified``.
+        the classification rules consult are labelled ``unclassified``.
     require_basal_difference:
         If True, a primed call also requires a significant basal
         difference (``basal`` contrast) in the direction implied by the case.
@@ -130,7 +130,7 @@ def classification_options(preset: str = "paper", **overrides) -> Classification
     Presets
     -------
     ``"paper"``
-        Exact rules of the published decision tree.
+        Exact rules of the published methodology.
     ``"strict"``
         ``na_action="unclassified"`` and ``require_basal_difference=True``.
 
@@ -173,7 +173,7 @@ _DEFINITIONS = [
     ("unresolved", 2, "", "B", "Responds only in {B}; level under stress neither different from nor equivalent to {A} control"),
     ("unresolved", 3, "", "A", "Responds only in {A}; level under stress neither different from nor equivalent to {B} control"),
     ("unresolved", 4, "", "A", "Responds only in {A}; level under stress neither different from nor equivalent to {B} control"),
-    ("unclassified", 0, "", "", "Missing statistics in a contrast required by the decision tree"),
+    ("unclassified", 0, "", "", "Missing statistics in a contrast required by the classification rules"),
 ]
 
 

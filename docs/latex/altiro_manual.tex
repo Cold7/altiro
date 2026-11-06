@@ -161,7 +161,7 @@
     {Analysis of Latent Transcriptional Induction and Response Outcomes\\[2pt]\normalsize expression response models of genes and orthologs in two-by-two designs};
   \node[anchor=north west, text=white!80, font=\sffamily\normalsize]
     at ([xshift=2.45cm, yshift=-7.05cm]current page.north west)
-    {User manual \quad\textbullet\quad Version 0.6.2 \quad\textbullet\quad Python and R};
+    {User manual \quad\textbullet\quad Version 0.6.3 \quad\textbullet\quad Python and R};
   % pattern glyphs
   \node[anchor=north west] at ([xshift=2.3cm, yshift=-8.6cm]current page.north west) {%
     \begin{tabular}{@{}c@{\hspace{5mm}}c@{\hspace{5mm}}c@{\hspace{5mm}}c@{\hspace{5mm}}c@{}}
@@ -181,7 +181,7 @@
     \textbf{\color{navy}What you will find in this manual}\\[4pt]
     \begin{tabular}{@{}p{7.6cm}p{7.6cm}@{}}
       \textbullet\ What the five response models mean & \textbullet\ Options, presets and their effect\\
-      \textbullet\ How the decision tree works & \textbullet\ Every output file and figure\\
+      \textbullet\ How the classification rules work & \textbullet\ Every output file and figure\\
       \textbullet\ Installation in Python and R & \textbullet\ Two worked examples with real data\\
       \textbullet\ Quick start with bundled data & \textbullet\ Cross-species analyses with orthologs\\
       \textbullet\ Input formats and templates & \textbullet\ Interpretation caveats and troubleshooting
@@ -228,7 +228,7 @@ other group already has \emph{without} stress. The other group is \emph{primed}.
 The idea of a \emph{stress-ready} (or pre-adapted) transcriptome comes from comparisons between
 stress-sensitive plants and their stress-tolerant relatives, where the tolerant species
 constitutively express genes that the sensitive species only induce under stress. With its default
-settings \pkg{} reproduces exactly the decision tree used by Contreras-Riquelme \emph{et al.}
+settings \pkg{} reproduces exactly the classification rules used by Contreras-Riquelme \emph{et al.}
 (2025, \emph{PLoS One} 20(5): e0324724) to compare cultivated tomato and the desert-adapted
 \emph{Solanum pennellii} under drought, and adds stricter, optional rules.
 
@@ -350,7 +350,7 @@ tolerant group, cases 3 and 4 are the ones that support pre-adaptation of \B.
   \node[flow] (in) {\textbf{Raw counts}\\+ sample table};
   \node[flow, right=of in] (fit) {\textbf{One model}\\DESeq2 / PyDESeq2\\\code{\textasciitilde{} cell}};
   \node[flow, right=of fit] (ct) {\textbf{Five contrasts}\\log2FC, padj};
-  \node[flow, right=of ct] (tree) {\textbf{Decision tree}\\\code{paper} / \code{strict}};
+  \node[flow, right=of ct] (tree) {\textbf{Classification rules}\\\code{paper} / \code{strict}};
   \node[flow, right=of tree, fill=navy, text=white] (out) {\textbf{Results}\\tables + figures};
   \foreach \a/\b in {in/fit, fit/ct, ct/tree, tree/out} \draw[flowarrow] (\a) -- (\b);
   \node[flow, above=0.8cm of in, fill=white, dashed] (orth) {\textbf{Two species?}\\RBH orthologs,\\merged counts};
@@ -371,12 +371,12 @@ tolerant group, cases 3 and 4 are the ones that support pre-adaptation of \B.
         \code{\textasciitilde{} cell}; size factors and dispersions are estimated across both groups.
   \item \textbf{Contrasts.} The five contrasts of Figure~\ref{fig:design} are extracted with
         Benjamini--Hochberg adjustment, Cook's outlier filtering and independent filtering.
-  \item \textbf{Classification} with the decision tree below.
+  \item \textbf{Classification} with the classification rules below.
   \item \textbf{Summaries and figures}: counts per model with explicit denominators, the
         primed-asymmetry test, and the figures of Section~\ref{sec:outputs}.
 \end{enumerate}
 
-\subsection{The decision tree}
+\subsection{The classification rules}
 
 A contrast is \emph{significant} when its adjusted p-value is below \code{alpha} (default 0.05) and,
 optionally, \(|\log_2\mathrm{FC}|\) is at least \code{min\_abs\_lfc}. Its \emph{direction} is the sign of
@@ -406,7 +406,7 @@ the log2 fold change.
         [{shared\_1/2}, fill=white, edge label={node[midway, left, font=\sffamily\scriptsize\bfseries, fill=white, inner sep=1pt, text=okgreen]{yes}}]
         [{opposite\_1/2}, fill=white, edge label={node[midway, right, font=\sffamily\scriptsize\bfseries, fill=white, inner sep=1pt, text=warnred]{no}}]]]]
 \end{forest}}
-\caption{The decision tree. ``Same level'' (=) means \emph{not significantly different} under the
+\caption{The classification rules drawn as a flowchart. ``Same level'' (=) means \emph{not significantly different} under the
 \code{paper} preset; Section~\ref{sec:options} describes stricter alternatives.}
 \label{fig:tree}
 \end{figure}
@@ -429,7 +429,7 @@ pip install "altiro[all] @ \
 
 # a specific version
 pip install "altiro[all] @ \
-  git+https://github.com/Cold7/altiro.git@v0.6.2#subdirectory=python"
+  git+https://github.com/Cold7/altiro.git@v0.6.3#subdirectory=python"
 
 altiro --version
 \end{shcode}
@@ -722,7 +722,7 @@ statistics of each tool, not from the classifier, so report which tool was used.
 \toprule
 \textsf{\textbf{option}} & \textsf{\textbf{paper}} & \textsf{\textbf{strict}} & \textsf{\textbf{meaning}}\\
 \midrule
-alpha & 0.05 & 0.05 & adjusted p-value threshold\\
+alpha & 0.05 & 0.05 & adjusted p-value threshold (any value)\\
 min\_abs\_lfc & 0 & 0 & minimum \(|\log_2\mathrm{FC}|\) for a significant change\\
 na\_action & \code{not\_de} & \code{unclassified} & how a missing \code{padj} is treated\\
 require\_basal\_difference & no & yes & primed calls need a significant basal difference\\
@@ -736,6 +736,34 @@ sign\_digits & 2 & 2 & rounding of log2FC before taking its sign\\
 alt.classify_responses(tabs, preset="strict")
 alt.classify_responses(tabs, preset="paper", equivalence_margin=0.5, alpha=0.01)
 \end{pycode}
+
+\subsubsection*{Significance threshold (\code{alpha})}
+A contrast counts as significant when its adjusted p-value is below \code{alpha}, which is 0.05 by
+default. Any value between 0 and 1 can be used, and the argument has the same name in Python, R and
+the command line:
+
+\begin{pycode}
+res = alt.run_altiro(counts, samples, ..., alpha=0.01)   # full workflow
+cls = alt.classify_responses(res.contrasts, alpha=0.01)  # re-classify, no refit
+\end{pycode}
+\begin{rcode}
+res <- altiro(counts, samples, ..., alpha = 0.01)
+cls <- classify_responses(res$contrasts, alpha = 0.01)
+\end{rcode}
+\begin{shcode}
+altiro run ... --alpha 0.01
+altiro classify ... --alpha 0.01
+\end{shcode}
+
+In \code{run\_altiro()} and \code{altiro()} the same value is also used by DESeq2 for independent
+filtering, unless \code{filter\_alpha} is given (the original tomato script used
+\code{filter\_alpha = 0.01} with \code{alpha = 0.05}). Because the classification only reads the
+contrast tables, a different threshold can be tried with \code{classify\_responses()} on saved
+contrasts without refitting the model. A stricter \code{alpha} reduces the number of responsive
+genes, but under the \code{paper} preset it raises the share of primed calls among them, because a
+crossed difference must also pass the stricter threshold to make a response unique. On the rice
+example, \code{alpha = 0.01} gives 2,595 primed genes (64\% of responsive genes) against 4,225
+(62\%) with 0.05. Report the value used.
 
 \subsubsection*{Missing adjusted p-values}
 DESeq2 sets \code{padj} to missing for low-count genes (independent filtering) and outliers. Under
@@ -1321,7 +1349,7 @@ tables in either language.
 run\_altiro() & altiro() & counts \(\rightarrow\) contrasts \(\rightarrow\) classification\\
 run\_contrasts() & run\_contrasts() & DESeq2 / PyDESeq2 fit and the five contrasts\\
 build\_design() & build\_design() & map samples to the four cells\\
-classify\_responses() & classify\_responses() & the decision tree\\
+classify\_responses() & classify\_responses() & the classification rules\\
 classification\_options() & classification\_options() & presets and options\\
 model\_definitions() & model\_definitions() & table of models and cases\\
 summarize\_classification() & summarize\_classification() & counts and percentages\\

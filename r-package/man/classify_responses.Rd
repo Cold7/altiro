@@ -44,7 +44,7 @@ columns \code{feature}, \code{label}, \code{model}, \code{case}, \code{primed_gr
 statistics of each contrast.
 }
 \description{
-Applies the decision tree of Contreras-Riquelme et al. (2025) to the five
+Applies the classification rules of Contreras-Riquelme et al. (2025) to the five
 contrasts of a 2 x 2 design and assigns each feature (ortholog pair or gene)
 to one model: primed (cases 1-4; called stress-ready in the original
 publication), shared (1-2), unique (1-4),

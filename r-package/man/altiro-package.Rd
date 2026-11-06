@@ -10,7 +10,7 @@ primed (called stress-ready in the original publication), shared, unique,
 opposite and no-response models from five
 differential-expression contrasts between two groups (species, genotypes,
 cell lines) under control and stress conditions. The default rules
-reproduce the decision tree of Contreras-Riquelme et al. (2025)
+reproduce the classification rules of Contreras-Riquelme et al. (2025)
 \doi{10.1371/journal.pone.0324724}; optional stricter rules handle missing
 statistics, require a basal difference, or test equivalence explicitly.
 }
@@ -19,7 +19,7 @@ Main functions:
 \itemize{
 \item \code{\link[=altiro]{altiro()}} - counts to classification in one call.
 \item \code{\link[=run_contrasts]{run_contrasts()}} - DESeq2 fit and the five contrasts.
-\item \code{\link[=classify_responses]{classify_responses()}} - the decision tree.
+\item \code{\link[=classify_responses]{classify_responses()}} - the classification rules.
 \item \code{\link[=summarize_classification]{summarize_classification()}}, \code{\link[=primed_asymmetry]{primed_asymmetry()}} - summaries.
 \item \code{\link[=reciprocal_best_hits]{reciprocal_best_hits()}}, \code{\link[=merge_ortholog_counts]{merge_ortholog_counts()}} - cross-species input.
 \item \code{\link[=plot_model_patterns]{plot_model_patterns()}}, \code{\link[=plot_summary]{plot_summary()}} - figures.

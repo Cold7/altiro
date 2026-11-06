@@ -1,3 +1,11 @@
+# altiro 0.6.3
+
+* Documentation and messages call the classification "classification rules" instead of
+  "decision tree", to avoid confusion with the machine-learning algorithm. The description of
+  `unclassified` features changes accordingly; labels and results are unchanged.
+* Manual: new subsection on the significance threshold `alpha` (Python, R and command line,
+  re-classification without refitting, effect on primed calls).
+
 # altiro 0.6.2
 
 * `altiro classify` (command line) gains `--lfc-col`, `--padj-col` and `--se-col`, so contrast tables

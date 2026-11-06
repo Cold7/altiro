@@ -2,13 +2,13 @@
 
 *Analysis of Latent Transcriptional Induction and Response Outcomes* (package `altiro`, formerly `orthoresponse`)
 
-Version 0.6.2 · Python and R
+Version 0.6.3 · Python and R
 
 `altiro` classifies genes (within one species) or ortholog pairs (between
 two species) into **expression response models** in a 2 x 2 design: two
 **groups** (species, genotypes, cultivars, cell lines...) measured under a
 **control** and a **stress** condition. The default rules reproduce exactly the
-decision tree of
+classification rules of
 
 > Contreras-Riquelme JS, Contreras M, Moyano TC, Sjoberg R, Jimenez-Gomez J,
 > Alvarez JM (2025). Desert-adapted tomato *Solanum pennellii* exhibit unique
@@ -27,7 +27,7 @@ outputs, and give identical classifications for identical inputs.
 3. [Quick start](#3-quick-start)
 4. [Input data](#4-input-data)
 5. [What the workflow does](#5-what-the-workflow-does)
-6. [The decision tree](#6-the-decision-tree)
+6. [The classification rules](#6-the-classification-rules)
 7. [Presets and options](#7-presets-and-options)
 8. [Outputs](#8-outputs)
 9. [Customizing names and labels](#9-customizing-names-and-labels)
@@ -365,13 +365,13 @@ You can also pass a single wide table whose columns are
    the independent filtering; by default it equals `alpha`. The published
    script used 0.01 for filtering and 0.05 for classification
    (`alpha=0.05, filter_alpha=0.01`).
-5. **Classification** with the decision tree (section 6).
+5. **Classification** with the classification rules (section 6).
 6. **Summaries**: counts per model with explicit denominators, and the
    primed-asymmetry test.
 
 ---
 
-## 6. The decision tree
+## 6. The classification rules
 
 A contrast is **significant** when `padj < alpha` (and
 `|log2FC| >= min_abs_lfc`, default 0). Its **direction** is the sign of the
@@ -425,6 +425,35 @@ alt.classify_responses(tables, preset="strict", equivalence_margin=0.5)
 ```r
 classify_responses(tables, preset = "strict", equivalence_margin = 0.5)
 ```
+
+### 7.0 Significance threshold (`alpha`)
+
+A contrast counts as significant when its adjusted p-value is below `alpha`,
+0.05 by default. Any value between 0 and 1 can be used, with the same name in
+Python, R and the command line:
+
+```python
+res = alt.run_altiro(counts, samples, ..., alpha=0.01)   # full workflow
+cls = alt.classify_responses(res.contrasts, alpha=0.01)  # re-classify, no refit
+```
+```r
+res <- altiro(counts, samples, ..., alpha = 0.01)
+cls <- classify_responses(res$contrasts, alpha = 0.01)
+```
+```bash
+altiro run ... --alpha 0.01
+altiro classify ... --alpha 0.01
+```
+
+In `run_altiro()` / `altiro()` the same value is also used by DESeq2 for
+independent filtering unless `filter_alpha` is given. Because classification
+only reads the contrast tables, other thresholds can be tried on saved
+contrasts without refitting. A stricter `alpha` reduces the number of
+responsive genes, but under the `paper` preset it raises the share of primed
+calls among them, because a crossed difference must also pass the stricter
+threshold to make a response unique (rice example: 2,595 primed genes, 64% of
+responsive, with `alpha = 0.01`, against 4,225, 62%, with 0.05). Report the
+value used.
 
 ### 7.1 Missing adjusted p-values (`na_action`)
 
@@ -983,7 +1012,7 @@ To refit from counts with the published settings use
 | `run_altiro()` | `altiro()` | counts -> contrasts -> classification |
 | `run_contrasts()` | `run_contrasts()` | fit (Py)DESeq2 and extract the five contrasts |
 | `build_design()` | `build_design()` | map samples to the four cells |
-| `classify_responses()` | `classify_responses()` | decision tree |
+| `classify_responses()` | `classify_responses()` | classification rules |
 | `classification_options()` | `classification_options()` | presets and options |
 | `model_definitions()` | `model_definitions()` | table of models and cases |
 | `summarize_classification()` | `summarize_classification()` | counts and percentages |

@@ -6,7 +6,7 @@ from altiro import CONTRAST_KEYS
 
 
 def random_contrasts(n=2000, seed=0, na_frac=0.05):
-    """Random contrast tables that visit every branch of the decision tree."""
+    """Random contrast tables that visit every branch of the classification rules."""
     rng = np.random.default_rng(seed)
     idx = [f"ortholog_{i}" for i in range(n)]
     tables = {}

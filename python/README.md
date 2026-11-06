@@ -4,7 +4,7 @@ ALTIRO, Analysis of Latent Transcriptional Induction and Response Outcomes.
 
 Classify genes or ortholog pairs into primed (stress-ready), shared, unique, opposite and
 no-response expression models in a 2 x 2 design (two groups x control/stress).
-The default rules reproduce the decision tree of Contreras-Riquelme *et al.*
+The default rules reproduce the classification rules of Contreras-Riquelme *et al.*
 (2025) *PLoS One* 20(5): e0324724.
 
 ```bash

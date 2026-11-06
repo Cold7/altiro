@@ -148,7 +148,7 @@ summarize_classification(cls)
 
 ## Presets and options
 
-The default `preset = "paper"` reproduces the published decision tree exactly.
+The default `preset = "paper"` reproduces the published classification rules exactly.
 Its rules have known limitations, so three options can be changed:
 
 | option | paper | strict | effect |

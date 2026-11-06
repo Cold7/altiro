@@ -29,7 +29,7 @@ one <- function(a, b, basal, mb, ma, ...) {
   classify_responses(tabs, ...)$label
 }
 
-test_that("single-feature rules follow the published decision tree", {
+test_that("single-feature rules follow the published classification rules", {
   ns <- 0.5; de <- 0.001
   expect_equal(one(c(ns, .1), c(de, 2), c(de, -2), c(ns, .1), c(de, 2)), "primed_1")
   expect_equal(one(c(ns, .1), c(de, -2), c(de, 2), c(ns, .1), c(de, -2)), "primed_2")

@@ -15,7 +15,7 @@ classification_options(
 )
 }
 \arguments{
-\item{preset}{\code{"paper"} (default) reproduces exactly the decision tree of
+\item{preset}{\code{"paper"} (default) reproduces exactly the classification rules of
 Contreras-Riquelme et al. (2025). \code{"strict"} sets
 \code{na_action = "unclassified"} and \code{require_basal_difference = TRUE}.}
 

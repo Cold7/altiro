@@ -1,6 +1,6 @@
 #' Contrast keys used by the classifier
 #'
-#' The decision tree needs five differential-expression contrasts between the
+#' The classification rules need five differential-expression contrasts between the
 #' four cells of a 2 x 2 design (groups A and B, conditions control and stress):
 #'
 #' \describe{
@@ -56,7 +56,7 @@ contrast_keys <- function() {
       "No response; no basal difference detected",
       rep("Responds only in {B}; level under stress neither different from nor equivalent to {A} control", 2),
       rep("Responds only in {A}; level under stress neither different from nor equivalent to {B} control", 2),
-      "Missing statistics in a contrast required by the decision tree"
+      "Missing statistics in a contrast required by the classification rules"
     ),
     stringsAsFactors = FALSE
   )
@@ -97,7 +97,7 @@ model_definitions <- function(group_names = c("A", "B"), include_extra = FALSE) 
 
 #' Classification options and presets
 #'
-#' @param preset `"paper"` (default) reproduces exactly the decision tree of
+#' @param preset `"paper"` (default) reproduces exactly the classification rules of
 #'   Contreras-Riquelme et al. (2025). `"strict"` sets
 #'   `na_action = "unclassified"` and `require_basal_difference = TRUE`.
 #' @param alpha Adjusted p-value threshold (default 0.05).
@@ -216,7 +216,7 @@ equivalence_test <- function(log2fc, lfc_se, margin) {
 
 #' Classify features into expression response models
 #'
-#' Applies the decision tree of Contreras-Riquelme et al. (2025) to the five
+#' Applies the classification rules of Contreras-Riquelme et al. (2025) to the five
 #' contrasts of a 2 x 2 design and assigns each feature (ortholog pair or gene)
 #' to one model: primed (cases 1-4; called stress-ready in the original
 #' publication), shared (1-2), unique (1-4),
